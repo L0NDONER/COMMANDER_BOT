@@ -1,0 +1,71 @@
+settings:
+  postcode: "NR204AW"
+  radius_miles: 25
+  poll_interval_minutes: 20
+  ebay_fees_percent: 13.5
+  default_min_margin: 40
+  default_min_profit: 15
+
+watchlist:
+
+  # ----------------------------
+  # Networking & Storage (Stricter Exclusions)
+  # ----------------------------
+  - keywords: 'netgear (nighthawk,orbi,rs700,rbk852,rbk752) -spares -repair -faulty -adapter -cable -aerial -antenna -part -bracket -mount -plug -power -lead'
+    max_buy_price: 160
+    min_margin: 35
+    min_profit: 40
+
+  - keywords: 'synology (ds218,ds220,ds720,ds920) -spares -repair -caddy -tray -rail -part -hdd -drive -fan -screw -cable -plug -power'
+    max_buy_price: 180
+    min_margin: 35
+    min_profit: 45
+
+  - keywords: 'ubiquiti (unifi,unify) (udm,usg) -spares -repair -cable -mount -part -accessory -poe -injector -bracket -plug -power'
+    max_buy_price: 150
+    min_margin: 35
+    min_profit: 40
+
+  # ----------------------------
+  # Power Tools (Filtering "Naked" tools and Batteries)
+  # ----------------------------
+  - keywords: 'makita 18v (drill,impact) -body -naked -spares -repair -bit -bits -chuck -case -bag -charger -blade -accessory -battery -batteries -empty'
+    max_buy_price: 90
+    min_margin: 40
+    min_profit: 25
+
+  - keywords: 'dewalt 18v (drill,impact) -body -naked -spares -repair -bit -bits -chuck -case -bag -charger -blade -accessory -battery -batteries -empty'
+    max_buy_price: 95
+    min_margin: 40
+    min_profit: 25
+
+  # ----------------------------
+  # Cameras & Audio (Excluding Mounts/Adapters)
+  # ----------------------------
+  - keywords: 'sony a6000 body -spares -repair -untested -strap -case -bag -lens -cap -cover -grip -filter -charger -cable -stylus -mount -adapter'
+    max_buy_price: 180
+    min_margin: 30
+    min_profit: 45
+
+  - keywords: 'marantz pm (6006,6007) -spares -repair -remote -cable -part -accessory -manual -plug -lead'
+    max_buy_price: 170
+    min_margin: 30
+    min_profit: 35
+  
+  # ----------------------------
+  # SKY Boxes (Exact Phrase Matching)
+  # ----------------------------
+  - keywords: '"sky+ hd 1tb box" -remote -bundle -joblot -spares -repair -faulty -broken -case -lead -cable -card -power -plug -wifi -connector'
+    max_buy_price: 15
+    min_margin: 60
+    min_profit: 15
+
+  - keywords: '"sky q 1tb box" -remote -bundle -joblot -spares -repair -faulty -broken -case -lead -cable -card -power -plug -mini -booster'
+    max_buy_price: 25
+    min_margin: 55
+    min_profit: 20
+
+  - keywords: '"sky q 2tb box" -remote -bundle -joblot -spares -repair -faulty -broken -case -lead -cable -card -power -plug -mini -booster'
+    max_buy_price: 45
+    min_margin: 45
+    min_profit: 25

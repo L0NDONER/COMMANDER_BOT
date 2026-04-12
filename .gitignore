@@ -1,0 +1,38 @@
+# Secrets & credentials
+credentials.py
+secrets.py
+.vault_pass
+*.key
+*.pem
+
+# Betfair certs
+services/betfair_telegram/certs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.venv/
+
+# Backups & temp files
+*.bak
+*.tmp
+*.orig
+
+# Logs & databases
+*.log
+*.db
+services/local_scout/scout.db
+services/local_scout/scout.log
+
+# Camera snapshots
+*.jpg
+*.jpeg
+*.png
+
+# Docker
+.dockerignore
