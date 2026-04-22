@@ -222,10 +222,15 @@ def calculate_profit(buy_price: float, sell_price: float) -> Dict[str, float]:
 
 
 def build_title(query: str) -> str:
-    """Build a clean Vinted title from the search query."""
+    """Build a Vinted title: Brand + Type + Size + Key Detail."""
+    def capitalise(text: str) -> str:
+        return " ".join(w.capitalize() if not w.isupper() else w for w in text.split())
+
     title = normalise_text(query)
-    words = [word.capitalize() if not word.isupper() else word for word in title.split()]
-    return " ".join(words)[:100]
+    if " - " in title:
+        main, detail = title.split(" - ", 1)
+        return f"{capitalise(main)} - {capitalise(detail)}"[:100]
+    return capitalise(title)[:100]
 
 
 def build_description(query: str) -> str:
