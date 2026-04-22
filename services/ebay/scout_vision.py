@@ -22,9 +22,8 @@ from services.ebay.scout import get_stats, verdict
 
 
 IDENTIFY_PROMPT = (
-    "Identify this item for a secondhand resale search query. "
-    "Reply with only: brand, item type, key descriptor "
-    "(e.g. 'Barbour Bedale wax jacket'). No extra text."
+    "Identify this item for a secondhand resale search. "
+    "Reply with only: brand and item type (e.g. 'Barbour wax jacket'). No extra text."
 )
 
 
