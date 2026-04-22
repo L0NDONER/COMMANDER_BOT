@@ -15,6 +15,7 @@ STRONG_BRANDS = {
     "reiss",
     "gant",
     "ralph lauren",
+    "hackett",
     "hackett london",
     "ted baker",
     "allsaints",
