@@ -137,7 +137,7 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         material = caption.lower().replace("garden", "").strip() or "heavy_green"
         reply = analyse_photo(image_bytes, material)
 
-    await update.message.reply_text(reply)
+    await update.message.reply_text(reply, parse_mode="HTML")
 
 
 if __name__ == "__main__":

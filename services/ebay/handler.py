@@ -82,7 +82,7 @@ def _format(query: str, buy_price: float, stats: dict, result: dict) -> str:
         f"Profit: {result['profit']}\n"
         f"ROI: {result['roi']}\n\n"
         f"TITLE\n"
-        f"{result['title']}\n\n"
+        f"<code>{result['title']}</code>\n\n"
         f"DESCRIPTION\n"
-        f"{result['description']}"
+        f"<code>{result['description']}</code>"
     )
