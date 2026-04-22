@@ -23,7 +23,8 @@ from services.ebay.scout import get_stats, verdict
 
 IDENTIFY_PROMPT = (
     "Identify this clothing item for a secondhand resale search. "
-    "Reply with only: brand and item type (e.g. 'Barbour wax jacket'). No extra text."
+    "Reply with only: brand, item type, and size if visible on a label (e.g. 'Barbour wax jacket L'). "
+    "Omit size if not clearly visible. No extra text."
 )
 
 
