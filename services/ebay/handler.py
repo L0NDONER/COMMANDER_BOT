@@ -34,7 +34,7 @@ def parse_scout(message: str) -> Tuple[str, float]:
     return query, buy_price
 
 
-def handle_scout_command(message: str) -> str:
+def handle_scout_command(message: str, keywords: list = None) -> str:
     """Handle the full incoming scout message."""
     query, buy_price = parse_scout(message)
 
@@ -50,7 +50,7 @@ def handle_scout_command(message: str) -> str:
 
     try:
         stats = get_stats(query)
-        result = verdict(buy_price, stats, query)
+        result = verdict(buy_price, stats, query, keywords=keywords)
         return _format(query, buy_price, stats, result)
     except Exception as exc:
         LOGGER.exception("Scout failed for query=%s", query)

@@ -126,8 +126,8 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             tmp_path = tmp.name
 
         try:
-            query = identify_item(tmp_path)
-            reply = handle_scout_command(f"scout {query} £{buy_price:.2f}")
+            query, keywords = identify_item(tmp_path)
+            reply = handle_scout_command(f"scout {query} £{buy_price:.2f}", keywords=keywords)
         except Exception as exc:
             log.exception("Vision scout failed")
             reply = f"❌ Vision scout error: {exc}"

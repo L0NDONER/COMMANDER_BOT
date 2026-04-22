@@ -23,20 +23,28 @@ from services.ebay.scout import get_stats, verdict
 
 IDENTIFY_PROMPT = (
     "Identify this clothing item for a secondhand resale search. "
-    "Reply with only: brand, item type, and size if visible on a label (e.g. 'Barbour wax jacket L'). "
+    "Reply with ONLY a comma-separated list: brand, item type, size (if visible on label), then 3 style keywords. "
+    "Example: 'Gant, Gingham Shirt, L, Preppy, Casual, Heritage'. "
     "Omit size if not clearly visible. No extra text."
 )
 
 
-def identify_item(image_path: str) -> str:
-    """Use Gemini Flash vision to identify an item from a photo."""
+def identify_item(image_path: str) -> tuple:
+    """Return (search_query, keywords) from a photo. search_query is brand + type + size only."""
     client = genai.Client(api_key=GEMINI_API_KEY)
     image = PIL.Image.open(image_path)
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=[image, IDENTIFY_PROMPT],
     )
-    return response.text.strip()
+    parts = [p.strip() for p in response.text.strip().split(",")]
+    if len(parts) >= 2:
+        query = " ".join(parts[:3]) if len(parts) >= 3 else " ".join(parts[:2])
+        keywords = parts[3:] if len(parts) > 3 else parts[2:]
+    else:
+        query = parts[0]
+        keywords = []
+    return query, keywords
 
 
 def evaluate_from_image(image_path: str, buy_price: float) -> Dict[str, object]:

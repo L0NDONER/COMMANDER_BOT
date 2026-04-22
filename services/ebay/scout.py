@@ -233,11 +233,12 @@ def build_title(query: str) -> str:
     return capitalise(title)[:100]
 
 
-def build_description(query: str) -> str:
+def build_description(query: str, keywords: list = None) -> str:
     """Build a generic ready-to-paste Vinted description."""
     title = build_title(query)
+    keyword_line = f"\n{' | '.join(keywords)}\n" if keywords else ""
     return (
-        f"{title}\n\n"
+        f"{title}\n{keyword_line}\n"
         "Good used condition.\n"
         "Any obvious flaws should be visible in the photos.\n"
         "Open to sensible offers.\n"
@@ -245,7 +246,7 @@ def build_description(query: str) -> str:
     )
 
 
-def verdict(buy_price: float, stats: Dict[str, object], query: str) -> Dict[str, object]:
+def verdict(buy_price: float, stats: Dict[str, object], query: str, keywords: list = None) -> Dict[str, object]:
     """Build a Vinted-aware verdict using eBay as price reference."""
     if "error" in stats:
         return {"verdict": "❓ UNKNOWN", "reason": "No price data found"}
@@ -271,17 +272,20 @@ def verdict(buy_price: float, stats: Dict[str, object], query: str) -> Dict[str,
         emoji = "❌ PASS"
         roi_display = f"{int(roi)}%"
 
+    def charm(price: float) -> str:
+        return f"£{max(0.99, (int(price) - 0.01)):.2f}"
+
     return {
         "verdict": emoji,
         "ebay_sell_for": f"£{ebay_median:.2f}",
-        "sell_for": f"£{vinted_prices['list_price']:.2f}",
-        "fast_sale": f"£{vinted_prices['fast_price']:.2f}",
+        "sell_for": charm(vinted_prices['list_price']),
+        "fast_sale": charm(vinted_prices['fast_price']),
         "fees": f"£{economics['fees']:.2f}",
         "postage": f"£{economics['postage']:.2f}",
         "profit": f"£{economics['profit']:.2f}",
         "roi": roi_display,
         "title": build_title(query),
-        "description": build_description(query),
+        "description": build_description(query, keywords),
         "discount": vinted_prices["discount"],
         "mock": stats.get("mock", False),
     }
