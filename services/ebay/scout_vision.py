@@ -33,7 +33,7 @@ def identify_item(image_path: str) -> str:
     client = genai.Client(api_key=GEMINI_API_KEY)
     image = PIL.Image.open(image_path)
     response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
         contents=[image, IDENTIFY_PROMPT],
     )
     return response.text.strip()
