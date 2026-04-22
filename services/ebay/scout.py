@@ -18,7 +18,7 @@ from typing import Dict, List
 
 import requests
 
-sys.path.insert(0, "/home/martin/ansible/commander")
+sys.path.insert(0, "/home/martin/commander")
 from credentials import EBAY_APP_ID, EBAY_SECRET
 
 from services.ebay.brands import STRONG_BRANDS, SLOW_KEYWORDS

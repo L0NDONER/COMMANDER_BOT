@@ -9,12 +9,16 @@ if APP_DIR not in sys.path:
     sys.path.insert(0, APP_DIR)
 
 import logging
+import re
+import tempfile
 
 from groq import Groq
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 
 from services.garden.vision import analyse_photo
+from services.ebay.scout_vision import identify_item
+from services.ebay.handler import handle_scout_command
 
 import telegram_config as config
 from safety_belt import SafetyConfig, safe_execute
@@ -108,14 +112,31 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if config.ALLOWED_CHAT_IDS and chat_id not in config.ALLOWED_CHAT_IDS:
         return
 
-    caption = (update.message.caption or "").strip().lower()
-    material = caption.replace("garden", "").strip() or "heavy_green"
-
-    photo = update.message.photo[-1]  # largest available size
+    caption = (update.message.caption or "").strip()
+    photo = update.message.photo[-1]
     file = await context.bot.get_file(photo.file_id)
     image_bytes = bytes(await file.download_as_bytearray())
 
-    reply = analyse_photo(image_bytes, material)
+    if caption.lower().startswith("scout"):
+        price_match = re.search(r"£?(\d+(?:\.\d{1,2})?)", caption)
+        buy_price = float(price_match.group(1)) if price_match else 5.0
+
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+            tmp.write(image_bytes)
+            tmp_path = tmp.name
+
+        try:
+            query = identify_item(tmp_path)
+            reply = handle_scout_command(f"scout {query} £{buy_price:.2f}")
+        except Exception as exc:
+            log.exception("Vision scout failed")
+            reply = f"❌ Vision scout error: {exc}"
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+    else:
+        material = caption.lower().replace("garden", "").strip() or "heavy_green"
+        reply = analyse_photo(image_bytes, material)
+
     await update.message.reply_text(reply)
 
 
