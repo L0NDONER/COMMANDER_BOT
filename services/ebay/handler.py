@@ -64,8 +64,11 @@ def _format(query: str, buy_price: float, stats: dict, result: dict) -> str:
         return f"❓ {query}\n{result['reason']}"
 
     mock_tag = " (MOCK)" if stats.get("mock") else ""
+    alert = result.get("high_value_alert", "")
+    alert_block = f"{alert}\n\n" if alert else ""
 
     return (
+        f"{alert_block}"
         f"🔍 {query}\n\n"
         f"📊 eBay UK reference - {stats['count']} used listings{mock_tag}\n"
         f"Low: £{stats['low']:.2f}\n"

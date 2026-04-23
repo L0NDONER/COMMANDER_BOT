@@ -67,6 +67,27 @@ STRONG_BRANDS = {
     "moncler",
 }
 
+HIGH_VALUE_KEYWORDS = {
+    "retro", "vintage", "1980s", "1990s", "90s", "80s",
+    "jvc", "umbro", "admiral", "bukta", "o2", "sega", "dreamcast",
+    "match worn", "player issue", "lextra",
+}
+
+HIGH_VALUE_THRESHOLD = 35.0
+
+
+def get_high_value_alert(query: str, median_price: float) -> str:
+    query_lower = query.lower()
+    match = next((k for k in HIGH_VALUE_KEYWORDS if k in query_lower), None)
+    if match and median_price > HIGH_VALUE_THRESHOLD:
+        return (
+            f"🚨 <b>HIGH-VALUE ASSET DETECTED</b> 🚨\n"
+            f"<i>Trigger: '{match.upper()}'</i>\n"
+            f"Do not list on Vinted — use eBay with a reserve price."
+        )
+    return ""
+
+
 SLOW_KEYWORDS = {
     "homeware",
     "plate",

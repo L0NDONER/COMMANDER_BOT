@@ -21,7 +21,7 @@ import requests
 sys.path.insert(0, "/home/martin/commander")
 from credentials import EBAY_APP_ID, EBAY_SECRET
 
-from services.ebay.brands import STRONG_BRANDS, SLOW_KEYWORDS
+from services.ebay.brands import STRONG_BRANDS, SLOW_KEYWORDS, get_high_value_alert
 
 
 # Configuration
@@ -277,6 +277,7 @@ def verdict(buy_price: float, stats: Dict[str, object], query: str, keywords: li
 
     return {
         "verdict": emoji,
+        "high_value_alert": get_high_value_alert(query, ebay_median),
         "ebay_sell_for": f"£{ebay_median:.2f}",
         "sell_for": charm(vinted_prices['list_price']),
         "fast_sale": charm(vinted_prices['fast_price']),
