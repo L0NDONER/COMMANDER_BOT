@@ -10,10 +10,13 @@ Requires:
 """
 
 import sys
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from typing import Dict
 
 import PIL.Image
 from google import genai
+
+GEMINI_TIMEOUT = 20  # seconds
 
 sys.path.insert(0, "/home/martin/commander")
 from credentials import GEMINI_API_KEY
@@ -33,10 +36,20 @@ def identify_item(image_path: str) -> tuple:
     """Return (search_query, keywords) from a photo. search_query is brand + type + size only."""
     client = genai.Client(api_key=GEMINI_API_KEY)
     image = PIL.Image.open(image_path)
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=[image, IDENTIFY_PROMPT],
-    )
+
+    def _call():
+        return client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[image, IDENTIFY_PROMPT],
+        )
+
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(_call)
+        try:
+            response = future.result(timeout=GEMINI_TIMEOUT)
+        except FuturesTimeoutError:
+            raise TimeoutError(f"Gemini vision timed out after {GEMINI_TIMEOUT}s")
+
     parts = [p.strip() for p in response.text.strip().split(",")]
     if len(parts) >= 2:
         query = " ".join(parts[:3]) if len(parts) >= 3 else " ".join(parts[:2])
