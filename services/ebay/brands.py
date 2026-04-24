@@ -83,6 +83,11 @@ BRAND_TIPS = {
     "burberry":         "Nova Check lining is the key detail buyers search for. Always mention it — even if it's just the cuffs.",
     "north face":       "700-fill and Gore-Tex jackets outsell fleece. Include the fill weight and any waterproof rating in the title.",
     "patagonia":        "Buyers are brand-loyal and eco-conscious. Mention 'Patagonia Repair Programme eligible' — it adds trust.",
+    "carhartt":         "Workwear is peak 2026 trend. 'Double Knee' trousers and 'Detroit' jackets sell for 2x the price of standard hoodies.",
+    "cos":              "The 'Quiet Luxury' king. Minimalist linen pieces and leather bags sell fastest. Include 'Minimalist' and 'Stealth Wealth' in tags.",
+    "lucy & yak":       "High brand loyalty. Always include the specific print name (e.g., 'Sunflower') and the fit type (e.g., 'Original' vs. 'Alexa').",
+    "stussy":           "8 ball and crown graphics are high-risk for fakes. If authentic, they sell in minutes. Lead with the graphic name.",
+    "damson madder":    "The 'UK Ganni'. Leopard prints and oversized collars are viral on TikTok. Use 'Scandi-style' in your description.",
 }
 
 
