@@ -26,6 +26,7 @@ venv/
 # Logs & databases
 *.log
 *.db
+cache.db
 services/local_scout/scout.db
 services/local_scout/scout.log
 

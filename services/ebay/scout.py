@@ -10,11 +10,14 @@ Design notes:
 """
 
 import base64
+import json
 import logging
 import random
 import re
+import sqlite3
 import sys
 import time
+from pathlib import Path
 from typing import Dict, List
 
 import requests
@@ -44,6 +47,46 @@ SLOW_ITEM_VINTED_DISCOUNT = 0.62
 FAST_SALE_EXTRA_DISCOUNT = 0.12
 
 LOGGER = logging.getLogger(__name__)
+
+CACHE_DB = Path(__file__).resolve().parent.parent.parent / "cache.db"
+CACHE_TTL = 60 * 60 * 24  # 24 hours
+
+
+def _cache_conn():
+    conn = sqlite3.connect(CACHE_DB)
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS cached_results (
+            query      TEXT PRIMARY KEY,
+            stats_json TEXT NOT NULL,
+            created_at INTEGER NOT NULL
+        )
+    """)
+    return conn
+
+
+def _get_cached(query: str) -> Dict | None:
+    with _cache_conn() as c:
+        try:
+            row = c.execute(
+                "SELECT stats_json FROM cached_results WHERE query=? AND created_at > ?",
+                (query.lower(), int(time.time()) - CACHE_TTL)
+            ).fetchone()
+            return json.loads(row[0]) if row else None
+        finally:
+            c.close()
+
+
+def _set_cached(query: str, stats: Dict):
+    with _cache_conn() as c:
+        try:
+            c.execute("""
+                INSERT INTO cached_results (query, stats_json, created_at) VALUES (?, ?, ?)
+                ON CONFLICT(query) DO UPDATE SET stats_json=excluded.stats_json, created_at=excluded.created_at
+            """, (query.lower(), json.dumps(stats), int(time.time())))
+        finally:
+            c.close()
+
 
 MOCK_DATA = {
     "barbour": (28.00, 67.00, 145.00, 14),
@@ -165,13 +208,23 @@ def analyse(items: List[dict]) -> Dict[str, object]:
 
 
 def get_stats(query: str) -> Dict[str, object]:
-    """Get price stats from mock data or live eBay API."""
+    """Get price stats — cache first, eBay API on miss."""
     if MOCK:
         return get_mock_stats(query)
 
+    cached = _get_cached(query)
+    if cached:
+        LOGGER.debug("Cache hit for query: %s", query)
+        return cached
+
     token = get_token()
     items = search_listings(query, token)
-    return analyse(items)
+    stats = analyse(items)
+
+    if "error" not in stats:
+        _set_cached(query, stats)
+
+    return stats
 
 
 def normalise_text(text: str) -> str:

@@ -4,6 +4,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./stars.db:/app/stars.db        # persist Stars balances across rebuilds
+      - ./cache.db:/app/cache.db        # persist eBay query cache across rebuilds
       - ./credentials.py:/app/credentials.py  # keep secrets off the image
     environment:
       - PYTHONUNBUFFERED=1
