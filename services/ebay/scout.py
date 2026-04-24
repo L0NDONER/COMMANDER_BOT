@@ -240,7 +240,9 @@ def build_description(query: str, keywords: list = None) -> str:
     return (
         f"{title}\n{keyword_line}\n"
         "Good used condition.\n"
-        "Any obvious flaws should be visible in the photos.\n"
+        "Any obvious flaws should be visible in the photos.\n\n"
+        "📏 Measurements (lying flat):\n"
+        "Pit-to-Pit: __cm | Length: __cm\n\n"
         "Open to sensible offers.\n"
         "Posted promptly."
     )
