@@ -88,6 +88,7 @@ BRAND_TIPS = {
     "lucy & yak":       "High brand loyalty. Always include the specific print name (e.g., 'Sunflower') and the fit type (e.g., 'Original' vs. 'Alexa').",
     "stussy":           "8 ball and crown graphics are high-risk for fakes. If authentic, they sell in minutes. Lead with the graphic name.",
     "damson madder":    "The 'UK Ganni'. Leopard prints and oversized collars are viral on TikTok. Use 'Scandi-style' in your description.",
+    "cotton traders":   "XXL and 3XL sizes are your best sellers here. 'Heritage' or 'Rugby' styles with embroidered crests (like the Shamrock) command the best prices.",
 }
 
 
