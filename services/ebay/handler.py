@@ -19,7 +19,7 @@ TIPS = [
     "💡 Vintage pieces sell better with era in the title — '90s', 'Y2K', 'retro' add clicks.",
 ]
 
-from services.ebay.brands import handle_brands
+from services.ebay.brands import handle_brands, get_brand_tip
 from services.ebay.scout import get_stats, verdict
 
 
@@ -102,5 +102,5 @@ def _format(query: str, buy_price: float, stats: dict, result: dict) -> str:
         f"<code>{result['title']}</code>\n\n"
         f"DESCRIPTION\n"
         f"<code>{result['description']}</code>\n\n"
-        f"<i>{random.choice(TIPS)}</i>"
+        f"{get_brand_tip(query) or f'<i>{random.choice(TIPS)}</i>'}"
     )

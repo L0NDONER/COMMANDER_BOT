@@ -67,6 +67,31 @@ STRONG_BRANDS = {
     "moncler",
 }
 
+BRAND_TIPS = {
+    "joe browns":       "Joe Browns 'Campervan' and 'Floral' prints sell 40% faster than plains. Check the label for the print name.",
+    "barbour":          "Barbour Bedale and Beaufort wax jackets outsell all other styles. Rewaxed condition adds £10–£15.",
+    "ralph lauren":     "Polo shirts in bold colours (yellow, purple, red) outsell white and navy. Include 'Classic Fit' or 'Slim Fit' in the title.",
+    "stone island":     "Always photograph the badge clearly. Buyers pay a premium for intact badges — a missing one halves the price.",
+    "cp company":       "The Goggle Jacket is the hero piece. Even worn condition sells fast. Lead with 'Goggle' in your title.",
+    "fred perry":       "Twin-tipped collars in original colourways (laurel/red) outsell modern cuts. Mention the tipping colour.",
+    "levi":             "501s in W30–W34 sell fastest. Always include waist and leg measurements — buyers are size-specific.",
+    "hackett":          "Hackett rugby shirts outsell everything else in the range. Include the colourway and any sponsor branding.",
+    "gant":             "Gant Rugger line outsells mainline. 'Rugger' in the title lifts visibility significantly.",
+    "adidas":           "Vintage Trefoil logo outsells the Three Stripes modern range by 3x. Check inside the collar for era.",
+    "nike":             "ACG and vintage 'Just Do It' era pieces command a premium. Check the swoosh style — pre-2000 labels sell faster.",
+    "umbro":            "Diamond logo era (pre-2008) outsells modern Umbro heavily. Replica kits need the season and team in the title.",
+    "burberry":         "Nova Check lining is the key detail buyers search for. Always mention it — even if it's just the cuffs.",
+    "north face":       "700-fill and Gore-Tex jackets outsell fleece. Include the fill weight and any waterproof rating in the title.",
+    "patagonia":        "Buyers are brand-loyal and eco-conscious. Mention 'Patagonia Repair Programme eligible' — it adds trust.",
+}
+
+
+def get_brand_tip(query: str) -> str:
+    query_lower = query.lower()
+    match = next((k for k in BRAND_TIPS if k in query_lower), None)
+    return f"🏷 <i>Merchant Tip: {BRAND_TIPS[match]}</i>" if match else ""
+
+
 HIGH_VALUE_KEYWORDS = {
     "retro", "vintage", "1980s", "1990s", "90s", "80s",
     "jvc", "umbro", "admiral", "bukta", "o2", "sega", "dreamcast",
