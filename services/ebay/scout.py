@@ -14,6 +14,7 @@ import logging
 import random
 import re
 import sys
+import time
 from typing import Dict, List
 
 import requests
@@ -83,8 +84,14 @@ def get_mock_stats(query: str) -> Dict[str, object]:
     }
 
 
+_token_cache = {"token": None, "expires_at": 0}
+
+
 def get_token() -> str:
-    """Request an OAuth token for the eBay API."""
+    """Return a cached OAuth token, refreshing only when expired."""
+    if _token_cache["token"] and time.time() < _token_cache["expires_at"]:
+        return _token_cache["token"]
+
     credentials = base64.b64encode(
         f"{EBAY_APP_ID}:{EBAY_SECRET}".encode("utf-8")
     ).decode("utf-8")
@@ -102,7 +109,10 @@ def get_token() -> str:
         timeout=10,
     )
     response.raise_for_status()
-    return response.json()["access_token"]
+    data = response.json()
+    _token_cache["token"] = data["access_token"]
+    _token_cache["expires_at"] = time.time() + data.get("expires_in", 7200) - 60
+    return _token_cache["token"]
 
 
 def search_listings(query: str, token: str, limit: int = 20) -> List[dict]:
