@@ -2,8 +2,22 @@
 """Telegram command handlers for Vinted-aware scout responses."""
 
 import logging
+import random
 import re
 from typing import Tuple
+
+TIPS = [
+    "💡 Lighting is 50% of the sale. Take it outside for true colour accuracy.",
+    "💡 Flat lay on a wood floor beats a hanger every time. Buyers see the fit better.",
+    "💡 Depill before you shoot. A fabric shaver adds £2–£5 to any knitwear.",
+    "💡 Measure pit-to-pit and length. Serious buyers pay extra for peace of mind.",
+    "💡 Post within 24 hours of a sale. 5-star reviews build your ranking fast.",
+    "💡 Natural daylight makes colours pop. Avoid yellow kitchen light.",
+    "💡 Bundle offers attract buyers. List similar items and mention bundles in your bio.",
+    "💡 First photo is your thumbnail. Make it count — clean background, good light.",
+    "💡 Check the label for fabric content. 100% cotton and wool outsell polyester blends.",
+    "💡 Vintage pieces sell better with era in the title — '90s', 'Y2K', 'retro' add clicks.",
+]
 
 from services.ebay.brands import handle_brands
 from services.ebay.scout import get_stats, verdict
@@ -87,5 +101,6 @@ def _format(query: str, buy_price: float, stats: dict, result: dict) -> str:
         f"TITLE\n"
         f"<code>{result['title']}</code>\n\n"
         f"DESCRIPTION\n"
-        f"<code>{result['description']}</code>"
+        f"<code>{result['description']}</code>\n\n"
+        f"<i>{random.choice(TIPS)}</i>"
     )
