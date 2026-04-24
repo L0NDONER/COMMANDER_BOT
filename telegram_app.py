@@ -17,7 +17,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
 from services.garden.vision import analyse_photo
-from services.ebay.scout_vision import identify_item
+from services.ebay.scout_vision import identify_item_async
 from services.ebay.handler import handle_scout_command
 
 import telegram_config as config
@@ -128,7 +128,7 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             tmp_path = tmp.name
 
         try:
-            query, keywords = identify_item(tmp_path)
+            query, keywords = await identify_item_async(tmp_path)
             reply = handle_scout_command(f"scout {query} £{buy_price:.2f}", keywords=keywords)
         except Exception as exc:
             log.exception("Vision scout failed")

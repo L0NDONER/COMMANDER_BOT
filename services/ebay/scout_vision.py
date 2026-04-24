@@ -9,8 +9,8 @@ Requires:
     GEMINI_API_KEY in credentials
 """
 
+import asyncio
 import sys
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from typing import Dict
 
 import PIL.Image
@@ -35,28 +35,33 @@ IDENTIFY_PROMPT = (
 )
 
 
-def identify_item(image_path: str) -> tuple:
-    """Return (search_query, keywords) from a photo. search_query is brand + type + size only."""
+def _call_gemini(image_path: str):
+    """Blocking Gemini call — run via asyncio.to_thread in async contexts."""
     client = genai.Client(api_key=GEMINI_API_KEY)
     image = PIL.Image.open(image_path)
+    return client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=[image, IDENTIFY_PROMPT],
+    )
 
-    def _call():
-        return client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=[image, IDENTIFY_PROMPT],
-        )
 
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(_call)
+def identify_item(image_path: str) -> tuple:
+    """Synchronous wrapper — use identify_item_async in async handlers."""
+    import concurrent.futures
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(_call_gemini, image_path)
         try:
             response = future.result(timeout=GEMINI_TIMEOUT)
-        except FuturesTimeoutError:
+        except concurrent.futures.TimeoutError:
             raise TimeoutError(f"Gemini vision timed out after {GEMINI_TIMEOUT}s")
 
+    return _parse_response(response)
+
+
+def _parse_response(response) -> tuple:
     raw = response.text.strip()
     if raw.upper() == "NOT_FOUND":
         raise ValueError("NOT_FOUND")
-
     parts = [p.strip() for p in raw.split(",")]
     if len(parts) >= 2:
         query = " ".join(parts[:3]) if len(parts) >= 3 else " ".join(parts[:2])
@@ -65,6 +70,18 @@ def identify_item(image_path: str) -> tuple:
         query = parts[0]
         keywords = []
     return query, keywords
+
+
+async def identify_item_async(image_path: str) -> tuple:
+    """Non-blocking version — use this in async Telegram handlers."""
+    try:
+        response = await asyncio.wait_for(
+            asyncio.to_thread(_call_gemini, image_path),
+            timeout=GEMINI_TIMEOUT,
+        )
+    except asyncio.TimeoutError:
+        raise TimeoutError(f"Gemini vision timed out after {GEMINI_TIMEOUT}s")
+    return _parse_response(response)
 
 
 def evaluate_from_image(image_path: str, buy_price: float) -> Dict[str, object]:
