@@ -117,7 +117,9 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     file = await context.bot.get_file(photo.file_id)
     image_bytes = bytes(await file.download_as_bytearray())
 
-    if caption.lower().startswith("scout"):
+    caption_lower = caption.lower()
+
+    if caption_lower.startswith("scout"):
         price_match = re.search(r"£?(\d+(?:\.\d{1,2})?)", caption)
         buy_price = float(price_match.group(1)) if price_match else 5.0
 
@@ -133,9 +135,13 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             reply = f"❌ Vision scout error: {exc}"
         finally:
             Path(tmp_path).unlink(missing_ok=True)
-    else:
-        material = caption.lower().replace("garden", "").strip() or "heavy_green"
+
+    elif caption_lower.startswith("garden"):
+        material = caption_lower.replace("garden", "").strip() or "heavy_green"
         reply = analyse_photo(image_bytes, material)
+
+    else:
+        return
 
     await update.message.reply_text(reply, parse_mode="HTML")
 

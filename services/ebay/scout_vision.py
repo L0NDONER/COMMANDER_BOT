@@ -25,8 +25,9 @@ from services.ebay.scout import get_stats, verdict
 
 
 IDENTIFY_PROMPT = (
-    "Identify this clothing item for a secondhand resale search. "
-    "Reply with ONLY a comma-separated list: brand, item type, size (if visible on label), then 3 style keywords. "
+    "Identify this item for a secondhand resale search. "
+    "If you cannot identify a saleable secondhand item (e.g. barcode, food, blurry photo), reply with only: NOT_FOUND. "
+    "Otherwise reply with ONLY a comma-separated list: brand, item type, size (if visible on label), then 3 style keywords. "
     "Example: 'Gant, Gingham Shirt, L, Preppy, Casual, Heritage'. "
     "Omit size if not clearly visible. No extra text."
 )
@@ -50,7 +51,11 @@ def identify_item(image_path: str) -> tuple:
         except FuturesTimeoutError:
             raise TimeoutError(f"Gemini vision timed out after {GEMINI_TIMEOUT}s")
 
-    parts = [p.strip() for p in response.text.strip().split(",")]
+    raw = response.text.strip()
+    if raw.upper() == "NOT_FOUND":
+        raise ValueError("NOT_FOUND")
+
+    parts = [p.strip() for p in raw.split(",")]
     if len(parts) >= 2:
         query = " ".join(parts[:3]) if len(parts) >= 3 else " ".join(parts[:2])
         keywords = parts[3:] if len(parts) > 3 else parts[2:]
