@@ -27,9 +27,11 @@ from services.ebay.scout import get_stats, verdict
 IDENTIFY_PROMPT = (
     "Identify this item for a secondhand resale search. "
     "If you cannot identify a saleable secondhand item (e.g. barcode, food, blurry photo), reply with only: NOT_FOUND. "
-    "Otherwise reply with ONLY a comma-separated list: brand, item type, size (if visible on label), then 3 style keywords. "
+    "Otherwise reply with ONLY a comma-separated list: brand, item type, size, then 3 style keywords. "
     "Example: 'Gant, Gingham Shirt, L, Preppy, Casual, Heritage'. "
-    "Omit size if not clearly visible. No extra text."
+    "For size: only report what is physically printed on a visible label in the photo. "
+    "Do NOT guess size from the item's shape or proportions. If no label is legible, omit size entirely. "
+    "No extra text."
 )
 
 
