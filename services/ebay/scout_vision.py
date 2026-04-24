@@ -67,8 +67,8 @@ def identify_item(image_path: str) -> tuple:
 
 def evaluate_from_image(image_path: str, buy_price: float) -> Dict[str, object]:
     """Take a photo and buy price, return a full Vinted verdict."""
-    query = identify_item(image_path)
+    query, keywords = identify_item(image_path)
     stats = get_stats(query)
-    result = verdict(buy_price, stats, query)
+    result = verdict(buy_price, stats, query, keywords=keywords)
     result["query"] = query
     return result

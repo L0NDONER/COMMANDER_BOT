@@ -14,7 +14,7 @@ import tempfile
 
 from groq import Groq
 from telegram import Update
-from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
 from services.garden.vision import analyse_photo
 from services.ebay.scout_vision import identify_item
@@ -146,8 +146,19 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(reply, parse_mode="HTML")
 
 
+async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "📸 <b>Scout</b>\nSend a photo with caption: <code>scout £5</code>\n\n"
+        "🌿 <b>Garden</b>\nSend a photo with caption: <code>garden</code>\n\n"
+        "🔍 <b>Text Scout</b>\nType: <code>scout barbour jacket XL £8</code>\n\n"
+        "📋 <b>Brands guide</b>\nType: <code>brands</code>",
+        parse_mode="HTML"
+    )
+
+
 if __name__ == "__main__":
     app = ApplicationBuilder().token(config.TELEGRAM_BOT_TOKEN).build()
+    app.add_handler(CommandHandler("help", cmd_help))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, on_message))
     app.add_handler(MessageHandler(filters.PHOTO, on_photo))
     log.info("Minty is running...")
