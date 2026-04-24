@@ -25,7 +25,7 @@ import requests
 sys.path.insert(0, "/home/martin/commander")
 from credentials import EBAY_APP_ID, EBAY_SECRET
 
-from services.ebay.brands import STRONG_BRANDS, SLOW_KEYWORDS, get_high_value_alert
+from services.ebay.brands import STRONG_BRANDS, SLOW_KEYWORDS, get_high_value_alert, is_low_value, LOW_VALUE_RESPONSE
 
 
 # Configuration
@@ -208,9 +208,12 @@ def analyse(items: List[dict]) -> Dict[str, object]:
 
 
 def get_stats(query: str) -> Dict[str, object]:
-    """Get price stats — cache first, eBay API on miss."""
+    """Get price stats — skip low-value brands, cache first, eBay API on miss."""
     if MOCK:
         return get_mock_stats(query)
+
+    if is_low_value(query):
+        return {"low_value": True}
 
     cached = _get_cached(query)
     if cached:
@@ -313,6 +316,8 @@ def build_description(query: str, keywords: list = None) -> str:
 
 def verdict(buy_price: float, stats: Dict[str, object], query: str, keywords: list = None) -> Dict[str, object]:
     """Build a Vinted-aware verdict using eBay as price reference."""
+    if stats.get("low_value"):
+        return {"verdict": "⚠️ LOW VALUE", "reason": LOW_VALUE_RESPONSE}
     if "error" in stats:
         return {"verdict": "❓ UNKNOWN", "reason": "No price data found"}
 

@@ -67,6 +67,26 @@ STRONG_BRANDS = {
     "moncler",
 }
 
+LOW_VALUE_BRANDS = {
+    "primark", "george", "f&f", "tu", "matalan", "asda", "next basics",
+    "new look", "shein", "boohoo", "missguided", "forever 21", "h&m",
+    "zara", "topshop", "topman", "select", "peacocks", "bonmarche",
+    "roman", "joe browns basics", "m&co", "simply be",
+}
+
+LOW_VALUE_RESPONSE = (
+    "⚠️ <b>High volume, low resale brand.</b>\n"
+    "Items from this brand typically sell for under £5 on Vinted "
+    "and are rarely worth listing unless in new-with-tags condition.\n\n"
+    "💡 <i>Tip: Charity shops overprice these. Walk past unless it's brand new.</i>"
+)
+
+
+def is_low_value(query: str) -> bool:
+    query_lower = query.lower()
+    return any(brand in query_lower for brand in LOW_VALUE_BRANDS)
+
+
 BRAND_TIPS = {
     "joe browns":       "Joe Browns 'Campervan' and 'Floral' prints sell 40% faster than plains. Check the label for the print name.",
     "barbour":          "Barbour Bedale and Beaufort wax jackets outsell all other styles. Rewaxed condition adds £10–£15.",

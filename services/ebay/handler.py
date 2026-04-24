@@ -75,7 +75,7 @@ def handle_scout_command(message: str, keywords: list = None) -> str:
 def _format(query: str, buy_price: float, stats: dict, result: dict) -> str:
     """Format a Telegram-safe plain text response."""
     if "reason" in result:
-        return f"❓ {query}\n{result['reason']}"
+        return f"{result['verdict']} <b>{query}</b>\n\n{result['reason']}"
 
     mock_tag = " (MOCK)" if stats.get("mock") else ""
     alert = result.get("high_value_alert", "")
