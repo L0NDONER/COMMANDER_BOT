@@ -71,6 +71,22 @@ def handle_scout_command(message: str, keywords: list = None) -> str:
         return f"❌ Scout error: {exc}"
 
 
+def handle_scout_command_logged(message: str, keywords: list = None) -> tuple:
+    """Returns (reply, verdict_str, median_price) for logging purposes."""
+    query, buy_price = parse_scout(message)
+    if not query:
+        return handle_scout_command(message, keywords), "UNKNOWN", None
+    try:
+        stats = get_stats(query)
+        result = verdict(buy_price, stats, query, keywords=keywords)
+        reply = _format(query, buy_price, stats, result)
+        median = float(stats["median"]) if "median" in stats else None
+        return reply, result.get("verdict", "UNKNOWN"), median
+    except Exception as exc:
+        LOGGER.exception("Scout failed for query=%s", query)
+        return f"❌ Scout error: {exc}", "ERROR", None
+
+
 
 def _format(query: str, buy_price: float, stats: dict, result: dict) -> str:
     """Format a Telegram-safe plain text response."""
