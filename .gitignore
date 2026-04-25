@@ -1,6 +1,9 @@
 # Secrets & credentials
 credentials.py
 secrets.py
+
+# Proprietary business logic — lives on EC2 only
+services/ebay/brands.py
 .vault_pass
 *.key
 *.pem
