@@ -156,8 +156,31 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "🧠 <b>Sonari OS: Scout Mode Active</b>\n\n"
+        "I'm your AI vision partner for UK resale. I turn shop labels into eBay data.\n\n"
+        "<b>How to Scout:</b>\n"
+        "1️⃣ <b>The Quick Scan:</b> Send a clear photo of any item or brand label.\n"
+        "2️⃣ <b>The Price Check:</b> Type scout followed by the price on the tag.\n"
+        "Example: Send a pic of a jacket and type <code>scout £5.99</code>\n\n"
+        "<b>What I do:</b>\n"
+        "• I identify the brand and model via Gemini AI.\n"
+        "• I pull the eBay Median Sold Price.\n"
+        "• I calculate the Verdict (BUY or PASS) based on your tag price.\n\n"
+        "<b>Barcodes:</b>\n"
+        "Send a photo of a barcode (Books/Games) for a Free Tier 0 scan.\n\n"
+        "<b>Commands:</b>\n"
+        "/stars - Check your balance\n"
+        "/trends - See what's selling in the UK right now\n\n"
+        "Ready? Send your first label and price now.",
+        parse_mode="HTML"
+    )
+
+
 if __name__ == "__main__":
     app = ApplicationBuilder().token(config.TELEGRAM_BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("help", cmd_help))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, on_message))
     app.add_handler(MessageHandler(filters.PHOTO, on_photo))
