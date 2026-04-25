@@ -6,6 +6,6 @@ services:
       - ./stars.db:/app/stars.db
       - ./cache.db:/app/cache.db
       - ./credentials.py:/app/credentials.py
-      - ./services/ebay/brands.py:/app/services/ebay/brands.py
+      - ./services/ebay:/app/services/ebay
     environment:
       - PYTHONUNBUFFERED=1
