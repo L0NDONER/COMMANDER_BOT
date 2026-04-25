@@ -9,3 +9,4 @@ services:
       - ./services/ebay:/app/services/ebay
     environment:
       - PYTHONUNBUFFERED=1
+      - ADMIN_CHAT_ID=5811891036

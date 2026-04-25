@@ -5,6 +5,7 @@ Each scout query costs STARS_PER_SCOUT stars.
 Users top up via /buy which sends a Telegram Stars invoice.
 """
 
+import os
 import sys
 import logging
 import re
@@ -36,7 +37,7 @@ from stars_db import (
     has_claimed_bounty, log_scout, get_trends, get_expert_users,
 )
 
-ADMIN_CHAT_ID = str(getattr(config, "ADMIN_CHAT_ID", "") or "")
+ADMIN_CHAT_ID = str(getattr(config, "ADMIN_CHAT_ID", "") or os.getenv("ADMIN_CHAT_ID", ""))
 ALLOWED_CHAT_IDS = [str(x) for x in getattr(config, "ALLOWED_CHAT_IDS", [])]
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
