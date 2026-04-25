@@ -313,6 +313,22 @@ async def cmd_approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def cmd_addstars(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Admin: /addstars <chat_id> <amount>"""
+    if not _is_admin(update):
+        return
+    if len(context.args) != 2 or not context.args[1].isdigit():
+        await update.message.reply_text("Usage: /addstars <chat_id> <amount>")
+        return
+    target, amount = context.args[0], int(context.args[1])
+    add_stars(target, amount)
+    await update.message.reply_text(f"✅ +{amount} Stars added to {target}.")
+    try:
+        await context.bot.send_message(chat_id=target, text=f"🎁 You've been gifted {amount} Stars! Use them to scout items.")
+    except Exception:
+        pass
+
+
 async def cmd_myid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = str(update.effective_chat.id)
     await update.message.reply_text(
@@ -332,6 +348,7 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("promote", cmd_promote))
     app.add_handler(CommandHandler("pending", cmd_pending))
     app.add_handler(CommandHandler("approve", cmd_approve))
+    app.add_handler(CommandHandler("addstars", cmd_addstars))
     app.add_handler(CommandHandler("trends", cmd_trends))
     app.add_handler(CommandHandler("experts", cmd_experts))
     app.add_handler(CallbackQueryHandler(on_region_callback, pattern="^set_region_"))
