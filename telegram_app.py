@@ -37,6 +37,7 @@ from stars_db import (
 )
 
 ADMIN_CHAT_ID = str(getattr(config, "ADMIN_CHAT_ID", ""))
+ALLOWED_CHAT_IDS = [str(x) for x in getattr(config, "ALLOWED_CHAT_IDS", [])]
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger(__name__)
@@ -143,7 +144,7 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not caption.lower().startswith("scout"):
         return
 
-    is_admin = bool(ADMIN_CHAT_ID) and chat_id == ADMIN_CHAT_ID
+    is_admin = (bool(ADMIN_CHAT_ID) and chat_id == ADMIN_CHAT_ID) or chat_id in ALLOWED_CHAT_IDS
     balance = get_balance(chat_id)
     if not is_admin and balance < STARS_PER_SCOUT:
         await update.message.reply_text(
@@ -244,7 +245,8 @@ async def cmd_promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 def _is_admin(update) -> bool:
-    return bool(ADMIN_CHAT_ID) and str(update.effective_chat.id) == ADMIN_CHAT_ID
+    chat_id = str(update.effective_chat.id)
+    return (bool(ADMIN_CHAT_ID) and chat_id == ADMIN_CHAT_ID) or chat_id in ALLOWED_CHAT_IDS
 
 
 async def cmd_pending(update: Update, context: ContextTypes.DEFAULT_TYPE):
