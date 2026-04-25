@@ -36,7 +36,7 @@ from stars_db import (
     has_claimed_bounty, log_scout, get_trends, get_expert_users,
 )
 
-ADMIN_CHAT_ID = str(getattr(config, "ADMIN_CHAT_ID", ""))
+ADMIN_CHAT_ID = str(getattr(config, "ADMIN_CHAT_ID", "") or "")
 ALLOWED_CHAT_IDS = [str(x) for x in getattr(config, "ALLOWED_CHAT_IDS", [])]
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -312,10 +312,19 @@ async def cmd_approve(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def cmd_myid(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = str(update.effective_chat.id)
+    await update.message.reply_text(
+        f"Your chat ID: `{chat_id}`\nAdmin ID configured: `{ADMIN_CHAT_ID}`\nMatch: {chat_id == ADMIN_CHAT_ID}",
+        parse_mode="Markdown"
+    )
+
+
 if __name__ == "__main__":
     init_db()
     app = ApplicationBuilder().token(config.TELEGRAM_BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", cmd_start))
+    app.add_handler(CommandHandler("myid", cmd_myid))
     app.add_handler(CommandHandler("help", cmd_help))
     app.add_handler(CommandHandler("balance", cmd_balance))
     app.add_handler(CommandHandler("buy", cmd_buy))
