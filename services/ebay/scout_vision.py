@@ -14,7 +14,9 @@ import sys
 from typing import Dict
 
 import PIL.Image
+import requests
 from google import genai
+from pyzbar.pyzbar import decode as decode_barcode
 
 GEMINI_TIMEOUT = 20  # seconds
 
@@ -33,6 +35,43 @@ IDENTIFY_PROMPT = (
     "Do NOT guess size from the item's shape or proportions. If no label is legible, omit size entirely. "
     "No extra text."
 )
+
+
+def _scan_barcode(image_path: str) -> tuple | None:
+    """Try to decode a barcode and look up the product. Returns (query, keywords) or None."""
+    image = PIL.Image.open(image_path)
+    barcodes = decode_barcode(image)
+    if not barcodes:
+        return None
+
+    code = barcodes[0].data.decode("utf-8").strip()
+
+    try:
+        # Open Library for ISBN (books)
+        if len(code) in (10, 13) and code.startswith(("97", "0", "1")):
+            r = requests.get(f"https://openlibrary.org/api/books?bibkeys=ISBN:{code}&format=json&jscmd=data", timeout=5)
+            data = r.json()
+            if data:
+                book = list(data.values())[0]
+                title = book.get("title", "")
+                authors = ", ".join(a["name"] for a in book.get("authors", []))
+                query = f"{authors} {title}".strip()
+                return query, ["Book", "Paperback", "Collectible"]
+
+        # Open Food Facts / UPC lookup fallback
+        r = requests.get(f"https://world.openfoodfacts.org/api/v0/product/{code}.json", timeout=5)
+        data = r.json()
+        if data.get("status") == 1:
+            product = data["product"]
+            name = product.get("product_name", "")
+            brand = product.get("brands", "")
+            if name:
+                return f"{brand} {name}".strip(), []
+
+    except Exception:
+        pass
+
+    return None
 
 
 def _call_gemini(image_path: str):
@@ -73,7 +112,11 @@ def _parse_response(response) -> tuple:
 
 
 async def identify_item_async(image_path: str) -> tuple:
-    """Non-blocking version — use this in async Telegram handlers."""
+    """Barcode first, Gemini vision fallback. Non-blocking."""
+    barcode_result = await asyncio.to_thread(_scan_barcode, image_path)
+    if barcode_result:
+        return barcode_result
+
     try:
         response = await asyncio.wait_for(
             asyncio.to_thread(_call_gemini, image_path),
