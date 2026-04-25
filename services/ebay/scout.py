@@ -67,25 +67,19 @@ def _cache_conn():
 
 def _get_cached(query: str) -> Dict | None:
     with _cache_conn() as c:
-        try:
-            row = c.execute(
-                "SELECT stats_json FROM cached_results WHERE query=? AND created_at > ?",
-                (query.lower(), int(time.time()) - CACHE_TTL)
-            ).fetchone()
-            return json.loads(row[0]) if row else None
-        finally:
-            c.close()
+        row = c.execute(
+            "SELECT stats_json FROM cached_results WHERE query=? AND created_at > ?",
+            (query.lower(), int(time.time()) - CACHE_TTL)
+        ).fetchone()
+        return json.loads(row[0]) if row else None
 
 
 def _set_cached(query: str, stats: Dict):
     with _cache_conn() as c:
-        try:
-            c.execute("""
-                INSERT INTO cached_results (query, stats_json, created_at) VALUES (?, ?, ?)
-                ON CONFLICT(query) DO UPDATE SET stats_json=excluded.stats_json, created_at=excluded.created_at
-            """, (query.lower(), json.dumps(stats), int(time.time())))
-        finally:
-            c.close()
+        c.execute("""
+            INSERT INTO cached_results (query, stats_json, created_at) VALUES (?, ?, ?)
+            ON CONFLICT(query) DO UPDATE SET stats_json=excluded.stats_json, created_at=excluded.created_at
+        """, (query.lower(), json.dumps(stats), int(time.time())))
 
 
 MOCK_DATA = {
