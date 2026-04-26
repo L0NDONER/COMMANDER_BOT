@@ -10,6 +10,7 @@ Requires:
 """
 
 import asyncio
+import logging
 import sys
 from typing import Dict
 
@@ -17,6 +18,8 @@ import PIL.Image
 import requests
 from google import genai
 from pyzbar.pyzbar import decode as decode_barcode
+
+LOGGER = logging.getLogger(__name__)
 
 GEMINI_TIMEOUT = 20  # seconds
 
@@ -42,9 +45,11 @@ def _scan_barcode(image_path: str) -> tuple | None:
     image = PIL.Image.open(image_path)
     barcodes = decode_barcode(image)
     if not barcodes:
+        LOGGER.info("No barcode detected — falling back to Gemini")
         return None
 
     code = barcodes[0].data.decode("utf-8").strip()
+    LOGGER.info("Barcode decoded: %s", code)
 
     try:
         # Open Library for ISBN (books)
@@ -56,7 +61,9 @@ def _scan_barcode(image_path: str) -> tuple | None:
                 title = book.get("title", "")
                 authors = ", ".join(a["name"] for a in book.get("authors", []))
                 query = f"{authors} {title}".strip()
+                LOGGER.info("ISBN hit: %s", query)
                 return query, ["Book", "Paperback", "Collectible"]
+            LOGGER.info("ISBN %s not in Open Library", code)
 
         # Open Food Facts / UPC lookup fallback
         r = requests.get(f"https://world.openfoodfacts.org/api/v0/product/{code}.json", timeout=5)
@@ -66,10 +73,14 @@ def _scan_barcode(image_path: str) -> tuple | None:
             name = product.get("product_name", "")
             brand = product.get("brands", "")
             if name:
+                LOGGER.info("UPC hit: %s %s", brand, name)
                 return f"{brand} {name}".strip(), []
+            LOGGER.info("UPC %s found but no product name", code)
+        else:
+            LOGGER.info("UPC %s not in Open Food Facts", code)
 
-    except Exception:
-        pass
+    except Exception as exc:
+        LOGGER.warning("Barcode lookup failed for %s: %s", code, exc)
 
     return None
 
