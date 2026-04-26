@@ -79,7 +79,7 @@ def _call_gemini(image_path: str):
     client = genai.Client(api_key=GEMINI_API_KEY)
     image = PIL.Image.open(image_path)
     return client.models.generate_content(
-        model="gemini-3.1-flash-preview",
+        model="gemini-3-flash-preview",
         contents=[image, IDENTIFY_PROMPT],
     )
 

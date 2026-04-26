@@ -77,7 +77,7 @@ def analyse_photo(image_bytes: bytes, material_hint: str = "heavy_green") -> str
         image_part = types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg")
 
         response = client.models.generate_content(
-            model="gemini-3.1-flash-preview",
+            model="gemini-3-flash-preview",
             contents=[prompt, image_part],
         )
         parsed = _parse_response(response.text)
