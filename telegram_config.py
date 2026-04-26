@@ -37,6 +37,7 @@ try:
     TELEGRAM_BOT_TOKEN = getattr(secrets, "TELEGRAM_BOT_TOKEN", None)
     TELEGRAM_CHAT_ID   = getattr(secrets, "TELEGRAM_CHAT_ID", None)
     GEMINI_API_KEY     = getattr(secrets, "GEMINI_API_KEY", None)
+    ADMIN_CHAT_ID      = getattr(secrets, "ADMIN_CHAT_ID", None)
 except (ImportError, AttributeError):
     ALLOWED_CHAT_IDS = os.getenv('ALLOWED_TELEGRAM_CHAT_IDS', '').split(',')
     GROQ_API_KEY     = os.getenv('GROQ_API_KEY')
