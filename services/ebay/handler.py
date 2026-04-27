@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Telegram command handlers for Vinted-aware scout responses."""
 
+import html
 import logging
 import random
 import re
@@ -90,16 +91,17 @@ def handle_scout_command_logged(message: str, keywords: list = None) -> tuple:
 
 def _format(query: str, buy_price: float, stats: dict, result: dict) -> str:
     """Format a Telegram-safe plain text response."""
+    safe_query = html.escape(query)
     if "reason" in result:
-        return f"{result['verdict']} <b>{query}</b>\n\n{result['reason']}"
+        return f"{result['verdict']} <b>{safe_query}</b>\n\n{html.escape(result['reason'])}"
 
     mock_tag = " (MOCK)" if stats.get("mock") else ""
     alert = result.get("high_value_alert", "")
-    alert_block = f"{alert}\n\n" if alert else ""
+    alert_block = f"{html.escape(alert)}\n\n" if alert else ""
 
     return (
         f"{alert_block}"
-        f"🔍 {query}\n\n"
+        f"🔍 {safe_query}\n\n"
         f"📊 eBay UK reference - {stats['count']} used listings{mock_tag}\n"
         f"Low: £{stats['low']:.2f}\n"
         f"Median: £{stats['median']:.2f}\n"
@@ -115,8 +117,8 @@ def _format(query: str, buy_price: float, stats: dict, result: dict) -> str:
         f"Profit: {result['profit']}\n"
         f"ROI: {result['roi']}\n\n"
         f"TITLE\n"
-        f"<code>{result['title']}</code>\n\n"
+        f"<code>{html.escape(result['title'])}</code>\n\n"
         f"DESCRIPTION\n"
-        f"<code>{result['description']}</code>\n\n"
+        f"<code>{html.escape(result['description'])}</code>\n\n"
         f"{get_brand_tip(query) or f'<i>{random.choice(TIPS)}</i>'}"
     )
