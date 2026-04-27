@@ -7,6 +7,7 @@ from pathlib import Path
 
 DB_PATH = Path(__file__).parent / "stars.db"
 STARS_PER_SCOUT = 5  # cost per scout query
+SIGNUP_BONUS_STARS = STARS_PER_SCOUT * 20  # 20 free scouts on first /start
 _HASH_SALT = "commander_scout_v1"
 
 
@@ -113,6 +114,16 @@ def add_stars(chat_id: str, amount: int):
             INSERT INTO balances (chat_id, stars) VALUES (?, ?)
             ON CONFLICT(chat_id) DO UPDATE SET stars = stars + excluded.stars
         """, (chat_id, amount))
+
+
+def claim_signup_bonus(chat_id: str, amount: int) -> bool:
+    """Grant a one-time signup bonus. Returns True only on first call per user."""
+    with _conn() as c:
+        cursor = c.execute(
+            "INSERT OR IGNORE INTO balances (chat_id, stars) VALUES (?, ?)",
+            (chat_id, amount)
+        )
+        return cursor.rowcount > 0
 
 
 def get_region(chat_id: str) -> str:

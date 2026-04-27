@@ -33,9 +33,10 @@ from services.ebay.handler import handle_scout_command, handle_scout_command_log
 import telegram_config as config
 from stars_db import (
     init_db, get_balance, add_stars, deduct_stars,
-    get_region, set_region, STARS_PER_SCOUT, BOUNTY_TIERS,
+    get_region, set_region, STARS_PER_SCOUT, SIGNUP_BONUS_STARS, BOUNTY_TIERS,
     submit_video_for_review, get_pending_rewards, approve_reward,
     has_claimed_bounty, log_scout, get_trends, get_expert_users,
+    claim_signup_bonus,
 )
 
 ADMIN_CHAT_ID = str(getattr(config, "ADMIN_CHAT_ID", "") or os.getenv("ADMIN_CHAT_ID", ""))
@@ -54,13 +55,20 @@ BUNDLES = [
 
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = str(update.effective_chat.id)
+    granted = claim_signup_bonus(chat_id, SIGNUP_BONUS_STARS)
     balance = get_balance(chat_id)
+    bonus_line = (
+        f"🎁 Welcome gift: {SIGNUP_BONUS_STARS} free Stars "
+        f"({SIGNUP_BONUS_STARS // STARS_PER_SCOUT} scouts on the house)\n\n"
+        if granted else ""
+    )
     keyboard = [
         [InlineKeyboardButton("🇬🇧 UK Market", callback_data="set_region_uk")],
         [InlineKeyboardButton("🇺🇸 US Market", callback_data="set_region_us")],
     ]
     await update.message.reply_text(
         f"👋 Welcome to Scout Bot!\n\n"
+        f"{bonus_line}"
         f"📸 Send a photo with caption: scout £5\n"
         f"💫 Each scout costs {STARS_PER_SCOUT} Stars\n"
         f"⭐ Your balance: {balance} Stars\n\n"
