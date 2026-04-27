@@ -5,6 +5,7 @@ Each scout query costs STARS_PER_SCOUT stars.
 Users top up via /buy which sends a Telegram Stars invoice.
 """
 
+import html
 import os
 import sys
 import logging
@@ -273,7 +274,7 @@ async def cmd_trends(update: Update, context: ContextTypes.DEFAULT_TYPE):
     lines = ["📊 <b>Top scouts this week:</b>\n"]
     for query, scouts, avg_price, buys in rows:
         pct = int((buys / scouts) * 100) if scouts else 0
-        lines.append(f"• <b>{query}</b> — {scouts} scouts | avg £{avg_price:.2f} | {pct}% BUY")
+        lines.append(f"• <b>{html.escape(query)}</b> — {scouts} scouts | avg £{avg_price:.2f} | {pct}% BUY")
     await update.message.reply_text("\n".join(lines), parse_mode="HTML")
 
 
