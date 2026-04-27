@@ -58,25 +58,29 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     granted = claim_signup_bonus(chat_id, SIGNUP_BONUS_STARS)
     balance = get_balance(chat_id)
     bonus_line = (
-        f"🎁 Welcome gift: {SIGNUP_BONUS_STARS} free Stars "
+        f"🎁 <b>Welcome gift:</b> {SIGNUP_BONUS_STARS} free Stars "
         f"({SIGNUP_BONUS_STARS // STARS_PER_SCOUT} scouts on the house)\n\n"
         if granted else ""
+    )
+    welcome_text = (
+        "<b>🚀 Welcome to Scout Bot!</b>\n\n"
+        "I use AI to scan <b>clothing labels</b> and check real-time eBay sold data "
+        "to see if an item is worth flipping on <b>Vinted</b>.\n\n"
+        f"{bonus_line}\n"
+        "<b>📸 How to start:</b>\n"
+        "Send me a clear photo of a brand label with the caption:\n"
+        "<code>scout £5</code>\n"
+        "<i>(I'll use the £5 to calculate your potential profit!)</i>\n\n"
+        f"⭐ <b>Balance:</b> {balance} Stars\n"
     )
     keyboard = [
         [InlineKeyboardButton("🇬🇧 UK Market", callback_data="set_region_uk")],
         [InlineKeyboardButton("🇺🇸 US Market", callback_data="set_region_us")],
     ]
     await update.message.reply_text(
-        f"👋 Welcome to Scout Bot!\n\n"
-        f"{bonus_line}"
-        f"📸 Send a photo with caption: scout £5\n"
-        f"💫 Each scout costs {STARS_PER_SCOUT} Stars\n"
-        f"⭐ Your balance: {balance} Stars\n\n"
-        f"Use /buy to top up.\n\n"
-        f"Which market should I scout?\n\n"
-        f"<i>🔒 Privacy: Commander stores your Star balance only. "
-        f"Search queries are anonymised. Nothing else is kept.</i>",
+        welcome_text,
         reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="HTML",
     )
 
 
