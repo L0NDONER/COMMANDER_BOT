@@ -22,6 +22,7 @@ TIPS = [
 
 from services.ebay.brands import handle_brands, get_brand_tip
 from services.ebay.scout import get_stats, verdict
+from web_feed import update_web_feed
 
 
 LOGGER = logging.getLogger(__name__)
@@ -66,6 +67,7 @@ def handle_scout_command(message: str, keywords: list = None) -> str:
     try:
         stats = get_stats(query)
         result = verdict(buy_price, stats, query, keywords=keywords)
+        _maybe_publish_feed(query, result)
         return _format(query, buy_price, stats, result)
     except Exception as exc:
         LOGGER.exception("Scout failed for query=%s", query)
@@ -80,6 +82,7 @@ def handle_scout_command_logged(message: str, keywords: list = None) -> tuple:
     try:
         stats = get_stats(query)
         result = verdict(buy_price, stats, query, keywords=keywords)
+        _maybe_publish_feed(query, result)
         reply = _format(query, buy_price, stats, result)
         median = float(stats["median"]) if "median" in stats else None
         return reply, result.get("verdict", "UNKNOWN"), median
@@ -87,6 +90,15 @@ def handle_scout_command_logged(message: str, keywords: list = None) -> tuple:
         LOGGER.exception("Scout failed for query=%s", query)
         return f"❌ Scout error: {exc}", "ERROR", None
 
+
+
+def _maybe_publish_feed(query: str, result: dict) -> None:
+    if "BUY" not in result.get("verdict", ""):
+        return
+    profit = result.get("profit_raw")
+    if profit is None or profit <= 0:
+        return
+    update_web_feed(query, f"{profit:.2f}")
 
 
 def _format(query: str, buy_price: float, stats: dict, result: dict) -> str:

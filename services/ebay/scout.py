@@ -348,6 +348,7 @@ def verdict(buy_price: float, stats: Dict[str, object], query: str, keywords: li
         "fees": f"£{economics['fees']:.2f}",
         "postage": f"£{economics['postage']:.2f}",
         "profit": f"£{economics['profit']:.2f}",
+        "profit_raw": economics["profit"],
         "roi": roi_display,
         "title": build_title(query),
         "description": build_description(query, keywords),
