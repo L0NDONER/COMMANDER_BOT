@@ -350,9 +350,14 @@ async def cmd_myid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def error_handler(update, context):
+    log.warning(f"Network hiccup: {context.error}")
+
+
 if __name__ == "__main__":
     init_db()
     app = ApplicationBuilder().token(config.TELEGRAM_BOT_TOKEN).build()
+    app.add_error_handler(error_handler)
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("myid", cmd_myid))
     app.add_handler(CommandHandler("help", cmd_help))
