@@ -9,7 +9,7 @@ services/ebay/brands.py
 *.pem
 
 # Betfair certs
-services/betfair_telegram/certs/
+scripts/betfair_telegram/certs/
 
 # Python
 __pycache__/
@@ -30,8 +30,8 @@ venv/
 *.log
 *.db
 cache.db
-services/local_scout/scout.db
-services/local_scout/scout.log
+scripts/local_scout/scout.db
+scripts/local_scout/scout.log
 
 # Camera snapshots
 *.jpg

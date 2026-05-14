@@ -46,7 +46,7 @@ PRACTICE_MODE: bool = True
 _CONFIG_DIR = os.path.expanduser(
     os.environ.get(
         "BETFAIR_CONFIG_DIR",
-        "/home/martin/commander/services/betfair_telegram",
+        "/home/martin/commander/scripts/betfair_telegram",
     )
 )
 if _CONFIG_DIR not in sys.path:

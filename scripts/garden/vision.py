@@ -17,7 +17,7 @@ import re
 from google import genai
 from google.genai import types
 
-from services.garden.materials import resolve_material, estimate_weight, DENSITY_MAP, RATE_MAP
+from scripts.garden.materials import resolve_material, estimate_weight, DENSITY_MAP, RATE_MAP
 
 LOGGER = logging.getLogger(__name__)
 

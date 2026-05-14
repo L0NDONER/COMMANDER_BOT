@@ -60,14 +60,16 @@ eBay API: `api.ebay.com/buy/browse/v1/item_summary/search`, marketplace `EBAY_GB
 
 `services/ebay/handler.py:handle_scout_command` is the older `scout <item> [£price]` text interface. Calls `get_stats` + `verdict` directly — no consensus, no workers, no vision. Kept for README-documented commands. Do not confuse with `evaluate_with_consensus`.
 
-## Other services (independent of eBay pipeline)
+## Standalone scripts (not deployed)
 
-- `services/local_scout/` — standalone daemon polling eBay watchlist. Not in Docker.
-- `services/garden/` — vision-based clearance volume estimator. Different prompt, different return shape.
-- `services/betfair_telegram/` — Betfair lay-trader bots, standalone.
-- `services/vision/blink_bridge.py` — Blink camera integration.
+Everything under `scripts/` is checked-in but not part of the Docker deploy. The Dockerfile copies them in but `telegram_app.py` doesn't import them at runtime.
 
-When working on the eBay pipeline, skip `grep`/`find` across `local_scout/`, `garden/`, `betfair_telegram/`, `vision/` — they're independent.
+- `scripts/local_scout/` — standalone daemon polling eBay watchlist.
+- `scripts/garden/` — vision-based clearance volume estimator. Different prompt, different return shape.
+- `scripts/betfair_telegram/` — Betfair lay-trader bots.
+- `scripts/vision/blink_bridge.py` — Blink camera integration.
+
+When working on the eBay pipeline, skip `grep`/`find` across `scripts/` — independent.
 
 ## Conventions
 

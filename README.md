@@ -34,8 +34,8 @@ Daemon that monitors eBay local listings against your watchlist and fires Telegr
 Watches: Netgear, Synology, Ubiquiti, Makita/DeWalt power tools, Sony cameras, Marantz hi-fi, Sky boxes.
 
 ```bash
-python3 services/local_scout/telegram_local_scout.py           # run once
-python3 services/local_scout/telegram_local_scout.py --daemon  # poll every N mins
+python3 scripts/local_scout/telegram_local_scout.py           # run once
+python3 scripts/local_scout/telegram_local_scout.py --daemon  # poll every N mins
 ```
 
 ### Garden Clearance Vision
@@ -56,8 +56,8 @@ Returns: estimated volume, weight, number of van runs, and a full job quote brok
 `betfair <command>` — integrates with the Betfair exchange via Telegram.
 
 Standalone traders also available:
-- `services/betfair_telegram/trader.py` — Over 2.5 Goals lay trader
-- `services/betfair_telegram/trader_updated.py` — Over 3.5 Goals lay trader
+- `scripts/betfair_telegram/trader.py` — Over 2.5 Goals lay trader
+- `scripts/betfair_telegram/trader_updated.py` — Over 3.5 Goals lay trader
 
 ### AI Fallback
 Any unrecognised message is handled by Minty, powered by Groq (Llama 3.3 70B). Responds to infrastructure questions with command suggestions, or just chats naturally.
@@ -124,9 +124,11 @@ commander/
 ├── safety_belt.py         # error handling wrapper
 ├── credentials.py         # secrets (not in git)
 ├── requirements.txt
-└── services/
-    ├── ebay/              # eBay scout + Vinted pricing
+├── services/
+│   └── ebay/              # eBay scout + Vinted pricing (deployed)
+└── scripts/               # standalone tools, not deployed
     ├── betfair_telegram/  # Betfair exchange integration
     ├── local_scout/       # automated eBay deal alerts
-    └── garden/            # vision-based clearance quoting
+    ├── garden/            # vision-based clearance quoting
+    └── vision/            # Blink camera bridge
 ```

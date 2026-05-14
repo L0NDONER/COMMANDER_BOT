@@ -108,14 +108,9 @@ def handle_brands():
 # -------------------------------
 
 def handle_betfair(arg):
-    # 1. Was: services.betfair_telegram.betfair_service
-    from services.betfair_telegram.bt_services.betfair.betfair_service import handle
-    
-    # 2. Was: bt_services.telegram.telegram_client
-    from services.betfair_telegram.bt_services.telegram.telegram_client import TelegramClient
-    
-    # 3. Was: import telegram_config (This one is likely config.py inside betfair_telegram)
-    from services.betfair_telegram import config as cfg
+    from scripts.betfair_telegram.bt_services.betfair.betfair_service import handle
+    from scripts.betfair_telegram.bt_services.telegram.telegram_client import TelegramClient
+    from scripts.betfair_telegram import config as cfg
 
     try:
         import credentials
