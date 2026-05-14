@@ -6,8 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - Runs in Docker on EC2 (SSH alias `aws`, user `ubuntu`, path `~/commander`).
 - Local repo is source of truth. EC2 is a clean git clone of `origin/main`.
-- Deploy: `git push` locally, then `ssh aws "cd commander && git pull && docker compose up -d --build"`.
-- If only `services/ebay/*` changed: `docker compose restart commander-leader` is enough (volume-mounted).
+- **Auto-deploy:** push to `main` → GitHub Actions (`.github/workflows/deploy.yml`) SSHes to EC2, pulls, and runs `docker compose up -d --build`. ~1m30s per deploy.
+- Manual fallback: `ssh aws "cd commander && git pull && docker compose up -d --build"`.
+- If only `services/ebay/*` changed and you want zero-downtime: `docker compose restart commander-leader` is enough (volume-mounted), but auto-deploy always does a full rebuild.
 - Do **not** edit files directly on EC2 — that workflow was retired 2026-05-14.
 
 ## Gitignored, EC2-only files
