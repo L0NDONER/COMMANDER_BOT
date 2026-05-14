@@ -26,6 +26,17 @@ docker compose restart commander-leader    # pick up edits to services/ebay/*
 docker compose logs -f commander-leader    # tail bot output
 ```
 
+## Tests
+
+```bash
+pip install -r requirements-dev.txt
+pytest tests/ -v
+```
+
+- `tests/conftest.py` stubs EC2-only modules (`credentials`, `services.ebay.brands`, `scout_vision`, `redis`) so the suite runs without those deps installed. Any new test that touches Redis-backed code should monkeypatch `scout_update.get_redis`.
+- CI gates deploys: the `test` job in `.github/workflows/deploy.yml` runs first; the `deploy` job has `needs: test`. Broken code cannot reach EC2.
+- Pull requests to `main` run tests but do not deploy.
+
 Volume-mounted (restart only): `services/ebay/`.
 Requires `--build`: `telegram_app.py`, `requirements.txt`, `Dockerfile`, anything else at repo root.
 
