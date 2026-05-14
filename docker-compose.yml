@@ -11,8 +11,6 @@ services:
       - ./stars.db:/app/stars.db
       - ./credentials.py:/app/credentials.py
       - ./services/ebay:/app/services/ebay
-      - ./scout_vision.py:/app/scout_vision.py  # Ensure vision is accessible
-      - ./downloads:/app/downloads  # SHARED
 
   commander-worker-1:
     hostname: worker-1
@@ -26,7 +24,6 @@ services:
     volumes:
       - ./credentials.py:/app/credentials.py
       - ./services/ebay:/app/services/ebay
-      - ./downloads:/app/downloads  # SHARED
 
   commander-worker-2:
     hostname: worker-2
@@ -40,7 +37,6 @@ services:
     volumes:
       - ./credentials.py:/app/credentials.py
       - ./services/ebay:/app/services/ebay
-      - ./downloads:/app/downloads  # SHARED
 
   redis:
     image: redis:alpine

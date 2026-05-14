@@ -25,7 +25,7 @@ Container layout (`docker-compose.yml`):
 - `commander-worker-1`, `commander-worker-2` — run `python3 -m services.ebay.worker`, cast pricing votes
 - `redis` — message bus + cache
 
-`services/ebay/` and `scout_vision.py` are volume-mounted, so edits to those files only need a restart, not a rebuild. Anything else (e.g. `telegram_app.py`, `requirements.txt`, Dockerfile) needs `--build`.
+`services/ebay/` is volume-mounted, so edits to files in that directory only need a restart, not a rebuild. Anything else (e.g. `telegram_app.py`, `requirements.txt`, Dockerfile) needs `--build`.
 
 Local non-Docker run (legacy text-mode scout, not the photo bot):
 ```bash
@@ -38,13 +38,11 @@ python3 telegram_app.py
 The flagship feature is the photo+price → Vinted resale verdict pipeline. It runs across three containers coordinating via Redis. Understanding this fan-out is the main thing that requires reading multiple files:
 
 1. **Telegram entry** (`telegram_app.py`) — user sends photo with caption (buy price). `handle_photo` downloads to `/tmp` and calls `evaluate_with_consensus(image_path, caption)`.
-2. **Vision identify** (`scout_vision.py` at repo root, mounted to `/app/scout_vision.py`) — `identify_item` tries `_scan_barcode` first (pyzbar → Open Library for ISBN, Open Food Facts for UPC). On miss, falls back to Gemini (`gemini-3-flash-preview`) with `IDENTIFY_PROMPT`. Returns `(query, keywords)` or raises `ValueError("NOT_FOUND")`.
+2. **Vision identify** (`services/ebay/scout_vision.py`) — `identify_item` tries `_scan_barcode` first (pyzbar → Open Library for ISBN, Open Food Facts for UPC). On miss, falls back to Gemini (`gemini-3-flash-preview`) with `IDENTIFY_PROMPT`. Returns `(query, keywords)` or raises `ValueError("NOT_FOUND")`.
 3. **Task fan-out** (`services/ebay/scout_update.py:evaluate_with_consensus`) — leader hashes the image, caches the vision result in Redis (`vision:{md5}`), then publishes a task to the `scout_tasks` pubsub channel with `img_hash` and `base_query`. Leader also casts its own vote.
 4. **Worker voting** (`services/ebay/worker.py`) — workers subscribe to `scout_tasks`. Each worker mutates the query via `diversify_query` (different suffixes per `WORKER_INDEX`) when `ANARCHY_MODE=true`, fetches eBay median via `get_stats`, and writes a vote into the `votes:{img_hash}` hash.
 5. **Consensus** — leader polls `votes:{img_hash}` for up to `CONSENSUS_TIMEOUT_SECONDS` until `CONSENSUS_REQUIRED` votes land. Median of medians wins; worker closest to it is "winner."
 6. **Publish to public feed** — if verdict contains BUY, `web_feed.update_web_feed` writes to `/var/www/html/feed/feed.json` (Nginx-served). **Only item name + profit go in this file — no user IDs, chat IDs, or other identifiers.**
-
-`scout_vision.py` exists at two paths. The repo-root copy is what the container imports (mounted as `/app/scout_vision.py`); `services/ebay/scout_vision.py` exists but is not the one in use. Edit the root copy.
 
 The eBay token is cached in Redis under `ebay_token`, statistics under `stats:{query.lower()}`. eBay calls go to `api.ebay.com/buy/browse/v1/item_summary/search` with marketplace `EBAY_GB` and condition filter `3000|4000|5000` (used items).
 
