@@ -1,4 +1,4 @@
-python-telegram-bot==21.6
+python-telegram-bot==22.7
 groq==1.0.0
 requests==2.32.3
 PyYAML==6.0.2
