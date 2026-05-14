@@ -26,7 +26,9 @@ GEMINI_TIMEOUT = 20  # seconds
 sys.path.insert(0, "/home/martin/commander")
 from credentials import GEMINI_API_KEY
 
-from services.ebay.scout import get_stats, verdict
+def some_function_that_needs_stats():
+    from scout_update import get_stats # Local import prevents circular crash
+    # ... use get_stats ...
 
 
 IDENTIFY_PROMPT = (
@@ -97,6 +99,9 @@ def _call_gemini(image_path: str):
 
 def identify_item(image_path: str) -> tuple:
     """Synchronous wrapper — use identify_item_async in async handlers."""
+    barcode_result = _scan_barcode(image_path)
+    if barcode_result:
+        return barcode_result
     import concurrent.futures
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
         future = executor.submit(_call_gemini, image_path)

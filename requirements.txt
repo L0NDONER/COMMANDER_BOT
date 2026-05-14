@@ -6,3 +6,4 @@ betfairlightweight
 google-genai
 Pillow
 pyzbar
+redis

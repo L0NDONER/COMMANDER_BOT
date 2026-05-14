@@ -1,13 +1,47 @@
 services:
-  commander:
+  commander-leader:
+    hostname: leader
     build: .
-    restart: unless-stopped
+    restart: always
+    environment:
+      - AGENT_ROLE=LEADER
+      - WORKER_INDEX=0
+      - REDIS_URL=redis://redis:6379/0
     volumes:
       - ./stars.db:/app/stars.db
-      - ./cache.db:/app/cache.db
       - ./credentials.py:/app/credentials.py
       - ./services/ebay:/app/services/ebay
-      - /var/www/html/feed:/var/www/html/feed  # The scoped mount
+      - ./scout_vision.py:/app/scout_vision.py  # Ensure vision is accessible
+      - ./downloads:/app/downloads  # SHARED
+
+  commander-worker-1:
+    hostname: worker-1
+    build: .
+    restart: always
+    command: python3 -m services.ebay.worker
     environment:
-      - PYTHONUNBUFFERED=1
-      - ADMIN_CHAT_ID=5811891036
+      - AGENT_ROLE=WORKER
+      - WORKER_INDEX=1
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./credentials.py:/app/credentials.py
+      - ./services/ebay:/app/services/ebay
+      - ./downloads:/app/downloads  # SHARED
+
+  commander-worker-2:
+    hostname: worker-2
+    build: .
+    restart: always
+    command: python3 -m services.ebay.worker
+    environment:
+      - AGENT_ROLE=WORKER
+      - WORKER_INDEX=2
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./credentials.py:/app/credentials.py
+      - ./services/ebay:/app/services/ebay
+      - ./downloads:/app/downloads  # SHARED
+
+  redis:
+    image: redis:alpine
+    restart: always
