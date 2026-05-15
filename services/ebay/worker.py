@@ -25,12 +25,13 @@ LOGGER = logging.getLogger(f"worker.{REPLICA}")
 def handle_task(task: dict) -> None:
   img_hash = task.get("img_hash")
   base_query = task.get("base_query")
+  condition = task.get("condition", "used")
   if not img_hash or not base_query:
       LOGGER.warning("Malformed task, skipping: %s", task)
       return
-  query = diversify_query(base_query, REPLICA) if ANARCHY_MODE else base_query
-  LOGGER.info("Search %r for img %s", query, img_hash[:8])
-  stats = get_stats(query, REPLICA)
+  query = diversify_query(base_query, REPLICA, condition) if ANARCHY_MODE else base_query
+  LOGGER.info("Search %r (cond=%s) for img %s", query, condition, img_hash[:8])
+  stats = get_stats(query, REPLICA, condition)
   if "median" in stats:
       cast_vote(img_hash, REPLICA, stats["median"], query)
       LOGGER.info("Voted median=%.2f", stats["median"])

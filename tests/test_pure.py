@@ -10,6 +10,7 @@ from services.ebay.scout_update import (
     charm,
     choose_vinted_discount,
     compute_confidence,
+    detect_condition,
     diversify_query,
     generate_listing_draft,
 )
@@ -106,3 +107,41 @@ def test_generate_listing_draft_title_capped_at_80():
     long_query = "x" * 200
     out = generate_listing_draft(long_query, ["k1"])
     assert len(out["title"]) <= 80
+
+
+# ---------- detect_condition ----------
+
+@pytest.mark.parametrize("caption", [
+    "4.50 brand new never worn still in box",
+    "5 BNIB",
+    "10 sealed",
+    "3.50 BNWT",
+    "8 new with tags",
+    "12 unworn",
+    "6 new in box",
+])
+def test_detect_condition_new(caption):
+    assert detect_condition(caption) == "new"
+
+
+@pytest.mark.parametrize("caption", [
+    "4.50",
+    "5 charity shop find",
+    "10",
+    "",
+    "new arrival in store",  # "new" alone must not trigger
+])
+def test_detect_condition_used(caption):
+    assert detect_condition(caption) == "used"
+
+
+def test_detect_condition_handles_none():
+    assert detect_condition(None) == "used"
+
+
+# ---------- diversify_query condition swap ----------
+
+def test_diversify_query_swaps_used_for_new(monkeypatch):
+    monkeypatch.setenv("WORKER_INDEX", "1")  # the "{base} used"/"new" slot
+    assert diversify_query("jordan 1", "w1", "used") == "jordan 1 used"
+    assert diversify_query("jordan 1", "w1", "new") == "jordan 1 new"

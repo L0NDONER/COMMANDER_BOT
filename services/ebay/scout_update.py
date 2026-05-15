@@ -50,6 +50,24 @@ REDIS_TTL_SECONDS = 300
 
 ANARCHY_MODE = os.getenv("ANARCHY_MODE", "true").lower() == "true"
 
+CONDITION_FILTERS = {
+    "new": "1000|1500",
+    "used": "3000|4000|5000",
+}
+
+# Phrases in the user's caption that mean the item is unused.
+# Kept strict — bare "new" matches too much ("new arrival", "newly listed").
+NEW_CONDITION_PATTERNS = re.compile(
+    r"\b(bnib|bnwt|bnwot|brand\s+new|new\s+in\s+box|still\s+in\s+box|"
+    r"sealed|unworn|unused|never\s+worn|never\s+used|new\s+with\s+tags)\b",
+    re.IGNORECASE,
+)
+
+def detect_condition(caption: str) -> str:
+    if caption and NEW_CONDITION_PATTERNS.search(caption):
+        return "new"
+    return "used"
+
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
@@ -119,11 +137,12 @@ def get_token() -> str:
     r.setex("ebay_token", ttl, token)
     return token
 
-def search_listings(query: str, token: str) -> List[dict]:
+def search_listings(query: str, token: str, condition: str = "used") -> List[dict]:
+    cond_ids = CONDITION_FILTERS.get(condition, CONDITION_FILTERS["used"])
     res = requests.get(
         "https://api.ebay.com/buy/browse/v1/item_summary/search",
         headers={"Authorization": f"Bearer {token}", "X-EBAY-C-MARKETPLACE-ID": MARKETPLACE},
-        params={"q": query, "limit": 15, "filter": "conditionIds:{3000|4000|5000},price:[5..500],priceCurrency:GBP"},
+        params={"q": query, "limit": 15, "filter": f"conditionIds:{{{cond_ids}}},price:[5..500],priceCurrency:GBP"},
         timeout=10
     )
     res.raise_for_status()
@@ -133,18 +152,19 @@ def analyse(items: List[dict]) -> Dict:
     prices = sorted(float(i["price"]["value"]) for i in items if "price" in i)
     return {"median": prices[len(prices) // 2]} if prices else {}
 
-def get_stats(query: str, replica: str = "default") -> Dict:
+def get_stats(query: str, replica: str = "default", condition: str = "used") -> Dict:
     if is_low_value(query):
         return {}
     r = get_redis()
-    cached = r.get(f"stats:{query.lower()}")
+    cache_key = f"stats:{condition}:{query.lower()}"
+    cached = r.get(cache_key)
     if cached:
         return json.loads(cached)
     try:
         token = get_token()
-        stats = analyse(search_listings(query, token))
+        stats = analyse(search_listings(query, token, condition))
         if stats:
-            r.setex(f"stats:{query.lower()}", 3600, json.dumps(stats))
+            r.setex(cache_key, 3600, json.dumps(stats))
         return stats
     except Exception as e:
         LOGGER.error(f"eBay Error: {e}")
@@ -172,8 +192,9 @@ def generate_listing_draft(query: str, keywords: List[str]) -> Dict[str, str]:
         "tags": seo_tags
     }
 
-def diversify_query(base: str, replica: str) -> str:
-    variants = [base, f"{base} used", f"{base} mens", f"{base} womens", f"{base} vintage"]
+def diversify_query(base: str, replica: str, condition: str = "used") -> str:
+    cond_word = "new" if condition == "new" else "used"
+    variants = [base, f"{base} {cond_word}", f"{base} mens", f"{base} womens", f"{base} vintage"]
     return variants[int(os.getenv("WORKER_INDEX", "0")) % len(variants)]
 
 def compute_confidence(vals: List[float]) -> str:
@@ -202,6 +223,9 @@ def evaluate_with_consensus(image_path: str, buy_price: str) -> Dict:
     except (ValueError, TypeError):
         clean_buy = 1.0
 
+    condition = detect_condition(str(buy_price))
+    LOGGER.info("Caption condition=%s", condition)
+
     with open(image_path, "rb") as f:
         img_hash = hashlib.md5(f.read()).hexdigest()
 
@@ -220,10 +244,11 @@ def evaluate_with_consensus(image_path: str, buy_price: str) -> Dict:
     r.publish("scout_tasks", json.dumps({
         "img_hash": img_hash,
         "base_query": base_query,
+        "condition": condition,
     }))
 
-    query = diversify_query(base_query, replica) if ANARCHY_MODE else base_query
-    stats = get_stats(query, replica)
+    query = diversify_query(base_query, replica, condition) if ANARCHY_MODE else base_query
+    stats = get_stats(query, replica, condition)
     if "median" in stats:
         cast_vote(img_hash, replica, stats["median"], query)
 
