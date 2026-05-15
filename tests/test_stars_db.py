@@ -1,6 +1,5 @@
 """Stars DB CRUD tests with a tmp-path DB so the real stars.db is untouched."""
 
-import importlib
 import sys
 
 import pytest

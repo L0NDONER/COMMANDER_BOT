@@ -4,7 +4,6 @@ Telegram handler for commander bot.
 Final Update: Explicit Vinted Price and Net Profit display.
 """
 
-import json
 import logging
 import os
 import sys
@@ -66,7 +65,7 @@ def format_result(result: Dict, raw_buy_input: str) -> str:
     # Extract numeric buy price from the user's caption (e.g., "4.50")
     try:
         numeric_buy = float(re.sub(r'[^\d.]', '', raw_buy_input))
-    except:
+    except (ValueError, TypeError):
         numeric_buy = 0.0
         
     net_profit = round(vinted_target - numeric_buy, 2)

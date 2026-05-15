@@ -1,0 +1,40 @@
+[flake8]
+max-line-length = 100
+exclude =
+    .git,
+    __pycache__,
+    .pytest_cache,
+    scripts,
+    credentials.py,
+    services/ebay/brands.py
+# Ignore style-only checks that are pervasive in this codebase.
+# Real-bug checks (F-codes, E722 bare except) remain enforced.
+extend-ignore =
+    E111,
+    E114,
+    E117,
+    E128,
+    E203,
+    E221,
+    E226,
+    E231,
+    E241,
+    E251,
+    E261,
+    E262,
+    E265,
+    E266,
+    E302,
+    E303,
+    E305,
+    E402,
+    E501,
+    E701,
+    E704,
+    E731,
+    E741,
+    W291,
+    W293,
+    W391,
+    W503,
+    W504

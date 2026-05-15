@@ -2,7 +2,7 @@
 """Vision-enhanced scout: identify items from photos then price via eBay.
 
 Usage:
-    result = evaluate_from_image("photo.jpg", buy_price=5.00)
+    query, keywords = identify_item("photo.jpg")
 
 Requires:
     pip install google-genai pillow
@@ -12,7 +12,6 @@ Requires:
 import asyncio
 import logging
 import sys
-from typing import Dict
 
 import PIL.Image
 import requests
@@ -25,11 +24,6 @@ GEMINI_TIMEOUT = 20  # seconds
 
 sys.path.insert(0, "/home/martin/commander")
 from credentials import GEMINI_API_KEY
-
-def some_function_that_needs_stats():
-    from scout_update import get_stats # Local import prevents circular crash
-    # ... use get_stats ...
-
 
 IDENTIFY_PROMPT = (
     "Identify this item for a secondhand resale search. "
@@ -141,12 +135,3 @@ async def identify_item_async(image_path: str) -> tuple:
     except asyncio.TimeoutError:
         raise TimeoutError(f"Gemini vision timed out after {GEMINI_TIMEOUT}s")
     return _parse_response(response)
-
-
-def evaluate_from_image(image_path: str, buy_price: float) -> Dict[str, object]:
-    """Take a photo and buy price, return a full Vinted verdict."""
-    query, keywords = identify_item(image_path)
-    stats = get_stats(query)
-    result = verdict(buy_price, stats, query, keywords=keywords)
-    result["query"] = query
-    return result

@@ -1,6 +1,5 @@
 # actions.py
 import subprocess
-import os
 import requests
 from services.ebay.handler import handle_scout_command
 from services.ebay.brands import handle_brands as _handle_brands
@@ -40,7 +39,7 @@ def handle_ping_command(target):
     try:
         out = run(["ping", "-c", "2", "-W", "2", target], timeout=5)
         return f"📡 Ping OK\n{out.splitlines()[-1]}"
-    except Exception as e:
+    except Exception:
         return f"❌ Ping failed: {target}"
 
 def handle_ssh_command(host):

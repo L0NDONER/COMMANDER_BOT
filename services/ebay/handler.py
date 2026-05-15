@@ -20,7 +20,7 @@ TIPS = [
     "💡 Vintage pieces sell better with era in the title — '90s', 'Y2K', 'retro' add clicks.",
 ]
 
-from services.ebay.brands import handle_brands, get_brand_tip
+from services.ebay.brands import get_brand_tip
 from services.ebay.scout_update import get_stats, verdict
 from web_feed import update_web_feed
 

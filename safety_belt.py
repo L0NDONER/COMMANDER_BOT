@@ -90,7 +90,7 @@ def safe_execute(
             _save_state(cfg.state_path, state)
         return reply
 
-    except Exception as exc:
+    except Exception:
         logging.exception("Unhandled error in request path", extra={"context": context})
 
         consecutive_failures += 1

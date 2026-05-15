@@ -1,7 +1,5 @@
 """Pure-function tests — no network, no Redis, no DB."""
 
-import os
-
 import pytest
 
 from services.ebay import scout_update
