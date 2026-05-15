@@ -272,9 +272,14 @@ def evaluate_with_consensus(image_path: str, buy_price: str) -> Dict:
     confidence = compute_confidence(medians)
     sell_price = avg_median * choose_vinted_discount(base_query)
     profit = sell_price - clean_buy
-    roi = (profit / clean_buy) * 100 if clean_buy > 0 else 0
 
-    final_verdict = "STRONG BUY" if roi >= 150 else "BUY" if roi >= 80 else "MAYBE" if roi >= 30 else "PASS"
+    if clean_buy > 0:
+        roi = (profit / clean_buy) * 100
+        final_verdict = "STRONG BUY" if roi >= 150 else "BUY" if roi >= 80 else "MAYBE" if roi >= 30 else "PASS"
+    else:
+        # Free stock — ROI is mathematically infinite. Judge on absolute return.
+        roi = 999
+        final_verdict = "STRONG BUY" if sell_price >= 5 else "PASS"
 
     listing = generate_listing_draft(base_query, keywords)
 
