@@ -27,12 +27,14 @@ from telegram.ext import (
 )
 
 from scout_update import evaluate_with_consensus
+import sales_db
 
 # ------------------------------------------------------------------------------
 # Config
 # ------------------------------------------------------------------------------
 
 from credentials import TELEGRAM_BOT_TOKEN as TELEGRAM_TOKEN
+from credentials import TELEGRAM_CHAT_ID as OWNER_CHAT_ID
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
 logging.basicConfig(level=LOG_LEVEL)
@@ -96,11 +98,52 @@ def format_result(result: Dict, raw_buy_input: str) -> str:
     return msg
 
 # ------------------------------------------------------------------------------
+# /sold parsing
+# ------------------------------------------------------------------------------
+
+_SOLD_PRICE_RE = re.compile(r"£\s*(\d+(?:\.\d{1,2})?)")
+
+
+def parse_sold(text: str):
+    """Pull £price out of a freeform /sold message, return (query, price).
+
+    Returns (None, None) if no £-prefixed price is present.
+    """
+    match = _SOLD_PRICE_RE.search(text)
+    if not match:
+        return None, None
+    price = float(match.group(1))
+    query = (text[:match.start()] + text[match.end():]).strip(" -,")
+    return query, price
+
+
+# ------------------------------------------------------------------------------
 # Handlers
 # ------------------------------------------------------------------------------
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("Send an image + price (e.g. 5.00) to evaluate.")
+
+
+async def handle_sold(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if int(update.effective_chat.id) != int(OWNER_CHAT_ID):
+        return  # Silently ignore — sales DB is owner-only
+
+    raw = (update.message.text or "").removeprefix("/sold").strip()
+    if not raw:
+        await update.message.reply_text(
+            "Usage: /sold <description> £<price>\n"
+            "Example: /sold Jordan 1 Low uk 9 BNIB £55"
+        )
+        return
+
+    query, price = parse_sold(raw)
+    if price is None:
+        await update.message.reply_text("❌ Couldn't find a £price in that message.")
+        return
+
+    sale_id = sales_db.log_sale(update.effective_chat.id, query, price, raw)
+    await update.message.reply_text(f"✅ Logged #{sale_id}: {query} @ £{price:.2f}")
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not update.message.photo:
@@ -140,8 +183,11 @@ def main() -> None:
     if not TELEGRAM_TOKEN:
         raise RuntimeError("TELEGRAM_TOKEN not set")
 
+    sales_db.init_db()
+
     app = Application.builder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("sold", handle_sold))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
 
     LOGGER.info("Bot started and listening...")

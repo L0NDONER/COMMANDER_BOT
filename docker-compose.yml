@@ -9,6 +9,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
     volumes:
       - ./stars.db:/app/stars.db
+      - ./sales.db:/app/sales.db
       - ./credentials.py:/app/credentials.py
       - ./services/ebay:/app/services/ebay
 

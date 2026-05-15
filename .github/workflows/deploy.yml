@@ -52,6 +52,7 @@ jobs:
             set -e
             cd ~/commander
             git pull --ff-only
+            touch sales.db
             docker compose up -d --build
             docker compose ps
           '
