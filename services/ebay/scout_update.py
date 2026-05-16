@@ -253,11 +253,11 @@ def evaluate_with_consensus(image_path: str, buy_price: str) -> Dict:
         cast_vote(img_hash, replica, stats["median"], query)
 
     votes = []
-    for _ in range(CONSENSUS_TIMEOUT_SECONDS):
+    for _ in range(CONSENSUS_TIMEOUT_SECONDS * 10):
         votes = get_votes(img_hash)
         if len(votes) >= CONSENSUS_REQUIRED:
             break
-        time.sleep(1)
+        time.sleep(0.1)
 
     if not votes:
         return {"status": "error", "message": "No pricing data collected."}
