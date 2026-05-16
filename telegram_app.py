@@ -56,14 +56,12 @@ def format_result(result: Dict, raw_buy_input: str) -> str:
         return f"⚠️ Error: {result.get('message', status)}"
 
     # 1. Extract raw numbers
-    median = result.get("median", 0)
     roi = result.get("roi", 0)
     confidence = result.get("confidence", "LOW")
     verdict = result.get("verdict", "❌ PASS")
-    
-    # 2. Financial Logic (0.72 is the Vinted Fee/Speed Discount)
-    vinted_target = result.get("sell_price_num", round(median * 0.50, 2))
-    
+
+    vinted_target = result["sell_price_num"]
+
     # Extract numeric buy price from the user's caption (e.g., "4.50")
     try:
         numeric_buy = float(re.sub(r'[^\d.]', '', raw_buy_input))
