@@ -165,15 +165,70 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     try:
         # Run core logic from scout_update
         result = evaluate_with_consensus(image_path, caption)
-        
+
         # Pass both result and the user's original caption for profit math
         message = format_result(result, caption)
-        
+
         # Markdown enabled for copy-paste on tap
         await update.message.reply_text(message, parse_mode='Markdown')
+
+        # Auto-log this evaluation as a candidate buy for /pnl reconciliation.
+        # Gated to owner so strangers' captions don't pollute the moat DB.
+        if (int(update.effective_chat.id) == int(OWNER_CHAT_ID)
+                and result.get("status") == "success"):
+            try:
+                buy_price = float(re.sub(r'[^\d.]', '', caption))
+            except (ValueError, TypeError):
+                buy_price = 0.0
+            if buy_price > 0 and result.get("query"):
+                sales_db.log_buy(
+                    update.effective_chat.id,
+                    result["query"],
+                    buy_price,
+                    result.get("median"),
+                    result.get("sell_price_num"),
+                    result.get("verdict"),
+                    caption,
+                )
     except Exception as exc:
         LOGGER.error("Processing failed: %s", exc)
         await update.message.reply_text("❌ The agent jury encountered an error.")
+
+
+async def handle_pnl(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if int(update.effective_chat.id) != int(OWNER_CHAT_ID):
+        return  # Owner-only — pnl is private moat data
+
+    rows = sales_db.pnl()
+    if not rows:
+        await update.message.reply_text("No buys or sales logged yet.")
+        return
+
+    matched, orphan_buys, orphan_sales = [], [], []
+    total_buy = total_sale = 0.0
+    for q, bought, sold, net, bn, sn in rows:
+        total_buy += bought
+        total_sale += sold
+        if bn and sn:
+            matched.append(f"`{q}`: £{bought:.2f} → £{sold:.2f} = £{net:+.2f}")
+        elif bn:
+            orphan_buys.append(f"`{q}`: £{bought:.2f}")
+        else:
+            orphan_sales.append(f"`{q}`: £{sold:.2f}")
+
+    lines = ["📊 *P&L*"]
+    if matched:
+        lines += ["", "*Matched:*", *matched]
+    if orphan_buys:
+        lines += ["", "*Bought, not sold yet:*", *orphan_buys]
+    if orphan_sales:
+        lines += ["", "*Sold, no matching buy logged:*", *orphan_sales]
+    lines += [
+        "",
+        f"*Totals:* spent £{total_buy:.2f}, earned £{total_sale:.2f}, "
+        f"net £{total_sale - total_buy:+.2f}",
+    ]
+    await update.message.reply_text("\n".join(lines), parse_mode='Markdown')
 
 # ------------------------------------------------------------------------------
 # Main
@@ -188,6 +243,7 @@ def main() -> None:
     app = Application.builder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("sold", handle_sold))
+    app.add_handler(CommandHandler("pnl", handle_pnl))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
 
     LOGGER.info("Bot started and listening...")
