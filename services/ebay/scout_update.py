@@ -241,7 +241,10 @@ def generate_listing_draft(query: str, keywords: List[str]) -> Dict[str, str]:
         "- Condition: Great pre-owned condition\n\n"
         "Fast shipping! Check my other items for bundle deals."
     )
-    seo_tags = "#" + " #".join([k.replace(" ", "") for k in keywords])
+    # Vinted search is a text search bar, not a hashtag browser. Space-stripped
+    # tags (#StoneIsland) don't match a buyer typing "Stone Island" — keep the
+    # spaces and use commas so each word is a separate search-indexable token.
+    seo_tags = ", ".join(keywords)
     return {"title": title[:80], "description": description, "tags": seo_tags}
 
 

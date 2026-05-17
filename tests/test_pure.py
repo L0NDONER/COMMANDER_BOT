@@ -105,7 +105,7 @@ def test_generate_listing_draft_shape():
     assert set(out.keys()) == {"title", "description", "tags"}
     assert "Barbour Jacket" in out["title"]
     assert "wax" in out["description"]
-    assert out["tags"].startswith("#")
+    assert out["tags"] == "wax, olive, size L"  # comma-separated, spaces kept
 
 
 def test_generate_listing_draft_title_capped_at_80():
