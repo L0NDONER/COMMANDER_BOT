@@ -163,7 +163,7 @@ def _score(votes: List[Dict], base_query: str, clean_buy: float) -> Dict:
     medians = [v["median"] for v in votes]
     avg_median = statistics.median(medians)
     winner = min(votes, key=lambda v: abs(v["median"] - avg_median))
-    LOGGER.info("Consensus: %d votes, winner=%s", len(votes), winner["replica"])
+    LOGGER.info("Consensus: %d votes, winning query=%s", len(votes), winner["replica"])
 
     discount = choose_vinted_discount(base_query)
     sell_price = avg_median * discount
