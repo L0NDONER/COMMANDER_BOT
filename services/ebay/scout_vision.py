@@ -78,6 +78,9 @@ def _scan_barcode(image_path: str) -> tuple | None:
 def _call_gemini(image_path: str):
     client = genai.Client(api_key=GEMINI_API_KEY)
     image = PIL.Image.open(image_path)
+    # Phone photos are 4–8MB; shrinking to a Gemini tile boundary cuts upload
+    # latency over mobile by seconds. Barcode scanning keeps the full-res image.
+    image.thumbnail((1568, 1568))
     return client.models.generate_content(
         model="gemini-3-flash-preview",
         contents=[image, IDENTIFY_PROMPT],
