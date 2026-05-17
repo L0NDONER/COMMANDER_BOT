@@ -33,14 +33,14 @@ pip install -r requirements-dev.txt
 pytest tests/ -v
 ```
 
-- `tests/conftest.py` stubs EC2-only modules (`credentials`, `services.ebay.brands`, `scout_vision`, `redis`) so the suite runs without those deps installed. Any new test that touches Redis-backed code should monkeypatch `scout_update.get_redis`.
+- `tests/conftest.py` stubs EC2-only modules (`credentials`, `services.ebay.brands`, `scout_vision`) so the suite runs without those deps installed.
 - CI gates deploys: the `test` job in `.github/workflows/deploy.yml` runs first; the `deploy` job has `needs: test`. Broken code cannot reach EC2.
 - Pull requests to `main` run tests but do not deploy.
 
 Volume-mounted (restart only): `services/ebay/`.
 Requires `--build`: `telegram_app.py`, `requirements.txt`, `Dockerfile`, anything else at repo root.
 
-Local non-Docker run (legacy text scout, not photo pipeline):
+Local non-Docker run:
 ```bash
 pip3 install -r requirements.txt
 python3 telegram_app.py
@@ -48,28 +48,18 @@ python3 telegram_app.py
 
 ## Containers
 
-| Container | Role | Entrypoint |
-|---|---|---|
-| `commander-leader` | Telegram bot, photo intake, consensus orchestrator | `telegram_app.py` |
-| `commander-worker-1`, `commander-worker-2` | Pricing voters | `python3 -m services.ebay.worker` |
-| `redis` | Pub/sub + cache | `redis:alpine` |
+Single container — `commander-leader` (`telegram_app.py`). The old Redis fan-out and `commander-worker-*` containers were stripped in commits b7515a3 / f72b523.
 
 ## Architecture — photo pricing pipeline
 
-Photo+price → Vinted resale verdict. Spans three containers via Redis:
+Photo+price → Vinted resale verdict. Single process, all in-memory:
 
-1. **Telegram** (`telegram_app.py:handle_photo`) — downloads photo to `/tmp`, calls `evaluate_with_consensus(image_path, caption)`.
+1. **Telegram** (`telegram_app.py:handle_photo`) — downloads photo to `/tmp`, calls `evaluate_with_consensus_saas(image_path, caption)`.
 2. **Vision** (`services/ebay/scout_vision.py:identify_item`) — `_scan_barcode` first (pyzbar → Open Library for ISBN, Open Food Facts for UPC). On miss, Gemini (`gemini-3-flash-preview`) with `IDENTIFY_PROMPT`. Returns `(query, keywords)` or raises `ValueError("NOT_FOUND")`.
-3. **Fan-out** (`services/ebay/scout_update.py:evaluate_with_consensus`) — leader md5-hashes image, caches vision result in Redis (`vision:{md5}`), publishes task to `scout_tasks` pubsub with `img_hash` and `base_query`, casts own vote.
-4. **Worker vote** (`services/ebay/worker.py`) — subscribes to `scout_tasks`. With `ANARCHY_MODE=true`, mutates query via `diversify_query` per `WORKER_INDEX`. Fetches eBay median via `get_stats`, writes vote into `votes:{img_hash}` hash.
-5. **Consensus** — leader polls `votes:{img_hash}` for up to `CONSENSUS_TIMEOUT_SECONDS` until `CONSENSUS_REQUIRED` votes. Median-of-medians wins; closest worker is "winner."
-6. **Public feed** — on BUY verdict, `web_feed.update_web_feed` writes `/var/www/html/feed/feed.json` (Nginx-served). **Only item name + profit. No user IDs, chat IDs, or identifiers.**
+3. **Consensus** (`services/ebay/scout_async.py:evaluate_with_consensus_saas`) — md5-hashes image, caches vision result via `database.set_cached_value("vision:{md5}", ...)`, builds 5 query variants (base / used|new / mens / womens / vintage), fans out to `asyncio.gather` with `CONSENSUS_TIMEOUT_SECONDS` timeout. Needs `MIN_VOTES_FOR_CONSENSUS` (2) successful medians. Median-of-medians wins; the variant closest to that median is logged as `winner=#N`.
+4. **Public feed** — on BUY verdict, `web_feed.update_web_feed` writes `/var/www/html/feed/feed.json` (Nginx-served). **Only item name + profit. No user IDs, chat IDs, or identifiers.**
 
-eBay API: `api.ebay.com/buy/browse/v1/item_summary/search`, marketplace `EBAY_GB`, condition filter `3000|4000|5000` (used). Token cached in Redis under `ebay_token`, stats under `stats:{query.lower()}`.
-
-## Architecture — legacy text scout
-
-`services/ebay/handler.py:handle_scout_command` is the older `scout <item> [£price]` text interface. Calls `get_stats` + `verdict` directly — no consensus, no workers, no vision. Kept for README-documented commands. Do not confuse with `evaluate_with_consensus`.
+eBay API: `api.ebay.com/buy/browse/v1/item_summary/search`, marketplace `EBAY_GB`, condition filter `3000|4000|5000` (used). Token + stats cached in the SQLite-backed `database` module under `ebay_token` and `stats:{condition}:{query.lower()}`.
 
 ## Standalone scripts (not deployed)
 
@@ -87,5 +77,4 @@ When working on the eBay pipeline, skip `grep`/`find` across `scripts/` — inde
 - Vision model: Gemini `gemini-3-flash-preview`. Chat fallback: Groq Llama 3.3 70B.
 - Currency: GBP throughout.
 - Vinted discount (eBay→Vinted price ratio): `DEFAULT_VINTED_DISCOUNT = 0.72`.
-- Redis keys: `vision:{md5}`, `votes:{img_hash}`, `stats:{query}`, `ebay_token`, `wallet:{replica}`.
-- `ANARCHY_MODE` env var (default true) enables per-worker query diversification.
+- Cache keys (SQLite via `database` module): `vision:{md5}`, `stats:{condition}:{query}`, `ebay_token`.
