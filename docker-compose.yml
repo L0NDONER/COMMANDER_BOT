@@ -3,43 +3,9 @@ services:
     hostname: leader
     build: .
     restart: always
-    environment:
-      - AGENT_ROLE=LEADER
-      - WORKER_INDEX=0
-      - REDIS_URL=redis://redis:6379/0
     volumes:
       - ./stars.db:/app/stars.db
       - ./sales.db:/app/sales.db
       - ./commander_saas.db:/app/commander_saas.db
       - ./credentials.py:/app/credentials.py
       - ./services/ebay:/app/services/ebay
-
-  commander-worker-1:
-    hostname: worker-1
-    build: .
-    restart: always
-    command: python3 -m services.ebay.worker
-    environment:
-      - AGENT_ROLE=WORKER
-      - WORKER_INDEX=1
-      - REDIS_URL=redis://redis:6379/0
-    volumes:
-      - ./credentials.py:/app/credentials.py
-      - ./services/ebay:/app/services/ebay
-
-  commander-worker-2:
-    hostname: worker-2
-    build: .
-    restart: always
-    command: python3 -m services.ebay.worker
-    environment:
-      - AGENT_ROLE=WORKER
-      - WORKER_INDEX=2
-      - REDIS_URL=redis://redis:6379/0
-    volumes:
-      - ./credentials.py:/app/credentials.py
-      - ./services/ebay:/app/services/ebay
-
-  redis:
-    image: redis:alpine
-    restart: always

@@ -13,12 +13,25 @@ def test_telegram_app_imports():
 
 def test_scout_update_imports():
     from services.ebay import scout_update
-    assert hasattr(scout_update, "evaluate_with_consensus")
-    assert hasattr(scout_update, "get_stats")
-    assert hasattr(scout_update, "cast_vote")
+    # Pure helpers + verdict math survived the Redis-strip refactor.
+    assert hasattr(scout_update, "analyse")
+    assert hasattr(scout_update, "charm")
+    assert hasattr(scout_update, "_score")
+    assert hasattr(scout_update, "detect_condition")
 
 
-def test_worker_imports():
-    from services.ebay import worker
-    assert hasattr(worker, "handle_task")
-    assert hasattr(worker, "run_worker")
+def test_scout_async_imports():
+    from services.ebay import scout_async
+    assert hasattr(scout_async, "evaluate_with_consensus_saas")
+    assert hasattr(scout_async, "get_token_async")
+    assert hasattr(scout_async, "get_worker_vote_async")
+
+
+def test_database_imports():
+    import database
+    assert hasattr(database, "init_db")
+    assert hasattr(database, "get_cached_value")
+    assert hasattr(database, "set_cached_value")
+    assert hasattr(database, "log_buy")
+    assert hasattr(database, "log_sale")
+    assert hasattr(database, "pnl")

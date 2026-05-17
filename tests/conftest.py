@@ -30,19 +30,6 @@ _stub(
 )
 
 
-# Tests must not require a running Redis. Stub the module so imports succeed;
-# any test that actually exercises Redis-touching code should monkeypatch get_redis.
-class _FakeRedis:
-    @classmethod
-    def from_url(cls, *a, **kw):
-        raise RuntimeError("Redis not available in tests — monkeypatch get_redis")
-
-
-redis_stub = types.ModuleType("redis")
-redis_stub.Redis = _FakeRedis
-sys.modules["redis"] = redis_stub
-
-
 # Stub scout_vision so scout_update can import it without pulling in
 # pyzbar / google-genai / PIL (heavy deps not needed for pure-function tests).
 _vision_stub = dict(identify_item=lambda image_path: ("stubbed query", ["stubbed-keyword"]))
