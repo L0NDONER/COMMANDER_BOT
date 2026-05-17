@@ -109,3 +109,41 @@ def test_pnl_sums_multiple_buys_and_sales_per_query(sales_db):
     assert len(rows) == 1
     q, bought, sold, net, bn, sn = rows[0]
     assert (bought, sold, net, bn, sn) == (12.0, 38.0, 26.0, 2, 2)
+
+
+def test_pnl_fuzzy_matches_extra_modifier(sales_db):
+    # Buy was logged with BNIB (from photo eval), sale was logged without it.
+    sales_db.log_buy("u", "Jordan 1 Low uk 9 BNIB", 4.50, raw="4.50")
+    sales_db.log_sale("u", "Jordan 1 Low uk 9", 55.0, "Jordan 1 Low uk 9 £55")
+    rows = sales_db.pnl()
+    assert len(rows) == 1
+    _q, bought, sold, net, bn, sn = rows[0]
+    assert (bought, sold, net, bn, sn) == (4.50, 55.0, 50.50, 1, 1)
+
+
+def test_pnl_fuzzy_rejects_size_mismatch(sales_db):
+    # Different sizes are NOT the same listing — must stay as orphans.
+    sales_db.log_buy("u", "Jordan 1 uk 9", 4.50, raw="4.50")
+    sales_db.log_sale("u", "Jordan 1 uk 11", 55.0, "Jordan 1 uk 11 £55")
+    rows = {r[0]: r for r in sales_db.pnl()}
+    assert rows["jordan 1 uk 9"][1:5] == (4.50, 0, -4.50, 1)
+    assert rows["jordan 1 uk 11"][1:5] == (0, 55.0, 55.0, 0)
+
+
+def test_pnl_fuzzy_tolerates_punctuation(sales_db):
+    sales_db.log_buy("u", "Air Jordan 1 (Low) UK-9", 4.50, raw="4.50")
+    sales_db.log_sale("u", "air jordan 1 low uk 9", 55.0, "air jordan 1 low uk 9 £55")
+    rows = sales_db.pnl()
+    assert len(rows) == 1
+    assert rows[0][3] == 50.50  # net
+
+
+def test_pnl_greedy_picks_best_match_first(sales_db):
+    # Two buys could each plausibly match one sale; greedy must pick the higher-similarity pair.
+    sales_db.log_buy("u", "barbour bedale wax jacket size 42", 20.0, raw="20")
+    sales_db.log_buy("u", "barbour jacket", 15.0, raw="15")
+    sales_db.log_sale("u", "barbour bedale wax jacket size 42", 80.0, "barbour bedale wax jacket size 42 £80")
+    rows = {r[0]: r for r in sales_db.pnl()}
+    # Exact match wins; the looser "barbour jacket" buy stays an orphan.
+    assert rows["barbour bedale wax jacket size 42"][1:5] == (20.0, 80.0, 60.0, 1)
+    assert rows["barbour jacket"][1:5] == (15.0, 0, -15.0, 1)

@@ -1,18 +1,39 @@
 #!/usr/bin/env python3
 """SQLite store for Vinted arbitrage moat — buys (auto-logged from photo evals)
-and sales (logged via /sold). /pnl joins them by lowercased query.
+and sales (logged via /sold). /pnl joins them by Jaccard token similarity.
 """
 
+import re
 import sqlite3
 from pathlib import Path
+from typing import Set
 
 DB_PATH = Path(__file__).parent / "sales.db"
+
+# Two queries are merged in /pnl if their token-set Jaccard similarity
+# meets this threshold. 0.65 catches BNIB-style additions ("jordan 1 low uk 9"
+# ↔ "jordan 1 low uk 9 bnib", 5/6 = 0.83) while rejecting size mismatches
+# ("jordan 1 uk 9" ↔ "jordan 1 uk 11", 3/5 = 0.6).
+MATCH_THRESHOLD = 0.65
+
+_TOKEN_SPLIT = re.compile(r"[^a-z0-9]+")
 
 
 def _conn():
     conn = sqlite3.connect(DB_PATH)
     conn.execute("PRAGMA journal_mode=WAL")
     return conn
+
+
+def _tokens(query: str) -> Set[str]:
+    return {t for t in _TOKEN_SPLIT.split(query.lower()) if t}
+
+
+def _similarity(a: str, b: str) -> float:
+    ta, tb = _tokens(a), _tokens(b)
+    if not ta or not tb:
+        return 0.0
+    return len(ta & tb) / len(ta | tb)
 
 
 def init_db():
@@ -85,38 +106,49 @@ def recent_buys(limit: int = 20) -> list:
 
 
 def pnl() -> list:
-    """Per-query rollup joining buys ↔ sales. Returns rows of
-    (query, total_buy, total_sale, net, buy_count, sale_count).
-    Includes orphans on either side (count=0 for the missing side).
+    """Per-query rollup joining buys ↔ sales by token-set Jaccard similarity.
+
+    Returns rows of (query, total_buy, total_sale, net, buy_count, sale_count),
+    sorted by net descending. Includes orphans on either side (count=0 for the
+    missing side). Each buy-group matches at most one sale-group (greedy by
+    similarity), so identical totals can't be double-counted across pairs.
     """
     with _conn() as c:
-        return c.execute("""
-            WITH b AS (
-                SELECT query,
-                       SUM(buy_price) AS total_buy,
-                       COUNT(*)       AS n
-                FROM buys GROUP BY query
-            ),
-            s AS (
-                SELECT query,
-                       SUM(price) AS total_sale,
-                       COUNT(*)   AS n
-                FROM sales GROUP BY query
-            )
-            SELECT b.query,
-                   b.total_buy,
-                   COALESCE(s.total_sale, 0),
-                   COALESCE(s.total_sale, 0) - b.total_buy,
-                   b.n,
-                   COALESCE(s.n, 0)
-            FROM b LEFT JOIN s ON b.query = s.query
-            UNION ALL
-            SELECT s.query,
-                   0,
-                   s.total_sale,
-                   s.total_sale,
-                   0,
-                   s.n
-            FROM s WHERE s.query NOT IN (SELECT query FROM b)
-            ORDER BY 4 DESC
-        """).fetchall()
+        buys = c.execute(
+            "SELECT query, SUM(buy_price), COUNT(*) FROM buys GROUP BY query"
+        ).fetchall()
+        sales = c.execute(
+            "SELECT query, SUM(price), COUNT(*) FROM sales GROUP BY query"
+        ).fetchall()
+
+    candidates = []
+    for bq, _bt, _bn in buys:
+        for sq, _st, _sn in sales:
+            score = _similarity(bq, sq)
+            if score >= MATCH_THRESHOLD:
+                candidates.append((score, bq, sq))
+    candidates.sort(reverse=True)
+
+    buy_lookup = {q: (t, n) for q, t, n in buys}
+    sale_lookup = {q: (t, n) for q, t, n in sales}
+    used_buys: Set[str] = set()
+    used_sales: Set[str] = set()
+    rows = []
+
+    for _score, bq, sq in candidates:
+        if bq in used_buys or sq in used_sales:
+            continue
+        bt, bn = buy_lookup[bq]
+        st, sn = sale_lookup[sq]
+        rows.append((bq, bt, st, st - bt, bn, sn))
+        used_buys.add(bq)
+        used_sales.add(sq)
+
+    for bq, bt, bn in buys:
+        if bq not in used_buys:
+            rows.append((bq, bt, 0, -bt, bn, 0))
+    for sq, st, sn in sales:
+        if sq not in used_sales:
+            rows.append((sq, 0, st, st, 0, sn))
+
+    return sorted(rows, key=lambda r: r[3], reverse=True)
