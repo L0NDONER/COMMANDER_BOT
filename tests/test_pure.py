@@ -91,6 +91,13 @@ def test_charm_floors_at_99p():
     assert charm(0.5) == "£0.99"
 
 
+def test_charm_rounds_not_truncates():
+    # 20.75 should round up to 21 then drop to 20.99 — not truncate to 19.99.
+    assert charm(20.75) == "£20.99"
+    # Below the .5 boundary still rounds down.
+    assert charm(20.40) == "£19.99"
+
+
 # ---------- generate_listing_draft ----------
 
 def test_generate_listing_draft_shape():

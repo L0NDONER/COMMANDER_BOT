@@ -195,8 +195,11 @@ def detect_condition(caption: str) -> str:
 
 
 def charm(p: float) -> str:
-    """Charm price: floor at £0.99, otherwise int(p) - 0.01."""
-    return f"£{max(0.99, int(p) - 0.01):.2f}"
+    """Charm price: floor at £0.99, otherwise round(p) - 0.01.
+
+    Rounds (not truncates) so £20.75 → £20.99, not £19.99.
+    """
+    return f"£{max(0.99, round(p) - 0.01):.2f}"
 
 
 def diversify_query(base: str, replica: str, condition: str = "used") -> str:
