@@ -119,9 +119,8 @@ sudo systemctl start commander
 ```
 commander/
 ├── telegram_app.py        # bot entry point
-├── telegram_config.py     # command registry
-├── actions.py             # command handlers
-├── safety_belt.py         # error handling wrapper
+├── sales_db.py            # SQLite store for buys/sales (auto-logged + /sold)
+├── web_feed.py            # atomic writer for public scan feed
 ├── credentials.py         # secrets (not in git)
 ├── requirements.txt
 ├── services/

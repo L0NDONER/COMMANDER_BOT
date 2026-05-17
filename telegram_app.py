@@ -6,16 +6,8 @@ Final Update: Explicit Vinted Price and Net Profit display.
 
 import logging
 import os
-import sys
 import re
 from typing import Dict
-
-# --- PATH FIX ---
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-EXTRA_PATH = os.path.join(CURRENT_DIR, "services", "ebay")
-if EXTRA_PATH not in sys.path:
-    sys.path.insert(0, EXTRA_PATH)
-# ----------------
 
 from telegram import Update
 from telegram.ext import (
@@ -26,8 +18,8 @@ from telegram.ext import (
     filters,
 )
 
-from scout_update import evaluate_with_consensus
 import sales_db
+from services.ebay.scout_update import evaluate_with_consensus
 
 # ------------------------------------------------------------------------------
 # Config

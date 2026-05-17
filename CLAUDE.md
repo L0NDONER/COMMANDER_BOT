@@ -86,6 +86,6 @@ When working on the eBay pipeline, skip `grep`/`find` across `scripts/` — inde
 
 - Vision model: Gemini `gemini-3-flash-preview`. Chat fallback: Groq Llama 3.3 70B.
 - Currency: GBP throughout.
-- Vinted discount (eBay→Vinted price ratio): `DEFAULT_VINTED_DISCOUNT = 0.72`. Some code uses `0.50` — check the file being edited.
+- Vinted discount (eBay→Vinted price ratio): `DEFAULT_VINTED_DISCOUNT = 0.72`.
 - Redis keys: `vision:{md5}`, `votes:{img_hash}`, `stats:{query}`, `ebay_token`, `wallet:{replica}`.
 - `ANARCHY_MODE` env var (default true) enables per-worker query diversification.

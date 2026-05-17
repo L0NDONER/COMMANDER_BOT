@@ -45,10 +45,9 @@ sys.modules["redis"] = redis_stub
 
 # Stub scout_vision so scout_update can import it without pulling in
 # pyzbar / google-genai / PIL (heavy deps not needed for pure-function tests).
-_stub(
-    "scout_vision",
-    identify_item=lambda image_path: ("stubbed query", ["stubbed-keyword"]),
-)
+_vision_stub = dict(identify_item=lambda image_path: ("stubbed query", ["stubbed-keyword"]))
+_stub("scout_vision", **_vision_stub)
+_stub("services.ebay.scout_vision", **_vision_stub)
 
 
 brands_attrs = dict(

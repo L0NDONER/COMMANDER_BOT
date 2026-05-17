@@ -1,29 +1,23 @@
 #!/usr/bin/env python3
-"""Vision-enhanced scout: identify items from photos then price via eBay.
+"""Identify items from photos: barcode (Open Library / Open Food Facts) → Gemini fallback.
 
 Usage:
     query, keywords = identify_item("photo.jpg")
-
-Requires:
-    pip install google-genai pillow
-    GEMINI_API_KEY in credentials
 """
 
-import asyncio
+import concurrent.futures
 import logging
-import sys
 
 import PIL.Image
 import requests
 from google import genai
 from pyzbar.pyzbar import decode as decode_barcode
 
+from credentials import GEMINI_API_KEY
+
 LOGGER = logging.getLogger(__name__)
 
 GEMINI_TIMEOUT = 20  # seconds
-
-sys.path.insert(0, "/home/martin/commander")
-from credentials import GEMINI_API_KEY
 
 IDENTIFY_PROMPT = (
     "Identify this item for a secondhand resale search. "
@@ -82,7 +76,6 @@ def _scan_barcode(image_path: str) -> tuple | None:
 
 
 def _call_gemini(image_path: str):
-    """Blocking Gemini call — run via asyncio.to_thread in async contexts."""
     client = genai.Client(api_key=GEMINI_API_KEY)
     image = PIL.Image.open(image_path)
     return client.models.generate_content(
@@ -92,18 +85,17 @@ def _call_gemini(image_path: str):
 
 
 def identify_item(image_path: str) -> tuple:
-    """Synchronous wrapper — use identify_item_async in async handlers."""
     barcode_result = _scan_barcode(image_path)
     if barcode_result:
         return barcode_result
-    import concurrent.futures
+    # ThreadPoolExecutor gives the call site a hard wall-clock timeout —
+    # the Gemini SDK has no caller-controllable timeout option.
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
         future = executor.submit(_call_gemini, image_path)
         try:
             response = future.result(timeout=GEMINI_TIMEOUT)
         except concurrent.futures.TimeoutError:
             raise TimeoutError(f"Gemini vision timed out after {GEMINI_TIMEOUT}s")
-
     return _parse_response(response)
 
 
@@ -119,19 +111,3 @@ def _parse_response(response) -> tuple:
         query = parts[0]
         keywords = []
     return query, keywords
-
-
-async def identify_item_async(image_path: str) -> tuple:
-    """Barcode first, Gemini vision fallback. Non-blocking."""
-    barcode_result = await asyncio.to_thread(_scan_barcode, image_path)
-    if barcode_result:
-        return barcode_result
-
-    try:
-        response = await asyncio.wait_for(
-            asyncio.to_thread(_call_gemini, image_path),
-            timeout=GEMINI_TIMEOUT,
-        )
-    except asyncio.TimeoutError:
-        raise TimeoutError(f"Gemini vision timed out after {GEMINI_TIMEOUT}s")
-    return _parse_response(response)
