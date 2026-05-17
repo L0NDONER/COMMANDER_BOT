@@ -52,7 +52,7 @@ jobs:
             set -e
             cd ~/commander
             git pull --ff-only
-            touch sales.db
-            docker compose up -d --build
+            touch sales.db commander_saas.db
+            docker compose up -d --build --remove-orphans
             docker compose ps
           '
