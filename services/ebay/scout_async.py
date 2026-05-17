@@ -136,12 +136,12 @@ async def get_stats_async(query: str, condition: str = "used") -> Dict:
         return {}
 
 
-async def get_worker_vote_async(query: str, condition: str) -> Optional[Dict]:
+async def get_worker_vote_async(query: str, condition: str, index: int = 0) -> Optional[Dict]:
     """One variant's vote. Returns a dict matching the legacy vote shape, or None."""
     stats = await get_stats_async(query, condition)
     if "median" not in stats:
         return None
-    return {"median": stats["median"], "query": query, "replica": query}
+    return {"median": stats["median"], "query": query, "replica": f"#{index}"}
 
 
 # ------------------------------------------------------------------------------
@@ -190,7 +190,7 @@ async def evaluate_with_consensus_saas(image_path: str, buy_price: str) -> Dict:
     base_query, keywords = await _vision_lookup_async(img_hash, image_path)
 
     variants = _variants(base_query, condition)
-    tasks = [get_worker_vote_async(v, condition) for v in variants]
+    tasks = [get_worker_vote_async(v, condition, i) for i, v in enumerate(variants)]
 
     try:
         results = await asyncio.wait_for(
