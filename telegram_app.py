@@ -4,6 +4,7 @@ Telegram handler for commander bot.
 Final Update: Explicit Vinted Price and Net Profit display.
 """
 
+import asyncio
 import logging
 import os
 import re
@@ -18,8 +19,8 @@ from telegram.ext import (
     filters,
 )
 
-import sales_db
-from services.ebay.scout_update import evaluate_with_consensus
+import database
+from services.ebay.scout_async import evaluate_with_consensus_saas
 
 # ------------------------------------------------------------------------------
 # Config
@@ -132,7 +133,7 @@ async def handle_sold(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         await update.message.reply_text("❌ Couldn't find a £price in that message.")
         return
 
-    sale_id = sales_db.log_sale(update.effective_chat.id, query, price, raw)
+    sale_id = await database.log_sale(update.effective_chat.id, query, price, raw)
     await update.message.reply_text(f"✅ Logged #{sale_id}: {query} @ £{price:.2f}")
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -153,13 +154,9 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text("🤖 Dispatching agents to the jury...")
 
     try:
-        # Run core logic from scout_update
-        result = evaluate_with_consensus(image_path, caption)
+        result = await evaluate_with_consensus_saas(image_path, caption)
 
-        # Pass both result and the user's original caption for profit math
         message = format_result(result, caption)
-
-        # Markdown enabled for copy-paste on tap
         await update.message.reply_text(message, parse_mode='Markdown')
 
         # Auto-log this evaluation as a candidate buy for /pnl reconciliation.
@@ -171,7 +168,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             except (ValueError, TypeError):
                 buy_price = 0.0
             if buy_price > 0 and result.get("query"):
-                sales_db.log_buy(
+                await database.log_buy(
                     update.effective_chat.id,
                     result["query"],
                     buy_price,
@@ -189,7 +186,7 @@ async def handle_pnl(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     if int(update.effective_chat.id) != int(OWNER_CHAT_ID):
         return  # Owner-only — pnl is private moat data
 
-    rows = sales_db.pnl()
+    rows = await database.pnl()
     if not rows:
         await update.message.reply_text("No buys or sales logged yet.")
         return
@@ -228,7 +225,7 @@ def main() -> None:
     if not TELEGRAM_TOKEN:
         raise RuntimeError("TELEGRAM_TOKEN not set")
 
-    sales_db.init_db()
+    asyncio.run(database.init_db())
 
     app = Application.builder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
