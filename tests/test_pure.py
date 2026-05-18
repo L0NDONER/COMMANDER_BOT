@@ -77,7 +77,7 @@ def test_analyse_empty_items():
 
 def test_analyse_skips_items_without_price():
     items = [{"price": {"value": "5"}}, {"title": "no price"}, {"price": {"value": "15"}}]
-    assert analyse(items) == {"median": 15.0}
+    assert analyse(items) == {"median": 10.0}
 
 
 # ---------- charm ----------
