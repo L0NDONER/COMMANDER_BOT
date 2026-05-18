@@ -69,8 +69,8 @@ LOGGER = logging.getLogger(__name__)
 # ------------------------------------------------------------------------------
 
 def analyse(items: List[dict]) -> Dict:
-    prices = sorted(float(i["price"]["value"]) for i in items if "price" in i)
-    return {"median": prices[len(prices) // 2]} if prices else {}
+    prices = [float(i["price"]["value"]) for i in items if "price" in i]
+    return {"median": statistics.median(prices)} if prices else {}
 
 
 def detect_condition(caption: str) -> str:
