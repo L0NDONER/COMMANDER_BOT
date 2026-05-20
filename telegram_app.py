@@ -36,6 +36,7 @@ LOGGER = logging.getLogger(__name__)
 # httpx logs every request at INFO including the bot token in the URL.
 # Mute below WARNING so docker logs don't expose secrets.
 logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("telegram.ext._utils.networkloop").setLevel(logging.ERROR)
 
 # ------------------------------------------------------------------------------
 # Formatting helpers
