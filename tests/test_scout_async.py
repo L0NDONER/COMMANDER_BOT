@@ -118,13 +118,14 @@ def test_happy_path_returns_success_verdict(scout, image_path):
         assert key in result, f"missing key: {key}"
 
 
-def test_five_way_fanout_queries_all_variants(scout, image_path):
+def test_fanout_queries_base_condition_and_keyword_variants(scout, image_path):
     scout_mod, fake, _db = scout
     _run(scout_mod.evaluate_with_consensus_saas(image_path, "5.00"))
 
-    # 5 variants per the spec: base, "{base} used", "{base} mens", "{base} womens", "{base} vintage"
-    assert len(fake.search_queries) == 5
-    expected_suffixes = {"", " used", " mens", " womens", " vintage"}
+    # Stub vision yields keywords=["stubbed-keyword"], so variants are:
+    # base, "{base} used", "{base} stubbed-keyword" — 3 in total.
+    assert len(fake.search_queries) == 3
+    expected_suffixes = {"", " used", " stubbed-keyword"}
     actual_suffixes = {q.removeprefix("stubbed query") for q in fake.search_queries}
     assert actual_suffixes == expected_suffixes
 
@@ -150,14 +151,12 @@ def test_token_cache_reused_across_runs(scout, image_path, tmp_path):
 
 
 def test_insufficient_votes_returns_error(scout, image_path):
-    """If 4 of 5 variants return empty market data, < MIN_VOTES_FOR_CONSENSUS — error."""
+    """If all-but-one variant returns empty market data, < MIN_VOTES_FOR_CONSENSUS — error."""
     scout_mod, fake, _db = scout
     # Fail every variant except the bare base query → only 1 valid vote
     fake._fail_queries = {
         "stubbed query used",
-        "stubbed query mens",
-        "stubbed query womens",
-        "stubbed query vintage",
+        "stubbed query stubbed-keyword",
     }
     result = _run(scout_mod.evaluate_with_consensus_saas(image_path, "5.00"))
     assert result["status"] == "error"

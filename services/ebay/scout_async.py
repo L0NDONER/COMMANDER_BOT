@@ -170,15 +170,19 @@ async def _vision_lookup_async(img_hash: str, image_path: str) -> Tuple[str, Lis
 # Consensus
 # ------------------------------------------------------------------------------
 
-def _variants(base_query: str, condition: str) -> List[str]:
+def _variants(base_query: str, condition: str, keywords: List[str]) -> List[str]:
+    """Build up to 4 search variants: base, base+condition, and base+keyword(s).
+
+    Keyword suffixes come from Gemini and are skipped if they already appear in
+    the base query. Dedup preserves priority order so base_query always survives.
+    """
     cond_word = "new" if condition == "new" else "used"
-    return [
-        base_query,
-        f"{base_query} {cond_word}",
-        f"{base_query} mens",
-        f"{base_query} womens",
-        f"{base_query} vintage",
-    ]
+    variants = [base_query, f"{base_query} {cond_word}"]
+    base_lower = base_query.lower()
+    for kw in keywords[:3]:
+        if kw and kw.lower() not in base_lower:
+            variants.append(f"{base_query} {kw}")
+    return list(dict.fromkeys(variants))[:4]
 
 
 async def evaluate_with_consensus_saas(image_path: str, buy_price: str) -> Dict:
@@ -189,7 +193,7 @@ async def evaluate_with_consensus_saas(image_path: str, buy_price: str) -> Dict:
     img_hash = await asyncio.to_thread(_md5_file, image_path)
     base_query, keywords = await _vision_lookup_async(img_hash, image_path)
 
-    variants = _variants(base_query, condition)
+    variants = _variants(base_query, condition, keywords)
     tasks = [get_worker_vote_async(v, condition, i) for i, v in enumerate(variants)]
 
     try:
