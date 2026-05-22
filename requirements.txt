@@ -8,3 +8,6 @@ betfairlightweight
 google-genai
 Pillow
 pyzbar
+fastapi
+uvicorn
+python-multipart

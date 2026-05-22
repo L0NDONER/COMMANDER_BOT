@@ -19,8 +19,11 @@ from telegram.ext import (
     filters,
 )
 
+import uvicorn
+
 import database
 from services.ebay.scout_async import evaluate_with_consensus_saas
+from web_app import app as web_app
 
 # ------------------------------------------------------------------------------
 # Config
@@ -222,11 +225,11 @@ async def handle_pnl(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 # Main
 # ------------------------------------------------------------------------------
 
-def main() -> None:
+async def main_async() -> None:
     if not TELEGRAM_TOKEN:
         raise RuntimeError("TELEGRAM_TOKEN not set")
 
-    asyncio.run(database.init_db())
+    await database.init_db()
 
     app = Application.builder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
@@ -234,8 +237,30 @@ def main() -> None:
     app.add_handler(CommandHandler("pnl", handle_pnl))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
 
-    LOGGER.info("Bot started and listening...")
-    app.run_polling()
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling()
+
+    config = uvicorn.Config(
+        web_app,
+        host=os.getenv("WEB_HOST", "0.0.0.0"),
+        port=int(os.getenv("WEB_PORT", "8080")),
+        log_level=LOG_LEVEL.lower(),
+    )
+    server = uvicorn.Server(config)
+
+    LOGGER.info("Bot + web server started.")
+    try:
+        await server.serve()
+    finally:
+        await app.updater.stop()
+        await app.stop()
+        await app.shutdown()
+
+
+def main() -> None:
+    asyncio.run(main_async())
+
 
 if __name__ == "__main__":
     main()

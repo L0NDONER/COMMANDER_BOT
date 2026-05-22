@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0a0a0a">
+<title>Flaz</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    background: #0a0a0a;
+    color: #f5f5f5;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100svh;
+    padding: env(safe-area-inset-top, 12px) 16px env(safe-area-inset-bottom, 12px);
+    overflow: hidden;
+    gap: 12px;
+  }
+  header {
+    text-align: center;
+    font-weight: 800;
+    letter-spacing: 0.4em;
+    font-size: 18px;
+    padding: 6px 0;
+    color: #fafafa;
+  }
+  .photo {
+    flex: 1 1 auto;
+    min-height: 0;
+    border-radius: 16px;
+    background: #161616;
+    border: 1px dashed #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .photo .hint {
+    color: #777;
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.4;
+    padding: 24px;
+  }
+  .photo .hint .big {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .price {
+    display: flex;
+    align-items: center;
+    background: #161616;
+    border-radius: 12px;
+    padding: 0 16px;
+    height: 56px;
+    border: 1px solid #2a2a2a;
+  }
+  .price .label {
+    font-size: 22px;
+    color: #888;
+    margin-right: 8px;
+  }
+  .price input {
+    flex: 1;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    color: #f5f5f5;
+    font-size: 22px;
+    font-weight: 600;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  button.go {
+    height: 64px;
+    border-radius: 14px;
+    border: 0;
+    background: #f5f5f5;
+    color: #0a0a0a;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+  }
+  button.go:disabled {
+    background: #333;
+    color: #777;
+  }
+  .result {
+    border-radius: 14px;
+    background: #161616;
+    padding: 14px 16px;
+    border: 1px solid #2a2a2a;
+    font-size: 15px;
+    line-height: 1.4;
+    min-height: 56px;
+    max-height: 40vh;
+    max-height: 40svh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .result.has-listing { justify-content: flex-start; }
+  .result.idle { color: #555; align-items: center; }
+  .result .verdict { font-weight: 800; font-size: 18px; margin-bottom: 4px; }
+  .result .meta { font-size: 13px; opacity: 0.85; }
+  .result .listing { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .result .field {
+    background: rgba(0,0,0,0.25);
+    border-radius: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+  }
+  .result .field .field-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.6;
+    margin-bottom: 2px;
+  }
+  .result .field .field-value {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.35;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .result .field.copied { outline: 1px solid currentColor; }
+  .result.strong-buy { background: #144a14; border-color: #2e8a2e; color: #f0fff0; }
+  .result.strong-buy .meta { color: #c8e8c8; }
+  .result.buy { background: #1c3a1c; border-color: #3a7a3a; color: #eaf6ea; }
+  .result.buy .meta { color: #bcd8bc; }
+  .result.maybe { background: #3d2f0e; border-color: #8a6a1f; color: #fff2cf; }
+  .result.maybe .meta { color: #e2cd95; }
+  .result.pass { background: #3a1818; border-color: #8a2e2e; color: #ffd8d8; }
+  .result.pass .meta { color: #e0a8a8; }
+  .result.err { border-color: #5a2d2d; color: #e88; }
+  .hidden { display: none !important; }
+  input[type="file"] { display: none; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>FLAZ</header>
+
+  <label class="photo" id="photoBox" for="photoInput">
+    <div class="hint" id="photoHint">
+      <span class="big">+</span>
+      Tap to take a photo
+    </div>
+    <img id="preview" class="hidden" alt="">
+    <input type="file" id="photoInput" accept="image/*" capture="environment">
+  </label>
+
+  <div class="price">
+    <span class="label">£</span>
+    <input type="text" inputmode="decimal" id="price" placeholder="buy price">
+  </div>
+
+  <button class="go" id="go" disabled>GO</button>
+
+  <div class="result idle" id="result">Take a photo, enter a price.</div>
+</div>
+
+<script>
+const photoInput = document.getElementById('photoInput');
+const preview = document.getElementById('preview');
+const photoHint = document.getElementById('photoHint');
+const priceInput = document.getElementById('price');
+const goBtn = document.getElementById('go');
+const resultEl = document.getElementById('result');
+
+let resizedBlob = null;
+let busy = false;
+
+function refresh() {
+  const ready = !!resizedBlob && parseFloat(priceInput.value) > 0 && !busy;
+  goBtn.disabled = !ready;
+}
+
+priceInput.addEventListener('input', refresh);
+
+photoInput.addEventListener('change', async () => {
+  const file = photoInput.files && photoInput.files[0];
+  if (!file) return;
+  try {
+    resizedBlob = await resizeImage(file, 1024, 0.8);
+    preview.src = URL.createObjectURL(resizedBlob);
+    preview.classList.remove('hidden');
+    photoHint.classList.add('hidden');
+    refresh();
+  } catch (e) {
+    showResult('err', 'Failed to read photo', '');
+  }
+});
+
+goBtn.addEventListener('click', async () => {
+  if (!resizedBlob) return;
+  const price = parseFloat(priceInput.value);
+  if (!(price > 0)) return;
+
+  busy = true; refresh();
+  showResult('idle', 'Dispatching agents to the jury…', '');
+
+  const fd = new FormData();
+  fd.append('image', resizedBlob, 'photo.jpg');
+  fd.append('price', String(price));
+
+  try {
+    const res = await fetch('/api/evaluate', { method: 'POST', body: fd });
+    const data = await res.json();
+    renderVerdict(data, price);
+  } catch (e) {
+    showResult('err', 'Network error', String(e));
+  } finally {
+    busy = false; refresh();
+  }
+});
+
+function renderVerdict(data, buyPrice) {
+  if (!data || data.status !== 'success') {
+    showResult('err', data && data.message ? data.message : 'No verdict', '');
+    return;
+  }
+  const net = (data.sell_price_num - buyPrice).toFixed(2);
+  const kind = verdictClass(data.verdict);
+  showResult(
+    kind,
+    `${data.verdict} — list ${data.sell_for}`,
+    `Median ${data.median_pretty} · Fast ${data.fast_sale} · Net £${net} · ${data.confidence}`,
+    { title: data.title, description: data.description, tags: data.tags }
+  );
+}
+
+function verdictClass(verdict) {
+  const v = String(verdict || '').toUpperCase();
+  if (v.includes('STRONG')) return 'strong-buy';
+  if (v.includes('BUY')) return 'buy';
+  if (v.includes('MAYBE')) return 'maybe';
+  return 'pass';
+}
+
+function showResult(kind, verdict, meta, listing) {
+  resultEl.className = 'result ' + kind + (listing ? ' has-listing' : '');
+  if (kind === 'idle') {
+    resultEl.textContent = verdict;
+    return;
+  }
+  resultEl.innerHTML = '';
+  const v = document.createElement('div');
+  v.className = 'verdict';
+  v.textContent = verdict;
+  resultEl.appendChild(v);
+  if (meta) {
+    const m = document.createElement('div');
+    m.className = 'meta';
+    m.textContent = meta;
+    resultEl.appendChild(m);
+  }
+  if (listing && (listing.title || listing.description || listing.tags)) {
+    const wrap = document.createElement('div');
+    wrap.className = 'listing';
+    appendField(wrap, 'Title', listing.title);
+    appendField(wrap, 'Description', listing.description);
+    appendField(wrap, 'Tags', listing.tags);
+    resultEl.appendChild(wrap);
+  }
+}
+
+function appendField(parent, label, value) {
+  if (!value) return;
+  const f = document.createElement('div');
+  f.className = 'field';
+  const l = document.createElement('div');
+  l.className = 'field-label';
+  l.textContent = label + ' — tap to copy';
+  const t = document.createElement('div');
+  t.className = 'field-value';
+  t.textContent = value;
+  f.appendChild(l);
+  f.appendChild(t);
+  f.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      f.classList.add('copied');
+      l.textContent = label + ' — copied!';
+      setTimeout(() => {
+        f.classList.remove('copied');
+        l.textContent = label + ' — tap to copy';
+      }, 1200);
+    } catch (e) { /* clipboard blocked, ignore */ }
+  });
+  parent.appendChild(f);
+}
+
+async function resizeImage(file, maxEdge, quality) {
+  const dataUrl = await new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+
+  const img = await new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = reject;
+    i.src = dataUrl;
+  });
+
+  let { width, height } = img;
+  const scale = Math.min(1, maxEdge / Math.max(width, height));
+  width = Math.round(width * scale);
+  height = Math.round(height * scale);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+  return await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+}
+</script>
+</body>
+</html>
