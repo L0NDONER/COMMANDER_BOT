@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Deployment
 
 - Runs in Docker on EC2 (SSH alias `aws`, user `ubuntu`, path `~/commander`).
@@ -15,40 +13,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `credentials.py` — API keys (Telegram, Groq, eBay, Gemini).
 - `services/ebay/brands.py` — proprietary brand lists: `STRONG_BRANDS`, `SLOW_KEYWORDS`, `is_low_value`, `handle_brands`, `get_brand_tip`.
+- `services/ebay/consensus_engine.py` — consensus orchestration: `MIN_VOTES_FOR_CONSENSUS`, `build_variants`, `gather_votes`. Stubbed in `tests/conftest.py` so CI passes without it.
 
-Never `git add` either. Never invent placeholder content — imports must keep resolving against the real EC2 copies.
+Never `git add` any of these. Never invent placeholder content — imports must keep resolving against the real EC2 copies.
 
 ## Build / run
 
-```bash
-docker compose up -d --build               # full rebuild
-docker compose restart commander-leader    # pick up edits to services/ebay/*
-docker compose logs -f commander-leader    # tail bot output
-```
+- Full rebuild: `docker compose up -d --build`
+- Pick up `services/ebay/*` edits: `docker compose restart commander-leader`
+- Tail logs: `docker compose logs -f commander-leader`
+- Local non-Docker: `pip3 install -r requirements.txt && python3 telegram_app.py`
 
 ## Tests
 
-```bash
-pip install -r requirements-dev.txt
-pytest tests/ -v
-```
-
-- `tests/conftest.py` stubs EC2-only modules (`credentials`, `services.ebay.brands`, `scout_vision`) so the suite runs without those deps installed.
-- CI gates deploys: the `test` job in `.github/workflows/deploy.yml` runs first; the `deploy` job has `needs: test`. Broken code cannot reach EC2.
-- Pull requests to `main` run tests but do not deploy.
+- `pip install -r requirements-dev.txt && pytest tests/ -v`
+- `tests/conftest.py` stubs EC2-only modules (`credentials`, `services.ebay.brands`, `scout_vision`).
+- CI gates deploys: `test` job runs first; `deploy` job has `needs: test`.
 
 Volume-mounted (restart only): `services/ebay/`.
 Requires `--build`: `telegram_app.py`, `requirements.txt`, `Dockerfile`, anything else at repo root.
 
-Local non-Docker run:
-```bash
-pip3 install -r requirements.txt
-python3 telegram_app.py
-```
-
 ## Containers
 
-Single container — `commander-leader` (`telegram_app.py`). The old Redis fan-out and `commander-worker-*` containers were stripped in commits b7515a3 / f72b523.
+Single container — `commander-leader` (`telegram_app.py`).
 
 ## Architecture — photo pricing pipeline
 
@@ -61,16 +48,9 @@ Photo+price → Vinted resale verdict. Single process, all in-memory:
 
 eBay API: `api.ebay.com/buy/browse/v1/item_summary/search`, marketplace `EBAY_GB`, condition filter `3000|4000|5000` (used). Token + stats cached in the SQLite-backed `database` module under `ebay_token` and `stats:{condition}:{query.lower()}`.
 
-## Standalone scripts (not deployed)
+## scripts/
 
-Everything under `scripts/` is checked-in but not part of the Docker deploy. The Dockerfile copies them in but `telegram_app.py` doesn't import them at runtime.
-
-- `scripts/local_scout/` — standalone daemon polling eBay watchlist.
-- `scripts/garden/` — vision-based clearance volume estimator. Different prompt, different return shape.
-- `scripts/betfair_telegram/` — Betfair lay-trader bots.
-- `scripts/vision/blink_bridge.py` — Blink camera integration.
-
-When working on the eBay pipeline, skip `grep`/`find` across `scripts/` — independent.
+Checked in, not deployed. When working on the eBay pipeline, skip `grep`/`find` across `scripts/` — independent.
 
 ## Conventions
 

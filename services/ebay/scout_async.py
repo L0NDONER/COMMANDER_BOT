@@ -17,6 +17,11 @@ import database
 from credentials import EBAY_APP_ID, EBAY_SECRET
 from services.ebay import scout_vision
 from services.ebay.brands import is_low_value
+from services.ebay.consensus_engine import (
+    MIN_VOTES_FOR_CONSENSUS,
+    build_variants,
+    gather_votes,
+)
 from services.ebay.scout_update import (
     CONDITION_FILTERS,
     CONSENSUS_TIMEOUT_SECONDS,
@@ -33,10 +38,6 @@ from services.ebay.scout_update import (
 )
 
 LOGGER = logging.getLogger(__name__)
-
-# Need ≥ 2 successful variant fetches before we'll publish a verdict.
-# Five tasks fan out, so we tolerate up to 3 transient failures per request.
-MIN_VOTES_FOR_CONSENSUS = 2
 
 # ------------------------------------------------------------------------------
 # Shared httpx client + token lock
@@ -167,23 +168,8 @@ async def _vision_lookup_async(img_hash: str, image_path: str) -> Tuple[str, Lis
 
 
 # ------------------------------------------------------------------------------
-# Consensus
+# Orchestrator
 # ------------------------------------------------------------------------------
-
-def _variants(base_query: str, condition: str, keywords: List[str]) -> List[str]:
-    """Build up to 4 search variants: base, base+condition, and base+keyword(s).
-
-    Keyword suffixes come from Gemini and are skipped if they already appear in
-    the base query. Dedup preserves priority order so base_query always survives.
-    """
-    cond_word = "new" if condition == "new" else "used"
-    variants = [base_query, f"{base_query} {cond_word}"]
-    base_lower = base_query.lower()
-    for kw in keywords[:3]:
-        if kw and kw.lower() not in base_lower:
-            variants.append(f"{base_query} {kw}")
-    return list(dict.fromkeys(variants))[:4]
-
 
 async def evaluate_with_consensus_saas(image_path: str, buy_price: str) -> Dict:
     clean_buy = _parse_buy_price(buy_price)
@@ -193,24 +179,13 @@ async def evaluate_with_consensus_saas(image_path: str, buy_price: str) -> Dict:
     img_hash = await asyncio.to_thread(_md5_file, image_path)
     base_query, keywords = await _vision_lookup_async(img_hash, image_path)
 
-    variants = _variants(base_query, condition, keywords)
-    tasks = [get_worker_vote_async(v, condition, i) for i, v in enumerate(variants)]
+    variants = build_variants(base_query, condition, keywords)
+    votes = await gather_votes(
+        variants, condition, get_worker_vote_async, CONSENSUS_TIMEOUT_SECONDS
+    )
 
-    try:
-        results = await asyncio.wait_for(
-            asyncio.gather(*tasks, return_exceptions=True),
-            timeout=CONSENSUS_TIMEOUT_SECONDS,
-        )
-    except asyncio.TimeoutError:
-        LOGGER.warning("Consensus timed out after %ss", CONSENSUS_TIMEOUT_SECONDS)
+    if votes is None:
         return {"status": "error", "message": "Pricing lookup timed out."}
-
-    votes: List[Dict] = []
-    for r in results:
-        if isinstance(r, dict) and "median" in r:
-            votes.append(r)
-        elif isinstance(r, Exception):
-            LOGGER.warning("Variant failed: %r", r)
 
     if len(votes) < MIN_VOTES_FOR_CONSENSUS:
         return {"status": "error", "message": "Insufficient market data."}

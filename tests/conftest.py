@@ -46,3 +46,38 @@ brands_attrs = dict(
 )
 _stub("brands", **brands_attrs)
 _stub("services.ebay.brands", **brands_attrs)
+
+
+# Stub consensus_engine — real implementation is gitignored, EC2-only.
+# This stub mirrors today's contract so orchestration tests can run in CI.
+# Future tuning on EC2 stays private.
+import asyncio as _asyncio
+
+
+def _stub_build_variants(base_query, condition, keywords):
+    cond_word = "new" if condition == "new" else "used"
+    variants = [base_query, f"{base_query} {cond_word}"]
+    base_lower = base_query.lower()
+    for kw in keywords[:3]:
+        if kw and kw.lower() not in base_lower:
+            variants.append(f"{base_query} {kw}")
+    return list(dict.fromkeys(variants))[:4]
+
+
+async def _stub_gather_votes(variants, condition, fetch_vote, timeout):
+    tasks = [fetch_vote(v, condition, i) for i, v in enumerate(variants)]
+    try:
+        results = await _asyncio.wait_for(
+            _asyncio.gather(*tasks, return_exceptions=True), timeout=timeout
+        )
+    except _asyncio.TimeoutError:
+        return None
+    return [r for r in results if isinstance(r, dict) and "median" in r]
+
+
+_stub(
+    "services.ebay.consensus_engine",
+    MIN_VOTES_FOR_CONSENSUS=2,
+    build_variants=_stub_build_variants,
+    gather_votes=_stub_gather_votes,
+)

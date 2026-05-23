@@ -4,6 +4,7 @@ secrets.py
 
 # Proprietary business logic — lives on EC2 only
 services/ebay/brands.py
+services/ebay/consensus_engine.py
 .vault_pass
 *.key
 *.pem
