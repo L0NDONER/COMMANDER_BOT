@@ -101,6 +101,17 @@
     background: #333;
     color: #777;
   }
+  button.again {
+    height: 52px;
+    border-radius: 14px;
+    border: 1px solid #555;
+    background: transparent;
+    color: #f5f5f5;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+  }
   .result {
     border-radius: 14px;
     background: #161616;
@@ -177,6 +188,7 @@
   <button class="go" id="go" disabled>GO</button>
 
   <div class="result idle" id="result">Take a photo, enter a price.</div>
+  <button class="again hidden" id="again">SCAN ANOTHER</button>
 </div>
 
 <script>
@@ -186,12 +198,14 @@ const photoHint = document.getElementById('photoHint');
 const priceInput = document.getElementById('price');
 const goBtn = document.getElementById('go');
 const resultEl = document.getElementById('result');
+const againBtn = document.getElementById('again');
 
 let resizedBlob = null;
 let busy = false;
 
 function refresh() {
-  const ready = !!resizedBlob && parseFloat(priceInput.value) > 0 && !busy;
+  const p = parseFloat(priceInput.value);
+  const ready = !!resizedBlob && priceInput.value.trim() !== '' && p >= 0 && isFinite(p) && !busy;
   goBtn.disabled = !ready;
 }
 
@@ -214,7 +228,7 @@ photoInput.addEventListener('change', async () => {
 goBtn.addEventListener('click', async () => {
   if (!resizedBlob) return;
   const price = parseFloat(priceInput.value);
-  if (!(price > 0)) return;
+  if (!isFinite(price) || price < 0) return;
 
   busy = true; refresh();
   goBtn.textContent = 'WORKING…';
@@ -228,13 +242,28 @@ goBtn.addEventListener('click', async () => {
     const res = await fetch('/api/evaluate', { method: 'POST', body: fd });
     const data = await res.json();
     renderVerdict(data, price);
+    againBtn.classList.remove('hidden');
   } catch (e) {
     showResult('err', 'Network error', String(e));
+    againBtn.classList.remove('hidden');
   } finally {
     busy = false;
     goBtn.textContent = 'GO';
     refresh();
   }
+});
+
+againBtn.addEventListener('click', () => {
+  resizedBlob = null;
+  photoInput.value = '';
+  preview.src = '';
+  preview.classList.add('hidden');
+  photoHint.classList.remove('hidden');
+  priceInput.value = '';
+  resultEl.className = 'result idle';
+  resultEl.textContent = 'Take a photo, enter a price.';
+  againBtn.classList.add('hidden');
+  refresh();
 });
 
 function renderVerdict(data, buyPrice) {
