@@ -216,6 +216,7 @@ photoInput.addEventListener('change', async () => {
   if (!file) return;
   try {
     resizedBlob = await resizeImage(file, 1024, 0.8);
+    if (preview.src) URL.revokeObjectURL(preview.src);
     preview.src = URL.createObjectURL(resizedBlob);
     preview.classList.remove('hidden');
     photoHint.classList.add('hidden');
@@ -256,6 +257,7 @@ goBtn.addEventListener('click', async () => {
 againBtn.addEventListener('click', () => {
   resizedBlob = null;
   photoInput.value = '';
+  if (preview.src) URL.revokeObjectURL(preview.src);
   preview.src = '';
   preview.classList.add('hidden');
   photoHint.classList.remove('hidden');
