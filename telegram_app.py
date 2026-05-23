@@ -184,6 +184,11 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     except Exception as exc:
         LOGGER.error("Processing failed: %s", exc)
         await update.message.reply_text("❌ The agent jury encountered an error.")
+    finally:
+        try:
+            os.remove(image_path)
+        except OSError:
+            pass
 
 
 async def handle_pnl(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
