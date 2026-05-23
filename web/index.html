@@ -217,6 +217,7 @@ goBtn.addEventListener('click', async () => {
   if (!(price > 0)) return;
 
   busy = true; refresh();
+  goBtn.textContent = 'WORKING…';
   showResult('idle', 'Dispatching agents to the jury…', '');
 
   const fd = new FormData();
@@ -230,7 +231,9 @@ goBtn.addEventListener('click', async () => {
   } catch (e) {
     showResult('err', 'Network error', String(e));
   } finally {
-    busy = false; refresh();
+    busy = false;
+    goBtn.textContent = 'GO';
+    refresh();
   }
 });
 
