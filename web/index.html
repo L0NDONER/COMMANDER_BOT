@@ -244,7 +244,7 @@ function renderVerdict(data, buyPrice) {
   showResult(
     kind,
     `${data.verdict} — list ${data.sell_for}`,
-    `Median ${data.median_pretty} · Fast ${data.fast_sale} · Net £${net} · ${data.confidence}`,
+    `Median ${data.median_pretty} · Fast ${data.fast_sale} · Net £${net} · ROI ${data.roi}% · ${data.confidence}`,
     { title: data.title, description: data.description, tags: data.tags }
   );
 }
