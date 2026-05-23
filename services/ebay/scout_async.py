@@ -17,6 +17,7 @@ import database
 from credentials import EBAY_APP_ID, EBAY_SECRET
 from services.ebay import scout_vision
 from services.ebay.brands import is_low_value
+from services.ebay.vinted_fetcher import get_vinted_vote
 from services.ebay.consensus_engine import (
     MIN_VOTES_FOR_CONSENSUS,
     build_variants,
@@ -180,11 +181,18 @@ async def evaluate_with_consensus_saas(image_path: str, buy_price: str) -> Dict:
     base_query, keywords = await _vision_lookup_async(img_hash, image_path)
 
     variants = build_variants(base_query, condition, keywords)
-    votes = await gather_votes(
-        variants, condition, get_worker_vote_async, CONSENSUS_TIMEOUT_SECONDS
-    )
+    ebay_coro = gather_votes(variants, condition, get_worker_vote_async, CONSENSUS_TIMEOUT_SECONDS)
+    vinted_coro = gather_votes(variants, condition, get_vinted_vote, CONSENSUS_TIMEOUT_SECONDS)
 
-    if votes is None:
+    ebay_result, vinted_result = await asyncio.gather(ebay_coro, vinted_coro, return_exceptions=True)
+
+    votes = []
+    if isinstance(ebay_result, list):
+        votes.extend(ebay_result)
+    if isinstance(vinted_result, list):
+        votes.extend(vinted_result)
+
+    if not votes:
         return {"status": "error", "message": "Pricing lookup timed out."}
 
     if len(votes) < MIN_VOTES_FOR_CONSENSUS:
