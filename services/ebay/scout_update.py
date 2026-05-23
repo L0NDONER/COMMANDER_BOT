@@ -83,6 +83,9 @@ def analyse(items: List[dict], query: str = "") -> Dict:
         title = i.get("title", "")
         if query and title and not _title_matches(title, query):
             continue
+        country = i.get("itemLocation", {}).get("country", "")
+        if country and country != "GB":
+            continue
         prices.append(float(i["price"]["value"]))
     return {"median": statistics.median(prices)} if prices else {}
 

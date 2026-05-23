@@ -98,6 +98,23 @@ def test_analyse_keeps_items_without_title():
     assert analyse(items, query="Gant Shirt") == {"median": 15.0}
 
 
+def test_analyse_filters_non_gb_listings():
+    items = [
+        {"title": "Gant Shirt", "price": {"value": "20"}, "itemLocation": {"country": "GB"}},
+        {"title": "Gant Shirt", "price": {"value": "50"}, "itemLocation": {"country": "US"}},
+        {"title": "Gant Shirt", "price": {"value": "30"}, "itemLocation": {"country": "GB"}},
+    ]
+    assert analyse(items, query="Gant Shirt") == {"median": 25.0}
+
+
+def test_analyse_keeps_items_without_location():
+    items = [
+        {"title": "Gant Shirt", "price": {"value": "20"}},
+        {"title": "Gant Shirt", "price": {"value": "30"}, "itemLocation": {"country": "GB"}},
+    ]
+    assert analyse(items, query="Gant Shirt") == {"median": 25.0}
+
+
 def test_title_matches_requires_min_tokens():
     assert _title_matches("Gant Gingham Shirt XL", "Gant Shirt") is True
     assert _title_matches("Gant Polo Jumper", "Gant Shirt") is False
