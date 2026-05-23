@@ -23,6 +23,7 @@ import uvicorn
 
 import database
 from services.ebay.scout_async import evaluate_with_consensus_saas
+from services.ebay.vinted_fetcher import warmup as vinted_warmup
 from web_app import app as web_app
 
 # ------------------------------------------------------------------------------
@@ -235,6 +236,7 @@ async def main_async() -> None:
         raise RuntimeError("TELEGRAM_TOKEN not set")
 
     await database.init_db()
+    asyncio.create_task(vinted_warmup())
 
     app = Application.builder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("start", start))

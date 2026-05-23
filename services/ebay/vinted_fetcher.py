@@ -60,6 +60,14 @@ async def refresh_session() -> None:
     await _ensure_session()
 
 
+async def warmup() -> None:
+    try:
+        await _ensure_session()
+        LOGGER.info("Vinted session pre-warmed")
+    except Exception:
+        LOGGER.warning("Vinted warmup failed — will retry on first request")
+
+
 async def search_vinted(query: str, per_page: int = 20) -> List[float]:
     await _ensure_session()
     await asyncio.sleep(random.uniform(0.3, 1.0))

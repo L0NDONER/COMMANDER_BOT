@@ -78,7 +78,10 @@ async def _stub_gather_votes(variants, condition, fetch_vote, timeout):
 async def _stub_vinted_vote(query, condition, index=0):
     return None
 
-_stub("services.ebay.vinted_fetcher", get_vinted_vote=_stub_vinted_vote)
+async def _stub_warmup():
+    pass
+
+_stub("services.ebay.vinted_fetcher", get_vinted_vote=_stub_vinted_vote, warmup=_stub_warmup)
 
 _stub(
     "services.ebay.consensus_engine",
