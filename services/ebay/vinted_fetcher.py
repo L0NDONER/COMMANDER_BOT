@@ -12,7 +12,7 @@ LOGGER = logging.getLogger(__name__)
 
 VINTED_BASE = "https://www.vinted.co.uk"
 VINTED_SEARCH = f"{VINTED_BASE}/api/v2/catalog/items"
-VINTED_PROXY = "socks5://127.0.0.1:1080"
+VINTED_PROXY = "socks5://host.docker.internal:1080"
 VINTED_CACHE_TTL = 43200  # 12 hours
 VINTED_TO_EBAY = 1 / 0.72
 
