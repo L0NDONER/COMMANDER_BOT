@@ -182,7 +182,7 @@ async def evaluate_with_consensus_saas(image_path: str, buy_price: str) -> Dict:
 
     variants = build_variants(base_query, condition, keywords)
     ebay_coro = gather_votes(variants, condition, get_worker_vote_async, CONSENSUS_TIMEOUT_SECONDS)
-    vinted_coro = gather_votes(variants, condition, get_vinted_vote, CONSENSUS_TIMEOUT_SECONDS)
+    vinted_coro = gather_votes(variants, condition, get_vinted_vote, CONSENSUS_TIMEOUT_SECONDS + 10)
 
     ebay_result, vinted_result = await asyncio.gather(ebay_coro, vinted_coro, return_exceptions=True)
 

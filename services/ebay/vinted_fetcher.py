@@ -62,7 +62,7 @@ async def refresh_session() -> None:
 
 async def search_vinted(query: str, per_page: int = 20) -> List[float]:
     await _ensure_session()
-    await asyncio.sleep(random.uniform(0.8, 2.0))
+    await asyncio.sleep(random.uniform(0.3, 1.0))
 
     client = _get_client()
     resp = await client.get(
