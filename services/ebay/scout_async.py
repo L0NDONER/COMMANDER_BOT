@@ -129,7 +129,7 @@ async def get_stats_async(query: str, condition: str = "used") -> Dict:
         return cached
     try:
         token = await get_token_async()
-        stats = analyse(await fetch_ebay_api_async(query, token, condition))
+        stats = analyse(await fetch_ebay_api_async(query, token, condition), query=query)
         if stats:
             await database.set_cached_value(cache_key, stats, ttl_seconds=STATS_CACHE_TTL_SECONDS)
         return stats

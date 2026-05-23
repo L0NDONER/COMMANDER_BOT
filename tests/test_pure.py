@@ -4,6 +4,7 @@ import pytest
 
 from services.ebay import scout_update
 from services.ebay.scout_update import (
+    _title_matches,
     analyse,
     charm,
     choose_vinted_discount,
@@ -78,6 +79,34 @@ def test_analyse_empty_items():
 def test_analyse_skips_items_without_price():
     items = [{"price": {"value": "5"}}, {"title": "no price"}, {"price": {"value": "15"}}]
     assert analyse(items) == {"median": 10.0}
+
+
+def test_analyse_filters_irrelevant_titles():
+    items = [
+        {"title": "Gant Gingham Shirt XL", "price": {"value": "25"}},
+        {"title": "Nike Air Max Trainers", "price": {"value": "80"}},
+        {"title": "Gant Oxford Shirt Large", "price": {"value": "30"}},
+    ]
+    assert analyse(items, query="Gant Shirt") == {"median": 27.5}
+
+
+def test_analyse_keeps_items_without_title():
+    items = [
+        {"price": {"value": "10"}},
+        {"title": "Gant Shirt M", "price": {"value": "20"}},
+    ]
+    assert analyse(items, query="Gant Shirt") == {"median": 15.0}
+
+
+def test_title_matches_requires_min_tokens():
+    assert _title_matches("Gant Gingham Shirt XL", "Gant Shirt") is True
+    assert _title_matches("Gant Polo Jumper", "Gant Shirt") is False
+    assert _title_matches("Random Shirt Blue", "Gant Shirt") is False
+
+
+def test_title_matches_single_token_query():
+    assert _title_matches("Gant Oxford Shirt", "Gant") is True
+    assert _title_matches("Nike Trainer", "Gant") is False
 
 
 # ---------- charm ----------

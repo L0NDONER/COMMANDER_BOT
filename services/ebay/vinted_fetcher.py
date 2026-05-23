@@ -8,6 +8,7 @@ from typing import Dict, List, Optional
 import httpx
 
 import database
+from services.ebay.scout_update import _title_matches
 
 LOGGER = logging.getLogger(__name__)
 
@@ -92,6 +93,9 @@ async def search_vinted(query: str, per_page: int = 20) -> List[float]:
     prices = []
     for item in items:
         try:
+            title = item.get("title", "")
+            if query and title and not _title_matches(title, query):
+                continue
             price = float(item["total_item_price"]["amount"])
             if 1.0 <= price <= 500.0:
                 prices.append(price)

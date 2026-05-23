@@ -68,8 +68,22 @@ LOGGER = logging.getLogger(__name__)
 # Pure helpers
 # ------------------------------------------------------------------------------
 
-def analyse(items: List[dict]) -> Dict:
-    prices = [float(i["price"]["value"]) for i in items if "price" in i]
+def _title_matches(title: str, query: str, min_tokens: int = 2) -> bool:
+    title_lower = title.lower()
+    tokens = query.lower().split()
+    hits = sum(1 for t in tokens if t in title_lower)
+    return hits >= min(min_tokens, len(tokens))
+
+
+def analyse(items: List[dict], query: str = "") -> Dict:
+    prices = []
+    for i in items:
+        if "price" not in i:
+            continue
+        title = i.get("title", "")
+        if query and title and not _title_matches(title, query):
+            continue
+        prices.append(float(i["price"]["value"]))
     return {"median": statistics.median(prices)} if prices else {}
 
 
