@@ -75,6 +75,11 @@ async def _stub_gather_votes(variants, condition, fetch_vote, timeout):
     return [r for r in results if isinstance(r, dict) and "median" in r]
 
 
+async def _stub_vinted_vote(query, condition, index=0):
+    return None
+
+_stub("services.ebay.vinted_fetcher", get_vinted_vote=_stub_vinted_vote)
+
 _stub(
     "services.ebay.consensus_engine",
     MIN_VOTES_FOR_CONSENSUS=2,

@@ -7,6 +7,8 @@ services:
       - "127.0.0.1:8080:8080"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    environment:
+      - VINTED_PROXY=socks5://host.docker.internal:1080
     volumes:
       - ./stars.db:/app/stars.db
       - ./sales.db:/app/sales.db

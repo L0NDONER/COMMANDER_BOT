@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import random
 import statistics
 from typing import Dict, List, Optional
@@ -12,7 +13,7 @@ LOGGER = logging.getLogger(__name__)
 
 VINTED_BASE = "https://www.vinted.co.uk"
 VINTED_SEARCH = f"{VINTED_BASE}/api/v2/catalog/items"
-VINTED_PROXY = "socks5://host.docker.internal:1080"
+VINTED_PROXY = os.getenv("VINTED_PROXY", "")
 VINTED_CACHE_TTL = 43200  # 12 hours
 VINTED_TO_EBAY = 1 / 0.72
 
@@ -35,7 +36,7 @@ def _get_client() -> httpx.AsyncClient:
     if _client is None:
         _client = httpx.AsyncClient(
             timeout=15.0,
-            proxy=VINTED_PROXY,
+            proxy=VINTED_PROXY or None,
             headers=HEADERS,
         )
     return _client
