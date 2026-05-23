@@ -1,7 +1,7 @@
 python-telegram-bot==22.7
 groq==1.0.0
 requests==2.32.3
-httpx
+httpx[socks]
 aiosqlite
 PyYAML==6.0.2
 betfairlightweight
