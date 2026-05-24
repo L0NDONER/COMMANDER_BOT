@@ -148,7 +148,12 @@
     background: #333;
     color: #777;
   }
-  button.again {
+  .post-buttons {
+    display: flex;
+    gap: 10px;
+  }
+  .post-buttons button {
+    flex: 1;
     height: 52px;
     border-radius: 14px;
     border: 1px solid #555;
@@ -250,7 +255,10 @@
   <button class="go" id="go" disabled>GO</button>
 
   <div class="result idle" id="result">Take a photo, enter a price.</div>
-  <button class="again hidden" id="again">SCAN ANOTHER</button>
+  <div class="post-buttons hidden" id="postButtons">
+    <button id="reprice">RE-PRICE</button>
+    <button id="again">SCAN ANOTHER</button>
+  </div>
 </div>
 
 <script>
@@ -267,6 +275,8 @@ const extrasRow = document.getElementById('extrasRow');
 const totalLine = document.getElementById('totalLine');
 const goBtn = document.getElementById('go');
 const resultEl = document.getElementById('result');
+const postButtons = document.getElementById('postButtons');
+const repriceBtn = document.getElementById('reprice');
 const againBtn = document.getElementById('again');
 
 let resizedBlob = null;
@@ -350,15 +360,27 @@ goBtn.addEventListener('click', async () => {
     const res = await fetch('/api/evaluate', { method: 'POST', body: fd });
     const data = await res.json();
     renderVerdict(data, price);
-    againBtn.classList.remove('hidden');
+    postButtons.classList.remove('hidden');
   } catch (e) {
     showResult('err', 'Network error', String(e));
-    againBtn.classList.remove('hidden');
+    postButtons.classList.remove('hidden');
   } finally {
     busy = false;
     goBtn.textContent = 'GO';
     refresh();
   }
+});
+
+repriceBtn.addEventListener('click', () => {
+  priceInput.value = '';
+  feesInput.value = '';
+  shippingInput.value = '';
+  totalLine.classList.add('hidden');
+  resultEl.className = 'result idle';
+  resultEl.textContent = 'Same photo — enter a new price.';
+  postButtons.classList.add('hidden');
+  priceInput.focus();
+  refresh();
 });
 
 againBtn.addEventListener('click', () => {
@@ -382,7 +404,7 @@ againBtn.addEventListener('click', () => {
   }
   resultEl.className = 'result idle';
   resultEl.textContent = 'Take a photo, enter a price.';
-  againBtn.classList.add('hidden');
+  postButtons.classList.add('hidden');
   refresh();
 });
 
