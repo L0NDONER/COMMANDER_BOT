@@ -86,6 +86,37 @@
     -webkit-appearance: none;
     appearance: none;
   }
+  .extras-toggle {
+    text-align: center;
+    font-size: 13px;
+    color: #555;
+    cursor: pointer;
+    padding: 2px 0;
+    user-select: none;
+  }
+  .extras-toggle:hover { color: #888; }
+  .extras-toggle.active { color: #888; }
+  .extras-row {
+    display: flex;
+    gap: 10px;
+  }
+  .extras-row .price {
+    flex: 1;
+    height: 46px;
+    padding: 0 12px;
+  }
+  .extras-row .price .label {
+    font-size: 16px;
+  }
+  .extras-row .price input {
+    font-size: 16px;
+  }
+  .total-line {
+    text-align: center;
+    font-size: 13px;
+    color: #888;
+    font-weight: 600;
+  }
   button.go {
     height: 64px;
     border-radius: 14px;
@@ -185,6 +216,19 @@
     <input type="text" inputmode="decimal" id="price" placeholder="buy price">
   </div>
 
+  <div class="extras-toggle" id="extrasToggle">+ fees &amp; shipping</div>
+  <div class="extras-row hidden" id="extrasRow">
+    <div class="price">
+      <span class="label">£</span>
+      <input type="text" inputmode="decimal" id="fees" placeholder="fees">
+    </div>
+    <div class="price">
+      <span class="label">£</span>
+      <input type="text" inputmode="decimal" id="shipping" placeholder="shipping">
+    </div>
+  </div>
+  <div class="total-line hidden" id="totalLine"></div>
+
   <button class="go" id="go" disabled>GO</button>
 
   <div class="result idle" id="result">Take a photo, enter a price.</div>
@@ -196,20 +240,56 @@ const photoInput = document.getElementById('photoInput');
 const preview = document.getElementById('preview');
 const photoHint = document.getElementById('photoHint');
 const priceInput = document.getElementById('price');
+const feesInput = document.getElementById('fees');
+const shippingInput = document.getElementById('shipping');
+const extrasToggle = document.getElementById('extrasToggle');
+const extrasRow = document.getElementById('extrasRow');
+const totalLine = document.getElementById('totalLine');
 const goBtn = document.getElementById('go');
 const resultEl = document.getElementById('result');
 const againBtn = document.getElementById('again');
 
 let resizedBlob = null;
 let busy = false;
+let extrasOpen = false;
+
+function getTotalPrice() {
+  const base = parseFloat(priceInput.value) || 0;
+  const fees = parseFloat(feesInput.value) || 0;
+  const ship = parseFloat(shippingInput.value) || 0;
+  return base + fees + ship;
+}
 
 function refresh() {
   const p = parseFloat(priceInput.value);
   const ready = !!resizedBlob && priceInput.value.trim() !== '' && p >= 0 && isFinite(p) && !busy;
   goBtn.disabled = !ready;
+  const fees = parseFloat(feesInput.value) || 0;
+  const ship = parseFloat(shippingInput.value) || 0;
+  if (extrasOpen && (fees > 0 || ship > 0) && p >= 0 && isFinite(p)) {
+    totalLine.textContent = 'Total: £' + getTotalPrice().toFixed(2);
+    totalLine.classList.remove('hidden');
+  } else {
+    totalLine.classList.add('hidden');
+  }
 }
 
 priceInput.addEventListener('input', refresh);
+feesInput.addEventListener('input', refresh);
+shippingInput.addEventListener('input', refresh);
+
+extrasToggle.addEventListener('click', () => {
+  extrasOpen = !extrasOpen;
+  extrasRow.classList.toggle('hidden', !extrasOpen);
+  extrasToggle.classList.toggle('active', extrasOpen);
+  extrasToggle.textContent = extrasOpen ? '− fees & shipping' : '+ fees & shipping';
+  if (!extrasOpen) {
+    feesInput.value = '';
+    shippingInput.value = '';
+    totalLine.classList.add('hidden');
+  }
+  refresh();
+});
 
 photoInput.addEventListener('change', async () => {
   const file = photoInput.files && photoInput.files[0];
@@ -228,7 +308,7 @@ photoInput.addEventListener('change', async () => {
 
 goBtn.addEventListener('click', async () => {
   if (!resizedBlob) return;
-  const price = parseFloat(priceInput.value);
+  const price = getTotalPrice();
   if (!isFinite(price) || price < 0) return;
 
   busy = true; refresh();
@@ -262,6 +342,15 @@ againBtn.addEventListener('click', () => {
   preview.classList.add('hidden');
   photoHint.classList.remove('hidden');
   priceInput.value = '';
+  feesInput.value = '';
+  shippingInput.value = '';
+  if (extrasOpen) {
+    extrasOpen = false;
+    extrasRow.classList.add('hidden');
+    extrasToggle.classList.remove('active');
+    extrasToggle.textContent = '+ fees & shipping';
+    totalLine.classList.add('hidden');
+  }
   resultEl.className = 'result idle';
   resultEl.textContent = 'Take a photo, enter a price.';
   againBtn.classList.add('hidden');
