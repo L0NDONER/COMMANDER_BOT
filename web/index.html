@@ -306,6 +306,7 @@ function refresh() {
   }
 }
 
+priceInput.addEventListener('focus', () => priceInput.select());
 priceInput.addEventListener('input', refresh);
 feesInput.addEventListener('input', refresh);
 shippingInput.addEventListener('input', refresh);
