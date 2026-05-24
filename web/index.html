@@ -416,7 +416,7 @@ function renderVerdict(data, buyPrice) {
   }
   const net = (data.sell_price_num - buyPrice).toFixed(2);
   const kind = verdictClass(data.verdict);
-  if ((kind === 'buy' || kind === 'strong-buy') && navigator.vibrate) navigator.vibrate(80);
+  if ((kind === 'buy' || kind === 'strong-buy') && navigator.vibrate) navigator.vibrate(200);
   showResult(
     kind,
     `${data.verdict} — list ${data.sell_for}`,
