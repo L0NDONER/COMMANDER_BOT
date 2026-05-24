@@ -86,6 +86,17 @@
     -webkit-appearance: none;
     appearance: none;
   }
+  .clip {
+    font-size: 22px;
+    color: #555;
+    cursor: pointer;
+    padding: 4px;
+    transform: rotate(315deg);
+    user-select: none;
+    line-height: 1;
+  }
+  .clip:hover { color: #888; }
+  .clip.has-photo { color: #4a4; }
   .extras-toggle {
     text-align: center;
     font-size: 13px;
@@ -214,6 +225,8 @@
   <div class="price">
     <span class="label">£</span>
     <input type="text" inputmode="decimal" id="price" placeholder="buy price">
+    <label class="clip" id="clipIcon" for="galleryInput">📎</label>
+    <input type="file" id="galleryInput" accept="image/*">
   </div>
 
   <div class="extras-toggle" id="extrasToggle">+ fees &amp; shipping</div>
@@ -237,6 +250,8 @@
 
 <script>
 const photoInput = document.getElementById('photoInput');
+const galleryInput = document.getElementById('galleryInput');
+const clipIcon = document.getElementById('clipIcon');
 const preview = document.getElementById('preview');
 const photoHint = document.getElementById('photoHint');
 const priceInput = document.getElementById('price');
@@ -291,19 +306,26 @@ extrasToggle.addEventListener('click', () => {
   refresh();
 });
 
+async function loadPhoto(file) {
+  resizedBlob = await resizeImage(file, 1024, 0.8);
+  if (preview.src) URL.revokeObjectURL(preview.src);
+  preview.src = URL.createObjectURL(resizedBlob);
+  preview.classList.remove('hidden');
+  photoHint.classList.add('hidden');
+  clipIcon.classList.add('has-photo');
+  refresh();
+}
+
 photoInput.addEventListener('change', async () => {
   const file = photoInput.files && photoInput.files[0];
   if (!file) return;
-  try {
-    resizedBlob = await resizeImage(file, 1024, 0.8);
-    if (preview.src) URL.revokeObjectURL(preview.src);
-    preview.src = URL.createObjectURL(resizedBlob);
-    preview.classList.remove('hidden');
-    photoHint.classList.add('hidden');
-    refresh();
-  } catch (e) {
-    showResult('err', 'Failed to read photo', '');
-  }
+  try { await loadPhoto(file); } catch (e) { showResult('err', 'Failed to read photo', ''); }
+});
+
+galleryInput.addEventListener('change', async () => {
+  const file = galleryInput.files && galleryInput.files[0];
+  if (!file) return;
+  try { await loadPhoto(file); } catch (e) { showResult('err', 'Failed to read photo', ''); }
 });
 
 goBtn.addEventListener('click', async () => {
@@ -337,6 +359,8 @@ goBtn.addEventListener('click', async () => {
 againBtn.addEventListener('click', () => {
   resizedBlob = null;
   photoInput.value = '';
+  galleryInput.value = '';
+  clipIcon.classList.remove('has-photo');
   if (preview.src) URL.revokeObjectURL(preview.src);
   preview.src = '';
   preview.classList.add('hidden');
