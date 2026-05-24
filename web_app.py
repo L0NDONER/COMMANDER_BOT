@@ -36,6 +36,11 @@ async def index() -> FileResponse:
     return FileResponse(WEB_DIR / "index.html")
 
 
+@app.get("/manifest.json")
+async def manifest() -> FileResponse:
+    return FileResponse(WEB_DIR / "manifest.json", media_type="application/manifest+json")
+
+
 @app.post("/api/evaluate")
 async def evaluate(
     image: UploadFile = File(...),
