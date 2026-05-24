@@ -48,6 +48,17 @@ Photo+price → Vinted resale verdict. Single process, all in-memory:
 
 eBay API: `api.ebay.com/buy/browse/v1/item_summary/search`, marketplace `EBAY_GB`, condition filter `3000|4000|5000` (used). Token + stats cached in the SQLite-backed `database` module under `ebay_token` and `stats:{condition}:{query.lower()}`.
 
+## Web app (flaz.co.uk)
+
+- `web_app.py` — FastAPI app serving the frontend and API endpoints.
+- `web/index.html` — single-page PWA. All CSS/JS inline, no build step.
+- `web/manifest.json` — PWA manifest (standalone display, icons, scope).
+- `web/icons/` — PWA icons (192, 512) and OG image. Served via `/icons/{name}` route.
+- Static files are served by explicit routes, not a catch-all static mount.
+- `POST /api/evaluate` — photo + price → consensus verdict (same pipeline as Telegram).
+- `POST /api/log-buy` — logs a buy decision to the database.
+- Lighthouse scores: 100 across performance, accessibility, best practices, SEO.
+
 ## scripts/
 
 Checked in, not deployed. When working on the eBay pipeline, skip `grep`/`find` across `scripts/` — independent.
