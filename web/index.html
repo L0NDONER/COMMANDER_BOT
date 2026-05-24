@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a0a0a">
 <link rel="manifest" href="/manifest.json">
 <meta name="description" content="Stop Guessing. Start Profiting. Scan clothing with AI to instantly uncover hidden market value and resale margins.">
@@ -20,7 +20,7 @@
     color: #f5f5f5;
     -webkit-tap-highlight-color: transparent;
   }
-  .app {
+  main.app {
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -51,7 +51,7 @@
     cursor: pointer;
   }
   .photo .hint {
-    color: #777;
+    color: #aaa;
     text-align: center;
     font-size: 15px;
     line-height: 1.4;
@@ -78,7 +78,7 @@
   }
   .price .label {
     font-size: 22px;
-    color: #888;
+    color: #999;
     margin-right: 8px;
   }
   .price input {
@@ -94,7 +94,7 @@
   }
   .clip {
     font-size: 22px;
-    color: #555;
+    color: #999;
     cursor: pointer;
     padding: 4px;
     transform: rotate(315deg);
@@ -106,7 +106,7 @@
   .extras-toggle {
     text-align: center;
     font-size: 13px;
-    color: #555;
+    color: #999;
     cursor: pointer;
     padding: 2px 0;
     user-select: none;
@@ -147,7 +147,7 @@
   }
   button.go:disabled {
     background: #333;
-    color: #777;
+    color: #aaa;
   }
   .post-buttons {
     display: flex;
@@ -164,6 +164,16 @@
     font-weight: 700;
     letter-spacing: 0.05em;
     cursor: pointer;
+  }
+  .post-buttons button.log-buy {
+    background: #1c3a1c;
+    border-color: #3a7a3a;
+    color: #eaf6ea;
+  }
+  .post-buttons button.log-buy.logged {
+    background: #333;
+    border-color: #555;
+    color: #aaa;
   }
   .result {
     border-radius: 14px;
@@ -182,7 +192,7 @@
     justify-content: center;
   }
   .result.has-listing { justify-content: flex-start; }
-  .result.idle { color: #555; align-items: center; }
+  .result.idle { color: #999; align-items: center; }
   .result .verdict { font-weight: 800; font-size: 18px; margin-bottom: 4px; }
   .result .meta { font-size: 13px; opacity: 0.85; }
   .result .listing { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
@@ -221,7 +231,7 @@
 </style>
 </head>
 <body>
-<div class="app">
+<main class="app">
   <header>FLAZ</header>
 
   <label class="photo" id="photoBox" for="photoInput">
@@ -257,10 +267,11 @@
 
   <div class="result idle" id="result">Take a photo, enter a price.</div>
   <div class="post-buttons hidden" id="postButtons">
+    <button class="log-buy hidden" id="logBuy">LOG BUY</button>
     <button id="reprice">RE-PRICE</button>
     <button id="again">SCAN ANOTHER</button>
   </div>
-</div>
+</main>
 
 <script>
 const photoInput = document.getElementById('photoInput');
@@ -277,6 +288,7 @@ const totalLine = document.getElementById('totalLine');
 const goBtn = document.getElementById('go');
 const resultEl = document.getElementById('result');
 const postButtons = document.getElementById('postButtons');
+const logBuyBtn = document.getElementById('logBuy');
 const repriceBtn = document.getElementById('reprice');
 const againBtn = document.getElementById('again');
 
@@ -284,6 +296,7 @@ let resizedBlob = null;
 let busy = false;
 let extrasOpen = false;
 let lastPrice = '';
+let lastVerdict = null;
 
 function getTotalPrice() {
   const base = parseFloat(priceInput.value) || 0;
@@ -376,11 +389,31 @@ goBtn.addEventListener('click', async () => {
   }
 });
 
+logBuyBtn.addEventListener('click', async () => {
+  if (!lastVerdict) return;
+  logBuyBtn.disabled = true;
+  logBuyBtn.textContent = 'LOGGING…';
+  try {
+    const fd = new FormData();
+    fd.append('query', lastVerdict.query);
+    fd.append('buy_price', String(lastVerdict.buyPrice));
+    fd.append('median', String(lastVerdict.median));
+    fd.append('verdict', lastVerdict.verdict);
+    await fetch('/api/log-buy', { method: 'POST', body: fd });
+    logBuyBtn.textContent = 'LOGGED';
+    logBuyBtn.classList.add('logged');
+  } catch (e) {
+    logBuyBtn.textContent = 'FAILED';
+    logBuyBtn.disabled = false;
+  }
+});
+
 repriceBtn.addEventListener('click', () => {
   priceInput.value = '';
   feesInput.value = '';
   shippingInput.value = '';
   totalLine.classList.add('hidden');
+  logBuyBtn.classList.add('hidden');
   resultEl.className = 'result idle';
   resultEl.textContent = 'Same photo — enter a new price.';
   postButtons.classList.add('hidden');
@@ -422,6 +455,14 @@ function renderVerdict(data, buyPrice) {
   const kind = verdictClass(data.verdict);
   if (kind === 'strong-buy' && navigator.vibrate) navigator.vibrate([500, 100, 500]);
   else if (kind === 'buy' && navigator.vibrate) navigator.vibrate(500);
+  lastVerdict = { query: data.query, buyPrice, median: data.median, verdict: data.verdict };
+  if (kind === 'buy' || kind === 'strong-buy') {
+    logBuyBtn.textContent = 'LOG BUY';
+    logBuyBtn.classList.remove('logged', 'hidden');
+    logBuyBtn.disabled = false;
+  } else {
+    logBuyBtn.classList.add('hidden');
+  }
   showResult(
     kind,
     `${data.verdict} — list ${data.sell_for}`,
