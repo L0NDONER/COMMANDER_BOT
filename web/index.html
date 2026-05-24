@@ -282,6 +282,7 @@ const againBtn = document.getElementById('again');
 let resizedBlob = null;
 let busy = false;
 let extrasOpen = false;
+let lastPrice = '';
 
 function getTotalPrice() {
   const base = parseFloat(priceInput.value) || 0;
@@ -349,6 +350,7 @@ goBtn.addEventListener('click', async () => {
   const price = getTotalPrice();
   if (!isFinite(price) || price < 0) return;
 
+  lastPrice = priceInput.value;
   busy = true; refresh();
   goBtn.textContent = 'WORKING…';
   showResult('idle', 'Dispatching agents to the jury…', '');
@@ -393,7 +395,7 @@ againBtn.addEventListener('click', () => {
   preview.src = '';
   preview.classList.add('hidden');
   photoHint.classList.remove('hidden');
-  priceInput.value = '';
+  priceInput.value = lastPrice;
   feesInput.value = '';
   shippingInput.value = '';
   if (extrasOpen) {
@@ -416,7 +418,8 @@ function renderVerdict(data, buyPrice) {
   }
   const net = (data.sell_price_num - buyPrice).toFixed(2);
   const kind = verdictClass(data.verdict);
-  if ((kind === 'buy' || kind === 'strong-buy') && navigator.vibrate) navigator.vibrate(500);
+  if (kind === 'strong-buy' && navigator.vibrate) navigator.vibrate([500, 100, 500]);
+  else if (kind === 'buy' && navigator.vibrate) navigator.vibrate(500);
   showResult(
     kind,
     `${data.verdict} — list ${data.sell_for}`,
