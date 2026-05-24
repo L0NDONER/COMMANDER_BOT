@@ -3,6 +3,7 @@ import logging
 import os
 import random
 import statistics
+import time
 from typing import Dict, List, Optional
 
 import httpx
@@ -17,6 +18,7 @@ VINTED_SEARCH = f"{VINTED_BASE}/api/v2/catalog/items"
 VINTED_PROXY = os.getenv("VINTED_PROXY", "")
 VINTED_CACHE_TTL = 43200  # 12 hours
 VINTED_TO_EBAY = 1 / 0.72
+VINTED_MAX_AGE_DAYS = 30
 
 HEADERS = {
     "User-Agent": (
@@ -90,9 +92,13 @@ async def search_vinted(query: str, per_page: int = 20) -> List[float]:
         return []
 
     items = resp.json().get("items", [])
+    cutoff = time.time() - VINTED_MAX_AGE_DAYS * 86400
     prices = []
     for item in items:
         try:
+            photo_ts = item.get("photo", {}).get("high_resolution", {}).get("timestamp", 0)
+            if photo_ts and photo_ts < cutoff:
+                continue
             title = item.get("title", "")
             if query and title and not _title_matches(title, query):
                 continue
