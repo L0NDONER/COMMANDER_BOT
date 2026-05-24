@@ -41,6 +41,36 @@ async def manifest() -> FileResponse:
     return FileResponse(WEB_DIR / "manifest.json", media_type="application/manifest+json")
 
 
+@app.get("/icons/{name}")
+async def icons(name: str) -> FileResponse:
+    path = WEB_DIR / "icons" / name
+    if not path.is_file() or ".." in name:
+        return JSONResponse({"error": "not found"}, status_code=404)
+    return FileResponse(path, media_type="image/png")
+
+
+@app.post("/api/log-buy")
+async def log_buy(
+    query: str = Form(...),
+    buy_price: float = Form(...),
+    median: float = Form(None),
+    verdict: str = Form(None),
+) -> JSONResponse:
+    try:
+        row_id = await database.log_buy(
+            chat_id="flaz",
+            query=query,
+            buy_price=buy_price,
+            median=median,
+            verdict=verdict,
+            raw=f"flaz web buy_price={buy_price}",
+        )
+        return JSONResponse({"status": "ok", "id": row_id})
+    except Exception as exc:
+        LOGGER.exception("log_buy failed")
+        return JSONResponse({"status": "error", "message": str(exc)}, status_code=500)
+
+
 @app.post("/api/evaluate")
 async def evaluate(
     image: UploadFile = File(...),
