@@ -38,6 +38,7 @@ scripts/local_scout/scout.log
 *.jpg
 *.jpeg
 *.png
+!web/icons/*.png
 
 # Docker
 .dockerignore
