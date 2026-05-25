@@ -33,6 +33,7 @@ venv/
 cache.db
 scripts/local_scout/scout.db
 scripts/local_scout/scout.log
+scripts/.fossil_lab_cache.json
 
 # Camera snapshots
 *.jpg
