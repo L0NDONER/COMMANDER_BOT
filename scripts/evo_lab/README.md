@@ -110,6 +110,30 @@ Backend `all-MiniLM-L6-v2`, 30-token vocab, k=3 (chance floor ≈ 0.10).
   residual difference is manifold-connectivity (τ-chains can't jump disconnected
   clusters), which has no product value and costs a ~42% stall rate.
 
+## Phase 2 — mixture-policy population (`evolve.py`)
+
+Sim mirroring the live pool (3 slots, winner-takes-energy), swapping only the
+respawn policy, under two fitness landscapes (smooth = good modifiers cluster
+semantically; random = quality unrelated to embedding). Fitness reported above
+the random-pick mean; diversity = mean pairwise cosine of live slots (lower =
+more diverse).
+
+- **Mixture beats random on fitness under SMOOTH (+0.19 vs +0.15) but at worse
+  diversity (0.42 vs 0.31)** — and the gain comes from the leader/lineage
+  (drift-from-*winner*) modes, not from semantics-from-self.
+- **Plain semantic respawn — drift from the DEAD token, which is what's wired
+  live — is WORSE than random even under smooth (+0.115 vs +0.150).** A token
+  dies because it's unfit; under smooth fitness its neighbours are unfit too, so
+  drifting from it is drift-toward-losers. The live wiring chose the one semantic
+  anchor that backfires. Useful direction = drift from the leader.
+- **Under RANDOM fitness, all policies tie (random marginally best).** Every
+  semantic effect is contingent on the unproven assumption that modifier quality
+  is smooth in embedding space.
+
+Net: the mixture "passes" only under an unproven assumption, with a diversity
+tax and a small, noisy margin. Its main value is diagnostic — it shows the
+shipped `semantic_respawn(dead)` is the weak choice.
+
 ## Verdict
 
 **The meta-finding settles it:** every operator that "helps" (single-jump
