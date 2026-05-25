@@ -83,9 +83,14 @@ async def _stub_warmup():
 
 _stub("services.ebay.vinted_fetcher", get_vinted_vote=_stub_vinted_vote, warmup=_stub_warmup)
 
+def _stub_record_consensus(base_query, condition, keywords, votes):
+    pass
+
+
 _stub(
     "services.ebay.consensus_engine",
     MIN_VOTES_FOR_CONSENSUS=2,
     build_variants=_stub_build_variants,
     gather_votes=_stub_gather_votes,
+    record_consensus=_stub_record_consensus,
 )

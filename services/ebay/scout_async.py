@@ -22,6 +22,7 @@ from services.ebay.consensus_engine import (
     MIN_VOTES_FOR_CONSENSUS,
     build_variants,
     gather_votes,
+    record_consensus,
 )
 from services.ebay.scout_update import (
     CONDITION_FILTERS,
@@ -199,6 +200,7 @@ async def evaluate_with_consensus_saas(image_path: str, buy_price: str) -> Dict:
         return {"status": "error", "message": "Insufficient market data."}
 
     scored = _score(votes, base_query, clean_buy)
+    record_consensus(base_query, condition, keywords, votes)
     listing = generate_listing_draft(base_query, keywords)
     sell_price = scored["sell_price"]
 
