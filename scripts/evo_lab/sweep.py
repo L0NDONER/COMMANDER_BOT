@@ -31,7 +31,7 @@ import argparse
 import numpy as np
 
 from embeddings import build_or_load_E, neighbours
-from vocab import SUFFIX_VOCAB
+from vocab import VOCABS
 
 # Gate targets (starting guesses — argue with the data, see README).
 P_BAND = (0.05, 0.15)
@@ -61,6 +61,7 @@ def sweep(E, grid, trials, k, scales, seed=0):
     for g in grid:
         crossed = np.zeros(n)
         local = np.zeros(n)
+        cos_sum = np.zeros(n)
         for i in range(n):
             sig = g * scales[i]
             pert = E[i] + rng.normal(0.0, sig, size=(trials, d))
@@ -68,13 +69,18 @@ def sweep(E, grid, trials, k, scales, seed=0):
             mask = who != i
             crossed[i] = mask.sum()
             if mask.any():
-                local[i] = np.isin(who[mask], topk[i]).sum()
+                landed = who[mask]
+                local[i] = np.isin(landed, topk[i]).sum()
+                cos_sum[i] = float((E[landed] @ E[i]).sum())  # Σ cos to source
         total = crossed.sum()
         per_token_p = crossed / trials
         rows.append({
             "g": g,
             "p": total / (n * trials),
             "locality": (local.sum() / total) if total else float("nan"),
+            # scale-invariant: mean cosine between source and landed token.
+            # Comparable across vocab sizes, unlike rank-based locality.
+            "cos": (cos_sum.sum() / total) if total else float("nan"),
             "p_std": float(np.std(per_token_p)),
             "p_min": float(per_token_p.min()),
             "p_max": float(per_token_p.max()),
@@ -88,13 +94,14 @@ def _best_in_band(rows):
 
 
 def _table(rows, label):
-    print(f"\n[{label}]  {'mult':>6} {'p':>7} {'local':>7} {'p_std':>7} "
-          f"{'p_min':>6} {'p_max':>6}")
-    print("-" * 52)
+    print(f"\n[{label}]  {'mult':>6} {'p':>7} {'local':>7} {'cos':>6} "
+          f"{'p_std':>7} {'p_min':>6} {'p_max':>6}")
+    print("-" * 60)
     for r in rows:
         loc = "  nan" if np.isnan(r["locality"]) else f"{r['locality']:.2f}"
+        cos = "  nan" if np.isnan(r["cos"]) else f"{r['cos']:.2f}"
         print(f"{'':>{len(label)+4}}{r['g']:6.3f} {r['p']:7.3f} {loc:>7} "
-              f"{r['p_std']:7.3f} {r['p_min']:6.2f} {r['p_max']:6.2f}")
+              f"{cos:>6} {r['p_std']:7.3f} {r['p_min']:6.2f} {r['p_max']:6.2f}")
 
 
 def report(rows, n_tokens, label="global"):
@@ -109,6 +116,8 @@ def report(rows, n_tokens, label="global"):
     print(f"G1 PASS: mult={best['g']:.3f} gives p={best['p']:.3f} (in {P_BAND}).")
     print(f"G2: in-band locality {best['locality']:.2f} vs chance {chance:.2f} "
           f"(random respawn) = {lift:.1f}x lift.")
+    print(f"    in-band mean crossing cosine = {best['cos']:.2f} "
+          "(scale-invariant; compare across vocabs).")
     if best["locality"] >= LOCALITY_TARGET:
         print(f"     STRONG: ≥{LOCALITY_TARGET} target. Clearly steerable.")
     elif lift >= 2.0:
@@ -156,6 +165,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--backend", default="sentence-transformers",
                     choices=["sentence-transformers", "random"])
+    ap.add_argument("--vocab", default="base", choices=list(VOCABS))
     ap.add_argument("--mode", default="global",
                     choices=["global", "per-cell", "compare"])
     ap.add_argument("--trials", type=int, default=4000)
@@ -163,11 +173,17 @@ def main():
     ap.add_argument("--sigmas", type=float, nargs="+", default=DEFAULT_GRID)
     args = ap.parse_args()
 
-    tokens, E = build_or_load_E(SUFFIX_VOCAB, backend=args.backend)
+    tokens, E = build_or_load_E(VOCABS[args.vocab], backend=args.backend,
+                                name=args.vocab)
     ones = np.ones(len(tokens))
     scales = cell_scales(E)
-    print(f"backend={args.backend}  |V|={len(tokens)}  d={E.shape[1]}  "
-          f"trials/token={args.trials}  k={args.k}  mode={args.mode}")
+    sim = E @ E.T
+    base_cos = float(sim[~np.eye(len(tokens), dtype=bool)].mean())
+    print(f"backend={args.backend}  vocab={args.vocab}  |V|={len(tokens)}  "
+          f"d={E.shape[1]}  trials/token={args.trials}  k={args.k}  "
+          f"mode={args.mode}")
+    print(f"baseline mean pairwise cosine = {base_cos:.2f} "
+          "(what a random crossing would score)")
 
     if args.mode == "compare":
         g_rows = sweep(E, args.sigmas, args.trials, args.k, ones)

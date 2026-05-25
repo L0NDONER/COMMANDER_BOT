@@ -94,10 +94,38 @@ Backend `all-MiniLM-L6-v2`, 30-token vocab, k=3 (chance floor ≈ 0.10).
   *isolated* ones — so crossings shift toward tokens with no near neighbours,
   lowering locality. The ~4× global ceiling looks **intrinsic** to
   frozen-Voronoi over this embedding, not a tuning miss.
-- **Open:** lever #2 (richer/curated vocab) untested. But the per-cell result
-  hints the cap is fairly fundamental.
-- **Product call still open:** is ~4×-chance semantic drift worth the genotype +
-  lineage machinery over random respawn, for a shelf-side triage bot?
+- **Richer vocab (lever #2) — REFUTED.** A 3× denser, cluster-rich vocab (85
+  tokens) left drift quality unchanged on the scale-invariant metric (mean
+  cosine of where crossings land = **0.42, identical to base**). The apparent
+  shifts — top-3 locality 0.39→0.31, lift 3.8×→8.6× — were pure artifacts of
+  `|V|` changing the k=3 slice and the chance floor. Density changed nothing real.
+- **Is 0.42 even good?** Baseline mean pairwise cosine (a random crossing) is
+  ~0.28. So drift lands ~+0.14 cosine above random — a real but **modest**
+  semantic pull. Confirms the effect exists; bounds how much.
+- **Multi-step prev-anchored walk (`walk.py`) — REFUTED.** A K-step accepted
+  walk (each hop ≥τ cosine to the previous token) does reach beyond knn(top-15)
+  (~40% of endpoints) while staying semantic — but its endpoint distribution
+  (meanCos 0.52, fat tail) is reproduced by a one-line **cosine-softmax
+  respawn** (`token ∝ exp(cos/T)`) off the precomputed cosine row. The only
+  residual difference is manifold-connectivity (τ-chains can't jump disconnected
+  clusters), which has no product value and costs a ~42% stall rate.
+
+## Verdict
+
+**The meta-finding settles it:** every operator that "helps" (single-jump
+mutation, per-cell σ, richer vocab, multi-step walk) is reproduced by a one-line
+closed-form lookup/sampler off the precomputed cosine row — knn respawn or
+cosine-softmax respawn. The genotype vectors, ε-perturbation, snap-to-token,
+accept/reject, lineage/fossil machinery never add anything a cosine row can't do
+directly.
+
+**Recommendation: not worth shipping.** For a shelf-side triage bot in churn
+mode, even the closed-form "semantic respawn" is only a modest, unproven gain
+over plain random respawn — and the full ALife apparatus buys nothing over that
+one-liner. The live engine's plain random respawn is the right call. Settled
+negative result. If "semantic respawn" is ever wanted, it's a cosine-softmax
+over the neighbour matrix — not this machinery. Revisit only if the product goal
+changes from triage velocity to query-quality optimization.
 
 ## Run
 

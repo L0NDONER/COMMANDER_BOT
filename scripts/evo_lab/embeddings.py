@@ -43,13 +43,15 @@ def _embed_random(vocab: list[str], d: int = 384, seed: int = 0) -> np.ndarray:
     return rng.standard_normal((len(vocab), d)).astype(np.float32)
 
 
-def build_or_load_E(vocab: list[str], backend: str = "sentence-transformers"):
+def build_or_load_E(vocab: list[str], backend: str = "sentence-transformers",
+                    name: str = "base"):
     """Return (tokens, E) with E L2-normalized (so ⟨v, E_t⟩ is cosine).
 
-    Cached per backend so it is genuinely frozen between runs.
+    Cached per (backend, name) so it is genuinely frozen between runs and
+    different vocabs don't clobber each other's matrix.
     """
     os.makedirs(_DATA, exist_ok=True)
-    cache = os.path.join(_DATA, f"E_{backend}.npz")
+    cache = os.path.join(_DATA, f"E_{backend}_{name}.npz")
     if os.path.exists(cache):
         z = np.load(cache, allow_pickle=True)
         if list(z["tokens"]) == vocab:
