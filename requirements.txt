@@ -11,3 +11,4 @@ pyzbar
 fastapi
 uvicorn
 python-multipart
+numpy
