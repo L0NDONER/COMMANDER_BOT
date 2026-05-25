@@ -4,8 +4,6 @@ import asyncio
 import sys
 from pathlib import Path
 
-import pytest
-
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
@@ -62,58 +60,52 @@ class TestBuildVariants:
 
 
 class TestGatherVotes:
-    @pytest.mark.asyncio
-    async def test_collects_successful_votes(self):
+    def test_collects_successful_votes(self):
         async def fetcher(query, condition, idx):
             return {"median": 10.0, "query": query}
 
-        votes = await gather_votes(["a", "b"], "used", fetcher, timeout=5.0)
+        votes = asyncio.run(gather_votes(["a", "b"], "used", fetcher, timeout=5.0))
         assert len(votes) == 2
         assert all("median" in v for v in votes)
 
-    @pytest.mark.asyncio
-    async def test_filters_exceptions(self):
+    def test_filters_exceptions(self):
         async def fetcher(query, condition, idx):
             if idx == 0:
                 raise ValueError("boom")
             return {"median": 5.0}
 
-        votes = await gather_votes(["a", "b"], "used", fetcher, timeout=5.0)
+        votes = asyncio.run(gather_votes(["a", "b"], "used", fetcher, timeout=5.0))
         assert len(votes) == 1
 
-    @pytest.mark.asyncio
-    async def test_filters_none_results(self):
+    def test_filters_none_results(self):
         async def fetcher(query, condition, idx):
             return None
 
-        votes = await gather_votes(["a", "b"], "used", fetcher, timeout=5.0)
+        votes = asyncio.run(gather_votes(["a", "b"], "used", fetcher, timeout=5.0))
         assert votes == []
 
-    @pytest.mark.asyncio
-    async def test_filters_dict_without_median(self):
+    def test_filters_dict_without_median(self):
         async def fetcher(query, condition, idx):
             return {"price": 10.0}
 
-        votes = await gather_votes(["a", "b"], "used", fetcher, timeout=5.0)
+        votes = asyncio.run(gather_votes(["a", "b"], "used", fetcher, timeout=5.0))
         assert votes == []
 
-    @pytest.mark.asyncio
-    async def test_timeout_returns_none(self):
+    def test_timeout_returns_none(self):
         async def fetcher(query, condition, idx):
             await asyncio.sleep(10)
             return {"median": 1.0}
 
-        result = await gather_votes(["a"], "used", fetcher, timeout=0.1)
+        result = asyncio.run(gather_votes(["a"], "used", fetcher, timeout=0.1))
         assert result is None
 
-    @pytest.mark.asyncio
-    async def test_partial_success(self):
+    def test_partial_success(self):
         async def fetcher(query, condition, idx):
             if idx == 0:
                 return {"median": 20.0}
             raise ConnectionError("down")
 
-        votes = await gather_votes(["a", "b", "c"], "used", fetcher, timeout=5.0)
+        votes = asyncio.run(gather_votes(["a", "b", "c"], "used", fetcher, timeout=5.0))
         assert len(votes) == 1
         assert votes[0]["median"] == 20.0
 
