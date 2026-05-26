@@ -22,7 +22,7 @@ MARKETPLACE = "EBAY_GB"
 
 # Vinted discount tiers (eBay median × tier = Vinted list price)
 DEFAULT_VINTED_DISCOUNT = 0.75
-STRONG_BRAND_DISCOUNT = 0.65
+STRONG_BRAND_DISCOUNT = 0.80
 SLOW_KEYWORD_DISCOUNT = 0.40
 FAST_SALE_MULTIPLIER = 0.88        # Vinted "Fast Sale" = list × this
 
