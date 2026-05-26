@@ -56,7 +56,7 @@ def test_choose_vinted_discount_default_when_no_brand_match():
 
 def test_choose_vinted_discount_strong_brand(monkeypatch):
     monkeypatch.setattr(scout_update, "STRONG_BRANDS", ["barbour"])
-    assert choose_vinted_discount("barbour jacket xxl") == 0.65
+    assert choose_vinted_discount("barbour jacket xxl") == scout_update.STRONG_BRAND_DISCOUNT
 
 
 def test_choose_vinted_discount_slow_keyword(monkeypatch):
