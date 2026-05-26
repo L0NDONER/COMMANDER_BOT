@@ -21,7 +21,7 @@ from services.ebay.brands import STRONG_BRANDS, SLOW_KEYWORDS
 MARKETPLACE = "EBAY_GB"
 
 # Vinted discount tiers (eBay median × tier = Vinted list price)
-DEFAULT_VINTED_DISCOUNT = 0.72
+DEFAULT_VINTED_DISCOUNT = 0.75
 STRONG_BRAND_DISCOUNT = 0.65
 SLOW_KEYWORD_DISCOUNT = 0.40
 FAST_SALE_MULTIPLIER = 0.88        # Vinted "Fast Sale" = list × this
