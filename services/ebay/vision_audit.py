@@ -35,6 +35,13 @@ def _tokens(s: str) -> List[str]:
             if t not in _SIZE_TOKENS]
 
 
+def _is_abstain(s: str) -> bool:
+    """True if a read is empty or NOT_FOUND (any spelling: 'NOT_FOUND',
+    'NOT FOUND', 'not found'). An abstention is no cross-check signal at all —
+    not a disagreement — so it must be bucketed apart from a genuine conflict."""
+    return re.sub(r"[^a-z]", "", (s or "").lower()) in ("", "notfound")
+
+
 def same_product(a: str, b: str) -> bool:
     """Agreement test on two free-form reads: agree iff the brand (first token)
     matches AND they share at least one non-brand content token.
@@ -89,31 +96,43 @@ def analyse(recs: List[dict]) -> None:
     if not n:
         print("no VISION_AUDIT records found.")
         return
-    # Re-judge from the logged raw reads with the CURRENT comparator, so tuning
-    # same_product applies retroactively to logs already collected (the baked-in
-    # "agree" field reflects whatever comparator was live when the line was written).
-    splits = [r for r in recs
-              if not same_product(r.get("gemini", ""), r.get("groq", ""))]
-    rate = len(splits) / n
-    print(f"reads={n}  agree={n - len(splits)} ({1 - rate:.0%})  "
-          f"split={len(splits)} ({rate:.0%})")
+    # Three states, not two. An abstention (either side NOT_FOUND) carries no
+    # cross-check signal and must not be counted as disagreement. The alarm is a
+    # CONFLICT: both models named a product and they differ. Re-judged from the
+    # logged raw reads with the current comparator, so tuning applies to old logs.
+    g_abstain = sum(1 for r in recs if _is_abstain(r.get("groq", "")))
+    m_abstain = sum(1 for r in recs if _is_abstain(r.get("gemini", "")))
+    named = [r for r in recs
+             if not _is_abstain(r.get("gemini", "")) and not _is_abstain(r.get("groq", ""))]
+    conflicts = [r for r in named
+                 if not same_product(r.get("gemini", ""), r.get("groq", ""))]
+    nn = len(named)
 
-    if splits:
-        print("\nsplits — your eye calls who's right:")
-        for r in splits:
+    print(f"reads={n}  both-named={nn}  "
+          f"abstained={n - nn} (groq={g_abstain}, gemini={m_abstain})")
+    if nn:
+        crate = len(conflicts) / nn
+        print(f"of both-named: agree={nn - len(conflicts)} ({1 - crate:.0%})  "
+              f"conflict={len(conflicts)} ({crate:.0%})")
+
+    if conflicts:
+        print("\nconflicts — both named a product but they differ; your eye calls it:")
+        for r in conflicts:
             print(f"  gemini={r.get('gemini')!r}\n  groq  ={r.get('groq')!r}\n")
 
-    if n < 20:
-        print(f"only {n} reads — let more photos flow (want >= ~20 to decide).")
+    if nn < 15:
+        print(f"only {nn} both-named reads — let more flow (want >= ~15-20 to decide).")
         return
-    if rate < 0.10:
-        print("VERDICT: models agree >=90%. Gemini reads are stable; an independent "
-              "live cross-check buys little for the latency. Don't wire it — keep "
-              "eyeballing.")
+    crate = len(conflicts) / nn
+    if crate < 0.10:
+        print("VERDICT: <10% conflict among reads both models named. Gemini isn't "
+              "confidently mis-IDing — divergence is mostly Groq abstaining (the weaker "
+              "reader). A live cross-check would fire on Groq's gaps, not Gemini's "
+              "errors. Don't wire it — keep eyeballing.")
     else:
-        print(f"VERDICT: {rate:.0%} split. Review the splits above: wire a live tag "
-              "ONLY if Gemini is the wrong one often enough to matter. If Groq is "
-              "usually the wrong one, the audit is just noise.")
+        print(f"VERDICT: {crate:.0%} brand/type conflict among both-named reads. Review "
+              "above and wire a live tag ONLY where Gemini is the wrong one. If Groq is "
+              "usually the wrong one, it's noise.")
 
 
 if __name__ == "__main__":

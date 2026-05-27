@@ -39,6 +39,24 @@ def test_empty_read_never_agrees():
     assert not vision_audit.same_product("NOT_FOUND", "")
 
 
+# ── abstention bucketing ──────────────────────────────────────────────────────
+def test_abstain_detection():
+    for s in ("NOT_FOUND", "NOT FOUND", "not found", ""):
+        assert vision_audit._is_abstain(s), s
+    assert not vision_audit._is_abstain("Nike Shirt")
+
+
+def test_groq_abstention_is_not_a_conflict(capsys):
+    recs = [{"gemini": "Brand Shirt", "groq": "Brand Shirt"}] * 16
+    recs += [{"gemini": "True Religion Hoodie", "groq": "NOT_FOUND"}] * 2
+    recs += [{"gemini": "Boss Orange Shirt", "groq": "NOT FOUND"}]   # space variant
+    vision_audit.analyse(recs)
+    out = capsys.readouterr().out
+    assert "abstained=3 (groq=3, gemini=0)" in out
+    assert "conflict=0" in out
+    assert "Don't wire it" in out
+
+
 # ── run_shadow ────────────────────────────────────────────────────────────────
 def test_run_shadow_logs_comparison(caplog):
     def fake_groq(image_path):
