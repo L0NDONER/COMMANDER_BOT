@@ -26,8 +26,13 @@ STRONG_BRAND_DISCOUNT = 0.80
 SLOW_KEYWORD_DISCOUNT = 0.40
 FAST_SALE_MULTIPLIER = 0.88        # Vinted "Fast Sale" = list × this
 
-# Consensus
-CONSENSUS_TIMEOUT_SECONDS = 10
+# Consensus — tiered fan-out deadlines (passed into gather_votes per source).
+# eBay is fast + reliable: keep the hot path snappy. Vinted is slow + polite
+# (behind the home-IP SOCKS tunnel): give it a generous window so the timeout
+# stops truncating real comps and biasing the median-of-medians.
+CONSENSUS_TIMEOUT_SECONDS = 10          # legacy default / shared fallback
+EBAY_TIMEOUT_SECONDS = 8                # Tier 1 (fast)
+VINTED_TIMEOUT_SECONDS = 25             # Tier 2 (polite)
 
 # kv_cache TTLs (seconds)
 VISION_CACHE_TTL_SECONDS = 3600

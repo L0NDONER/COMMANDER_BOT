@@ -17,6 +17,7 @@ import database
 from credentials import EBAY_APP_ID, EBAY_SECRET
 from services.ebay import scout_vision
 from services.ebay.brands import is_low_value
+from services.ebay.circuit_breaker import CircuitBreaker
 from services.ebay.vinted_fetcher import get_vinted_vote
 from services.ebay.consensus_engine import (
     MIN_VOTES_FOR_CONSENSUS,
@@ -26,7 +27,8 @@ from services.ebay.consensus_engine import (
 )
 from services.ebay.scout_update import (
     CONDITION_FILTERS,
-    CONSENSUS_TIMEOUT_SECONDS,
+    EBAY_TIMEOUT_SECONDS,
+    VINTED_TIMEOUT_SECONDS,
     FAST_SALE_MULTIPLIER,
     MARKETPLACE,
     STATS_CACHE_TTL_SECONDS,
@@ -47,6 +49,13 @@ LOGGER = logging.getLogger(__name__)
 
 _client: Optional[httpx.AsyncClient] = None
 _token_lock = asyncio.Lock()
+
+# Vinted is the polite, flaky source — guard it with a breaker so a stretch of
+# timeouts stops holding up the fan-out. Module-scoped: state persists across
+# photos, which is where the breaker earns its keep (skip Vinted for the next
+# ~60s once it goes dark, rather than waiting out the timeout on every photo).
+_vinted_breaker = CircuitBreaker(name="vinted", threshold=3, cooldown=60.0)
+_vinted_vote_guarded = _vinted_breaker.wrap(get_vinted_vote)
 
 
 def _get_client() -> httpx.AsyncClient:
@@ -182,8 +191,8 @@ async def evaluate_with_consensus_saas(image_path: str, buy_price: str) -> Dict:
     base_query, keywords = await _vision_lookup_async(img_hash, image_path)
 
     variants = build_variants(base_query, condition, keywords)
-    ebay_coro = gather_votes(variants, condition, get_worker_vote_async, CONSENSUS_TIMEOUT_SECONDS)
-    vinted_coro = gather_votes(variants, condition, get_vinted_vote, CONSENSUS_TIMEOUT_SECONDS + 10)
+    ebay_coro = gather_votes(variants, condition, get_worker_vote_async, EBAY_TIMEOUT_SECONDS)
+    vinted_coro = gather_votes(variants, condition, _vinted_vote_guarded, VINTED_TIMEOUT_SECONDS)
 
     ebay_result, vinted_result = await asyncio.gather(ebay_coro, vinted_coro, return_exceptions=True)
 
