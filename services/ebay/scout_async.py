@@ -65,8 +65,10 @@ _audit_tasks: set = set()
 
 def _schedule_vision_audit(image_path: str, gemini_query: str) -> None:
     """Kick off the independent Groq read in the background (cache-miss only).
-    Set env VISION_AUDIT=0 to disable without a redeploy (cost kill-switch)."""
-    if os.getenv("VISION_AUDIT", "1") != "1":
+    OFF by default: the 2026-05-27 audit found Gemini reads reliable and Groq's
+    divergence mostly noise (see project_vision_audit memory), so Groq is out of
+    the live path. Set env VISION_AUDIT=1 to re-enable, e.g. for a real-photo run."""
+    if os.getenv("VISION_AUDIT", "0") != "1":
         return
     task = asyncio.create_task(
         vision_audit.run_shadow(image_path, gemini_query, scout_vision.groq_identify)
