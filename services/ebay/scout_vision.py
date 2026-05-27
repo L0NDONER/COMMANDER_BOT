@@ -22,6 +22,12 @@ LOGGER = logging.getLogger(__name__)
 
 GEMINI_TIMEOUT = 20  # seconds
 
+# Both vision reads MUST get the same downsample, or the audit measures input
+# fidelity instead of model capability: a more-shrunk (or more-compressed) image
+# starves the weaker reader into NOT_FOUND on small labels. 1568px is Gemini's
+# tile boundary; Groq reuses it (high-quality JPEG) so the comparison is fair.
+VISION_MAX_PX = 1568
+
 # Independent second-opinion read (diagnostic only — never feeds the verdict).
 # Groq's multimodal Llama 4 has different weights from Gemini, so its errors are
 # uncorrelated: that's what makes it a real cross-check rather than the same
@@ -88,9 +94,9 @@ def _scan_barcode(image_path: str) -> tuple | None:
 def _call_gemini(image_path: str):
     client = genai.Client(api_key=GEMINI_API_KEY)
     image = PIL.Image.open(image_path)
-    # Phone photos are 4–8MB; shrinking to a Gemini tile boundary cuts upload
-    # latency over mobile by seconds. Barcode scanning keeps the full-res image.
-    image.thumbnail((1568, 1568))
+    # Phone photos are 4–8MB; shrinking to the tile boundary cuts upload latency
+    # over mobile by seconds. Barcode scanning keeps the full-res image.
+    image.thumbnail((VISION_MAX_PX, VISION_MAX_PX))
     return client.models.generate_content(
         model="gemini-3-flash-preview",
         contents=[image, IDENTIFY_PROMPT],
@@ -106,11 +112,11 @@ def groq_identify(image_path: str) -> str:
     question. OpenAI-compatible chat endpoint with a base64 image block.
     """
     image = PIL.Image.open(image_path)
-    image.thumbnail((1024, 1024))           # keep the base64 payload small
+    image.thumbnail((VISION_MAX_PX, VISION_MAX_PX))   # same fidelity as Gemini
     if image.mode != "RGB":
         image = image.convert("RGB")
     buf = io.BytesIO()
-    image.save(buf, format="JPEG", quality=85)
+    image.save(buf, format="JPEG", quality=95)        # near-lossless; don't starve labels
     b64 = base64.b64encode(buf.getvalue()).decode()
 
     resp = requests.post(
