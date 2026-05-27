@@ -5,19 +5,29 @@ Usage:
     query, keywords = identify_item("photo.jpg")
 """
 
+import base64
 import concurrent.futures
+import io
 import logging
+import os
 
 import PIL.Image
 import requests
 from google import genai
 from pyzbar.pyzbar import decode as decode_barcode
 
-from credentials import GEMINI_API_KEY
+from credentials import GEMINI_API_KEY, GROQ_API_KEY
 
 LOGGER = logging.getLogger(__name__)
 
 GEMINI_TIMEOUT = 20  # seconds
+
+# Independent second-opinion read (diagnostic only — never feeds the verdict).
+# Groq's multimodal Llama 4 has different weights from Gemini, so its errors are
+# uncorrelated: that's what makes it a real cross-check rather than the same
+# model re-confirming itself. Model id is env-overridable (Groq rotates these).
+GROQ_VISION_MODEL = os.getenv("GROQ_VISION_MODEL", "meta-llama/llama-4-scout-17b-16e-instruct")
+GROQ_VISION_TIMEOUT = 20  # seconds
 
 IDENTIFY_PROMPT = (
     "Identify this item for a secondhand resale search. "
@@ -85,6 +95,41 @@ def _call_gemini(image_path: str):
         model="gemini-3-flash-preview",
         contents=[image, IDENTIFY_PROMPT],
     )
+
+
+def groq_identify(image_path: str) -> str:
+    """Independent vision read via Groq's multimodal Llama 4. Returns the raw
+    model string (may be 'NOT_FOUND'). Diagnostic only — the verdict never sees
+    this; it exists so VISION_AUDIT can compare it against the Gemini read.
+
+    Uses the same IDENTIFY_PROMPT as Gemini so the two are answering the same
+    question. OpenAI-compatible chat endpoint with a base64 image block.
+    """
+    image = PIL.Image.open(image_path)
+    image.thumbnail((1024, 1024))           # keep the base64 payload small
+    if image.mode != "RGB":
+        image = image.convert("RGB")
+    buf = io.BytesIO()
+    image.save(buf, format="JPEG", quality=85)
+    b64 = base64.b64encode(buf.getvalue()).decode()
+
+    resp = requests.post(
+        "https://api.groq.com/openai/v1/chat/completions",
+        headers={"Authorization": f"Bearer {GROQ_API_KEY}"},
+        json={
+            "model": GROQ_VISION_MODEL,
+            "temperature": 0,
+            "max_tokens": 80,
+            "messages": [{"role": "user", "content": [
+                {"type": "text", "text": IDENTIFY_PROMPT},
+                {"type": "image_url",
+                 "image_url": {"url": f"data:image/jpeg;base64,{b64}"}},
+            ]}],
+        },
+        timeout=GROQ_VISION_TIMEOUT,
+    )
+    resp.raise_for_status()
+    return resp.json()["choices"][0]["message"]["content"].strip()
 
 
 def identify_item(image_path: str) -> tuple:

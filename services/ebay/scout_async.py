@@ -9,13 +9,14 @@ import asyncio
 import base64
 import hashlib
 import logging
+import os
 from typing import Dict, List, Optional, Tuple
 
 import httpx
 
 import database
 from credentials import EBAY_APP_ID, EBAY_SECRET
-from services.ebay import scout_vision
+from services.ebay import scout_vision, vision_audit
 from services.ebay.brands import is_low_value
 from services.ebay.circuit_breaker import CircuitBreaker
 from services.ebay.vinted_fetcher import get_vinted_vote
@@ -56,6 +57,22 @@ _token_lock = asyncio.Lock()
 # ~60s once it goes dark, rather than waiting out the timeout on every photo).
 _vinted_breaker = CircuitBreaker(name="vinted", threshold=3, cooldown=60.0)
 _vinted_vote_guarded = _vinted_breaker.wrap(get_vinted_vote)
+
+# Fire-and-forget vision-audit tasks. Held so the loop doesn't GC them mid-flight;
+# each removes itself on completion. Off the verdict path entirely.
+_audit_tasks: set = set()
+
+
+def _schedule_vision_audit(image_path: str, gemini_query: str) -> None:
+    """Kick off the independent Groq read in the background (cache-miss only).
+    Set env VISION_AUDIT=0 to disable without a redeploy (cost kill-switch)."""
+    if os.getenv("VISION_AUDIT", "1") != "1":
+        return
+    task = asyncio.create_task(
+        vision_audit.run_shadow(image_path, gemini_query, scout_vision.groq_identify)
+    )
+    _audit_tasks.add(task)
+    task.add_done_callback(_audit_tasks.discard)
 
 
 def _get_client() -> httpx.AsyncClient:
@@ -175,6 +192,7 @@ async def _vision_lookup_async(img_hash: str, image_path: str) -> Tuple[str, Lis
         {"query": base_query, "keywords": keywords},
         ttl_seconds=VISION_CACHE_TTL_SECONDS,
     )
+    _schedule_vision_audit(image_path, base_query)   # cache-miss only; off hot path
     return base_query, keywords
 
 
