@@ -20,7 +20,7 @@ import json
 import logging
 import re
 import sys
-from typing import Awaitable, Callable, List
+from typing import Callable, List
 
 LOGGER = logging.getLogger(__name__)
 
