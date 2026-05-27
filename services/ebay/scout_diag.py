@@ -74,38 +74,61 @@ def analyse(recs: List[dict]) -> None:
     for r in live:
         groups.setdefault((r.get("event"), r.get("src")), []).append(r)
 
-    gaps = []   # within-photo (slowest median - fastest median) / mean median
+    # Within-photo fixed-effects regression of log(median) on latency.
+    # Demeaning per photo removes the £5-book vs £200-hifi level AND scale, so
+    # we isolate pure within-fan-out covariation and use every vote, not just
+    # the two extremes. log() tames the right-skew of price ratios.
+    dl_all: List[float] = []      # within-photo demeaned latency
+    dy_all: List[float] = []      # within-photo demeaned log(median)
+    spans: List[float] = []
+    photos = 0
     for g in groups.values():
-        if len(g) < 2:
+        pairs = [(r["latency_ms"], r["median"]) for r in g
+                 if isinstance(r.get("median"), (int, float)) and r["median"] > 0]
+        lats = [p[0] for p in pairs]
+        if len(pairs) < 2 or max(lats) == min(lats):
             continue
-        g = sorted(g, key=lambda r: r["latency_ms"])
-        lo, hi = g[0]["median"], g[-1]["median"]
-        m = _mean([r["median"] for r in g])
-        if m:
-            gaps.append((hi - lo) / m)
+        lbar = _mean(lats)
+        ys = [math.log(m) for _, m in pairs]
+        ybar = _mean(ys)
+        for (L, _), y in zip(pairs, ys):
+            dl_all.append(L - lbar)
+            dy_all.append(y - ybar)
+        spans.append(max(lats) - min(lats))
+        photos += 1
 
+    n = len(dl_all)
     print(f"records={len(recs)}  live(non-cached)={len(live)}  cached={cached}  "
-          f"usable fan-outs={len(gaps)}")
-    if len(gaps) < 8:
+          f"photos used={photos}  pooled votes={n}")
+    if photos < 8:
         print("not enough multi-variant fan-outs yet — let more photos flow, "
               "then re-run. (need >= ~8 to say anything.)")
         return
 
-    mean = _mean(gaps)
-    sd = math.sqrt(_mean([(x - mean) ** 2 for x in gaps]))
-    if sd == 0:
-        t = 0.0 if abs(mean) < 1e-9 else float("inf")
-    else:
-        t = mean / (sd / math.sqrt(len(gaps)))
-    print(f"slowest-vs-fastest variant price gap: mean {mean:+.1%}  (sd {sd:.1%}, t {t:+.1f})")
+    sxx = sum(x * x for x in dl_all)
+    sxy = sum(x * y for x, y in zip(dl_all, dy_all))
+    if sxx == 0:
+        print("no within-photo latency spread — cannot regress.")
+        return
+    beta = sxy / sxx                                   # d(log price) per ms
+    sse = sum((y - beta * x) ** 2 for x, y in zip(dl_all, dy_all))
+    df = n - photos - 1                                # photos means + 1 slope
+    se = math.sqrt((sse / df) / sxx) if df > 0 else float("inf")
+    t = beta / se if se not in (0.0, float("inf")) else 0.0
+
+    per100 = math.exp(beta * 100) - 1                  # % price per +100ms
+    gap = math.exp(beta * _mean(spans)) - 1            # % across mean per-photo span
+    print(f"slope: {per100:+.1%} price per +100ms latency  (t {t:+.1f}, df {df})")
+    print(f"implied slow-vs-fast gap over mean per-photo latency span: {gap:+.1%}")
     if abs(t) < 2:
-        print("VERDICT: flat — slow variants do NOT price differently. The shared "
-              "timeout is not biasing the verdict; the minimal engine is validated.")
+        print("VERDICT: flat — no within-photo link between latency and price. The "
+              "shared timeout is not biasing the verdict; the minimal engine is validated.")
     else:
-        direction = "higher" if mean > 0 else "lower"
-        print(f"VERDICT: biased — slower variants price systematically {direction}. "
-              f"The timeout amputates them, skewing the median-of-medians. Consider a "
-              f"more generous CONSENSUS_TIMEOUT_SECONDS or down-weighting late variants.")
+        direction = "higher" if beta > 0 else "lower"
+        print(f"VERDICT: biased — slower variants price systematically {direction} "
+              f"(within photo, t {t:+.1f}). The timeout skews the median-of-medians; "
+              f"consider a more generous CONSENSUS_TIMEOUT_SECONDS or down-weighting "
+              f"late variants.")
 
 
 if __name__ == "__main__":
