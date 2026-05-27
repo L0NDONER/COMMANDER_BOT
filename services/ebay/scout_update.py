@@ -37,6 +37,10 @@ STATS_CACHE_TTL_SECONDS = 3600
 ROI_STRONG_BUY = 150
 ROI_BUY = 80
 ROI_MAYBE = 30
+# Thin comp data should make the verdict more cautious without hiding the true
+# ROI. We judge the verdict on a confidence-discounted ROI so a wildly
+# profitable LOW item still rates STRONG, but a marginal one slips a tier.
+CONFIDENCE_ROI_HAIRCUT = {"HIGH": 1.0, "MEDIUM": 0.75, "LOW": 0.5}
 # Free-stock branch: ROI is mathematically infinite; display sentinel and
 # judge on absolute return instead.
 FREE_STOCK_MIN_SELL = 5.0
@@ -187,10 +191,13 @@ def _score(votes: List[Dict], base_query: str, clean_buy: float) -> Dict:
 
     discount = choose_vinted_discount(base_query)
     sell_price = avg_median * discount
+    confidence = compute_confidence(medians)
 
     if clean_buy > 0:
         roi = (sell_price - clean_buy) / clean_buy * 100
-        verdict = _verdict_from_roi(roi)
+        # Display true ROI; judge the verdict on the haircut so thin comp data
+        # demotes marginal items but leaves big winners alone.
+        verdict = _verdict_from_roi(roi * CONFIDENCE_ROI_HAIRCUT[confidence])
     else:
         roi = FREE_STOCK_ROI_SENTINEL
         verdict = "STRONG BUY" if sell_price >= FREE_STOCK_MIN_SELL else "PASS"
@@ -198,7 +205,7 @@ def _score(votes: List[Dict], base_query: str, clean_buy: float) -> Dict:
     return {
         "avg_median": avg_median,
         "sell_price": sell_price,
-        "confidence": compute_confidence(medians),
+        "confidence": confidence,
         "winner": winner["replica"],
         "roi": roi,
         "verdict": verdict,
