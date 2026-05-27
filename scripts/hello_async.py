@@ -1,34 +1,56 @@
 import asyncio
+import aiohttp
+import xml.etree.ElementTree as ET
 
-async def ping_host(host, semaphore):
+TOP_N = 5
+
+
+async def fetch_rss(url, session, semaphore):
+    """Fetch + parse one feed. Returns (url, [headlines]) or raises — the caller's
+    gather(return_exceptions=True) isolates a bad feed from the good ones."""
     async with semaphore:
-        # Pinging with 1 packet (-c 1) and 1s timeout (-W 1)
-        # Using subprocess to call the system ping
-        proc = await asyncio.create_subprocess_exec(
-            'ping', '-c', '1', '-W', '1', host,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        
-        # Wait for the process to complete
-        await proc.wait()
-        
-        if proc.returncode == 0:
-            print(f"[UP] {host}")
-        else:
-            print(f"[DOWN] {host}")
+        print(f"...fetching {url}...")
+        async with session.get(url) as response:
+            response.raise_for_status()              # a 4xx/5xx body isn't XML
+            content = await response.text()
+        root = ET.fromstring(content)
+        headlines = []
+        for item in root.findall('.//item')[:TOP_N]:
+            t = item.find('title')                   # some items have no <title>
+            headlines.append(t.text if t is not None else "(no title)")
+        return url, headlines
+
 
 async def main():
-    # Set the bouncer to k=*
-    semaphore = asyncio.Semaphore(30)
-    
-    # List of targets
-    hosts = ["8.8.8.8", "1.1.1.1", "1.0.0.1"]
-    
-    # Fire all tasks at once; the semaphore will govern the flow
-    tasks = [ping_host(h, semaphore) for h in hosts]
-    await asyncio.gather(*tasks)
+    semaphore = asyncio.Semaphore(30)                # the throttle; slack at 1 URL
+    urls = [
+        "http://feeds.bbci.co.uk/news/business/rss.xml",
+        "http://feeds.bbci.co.uk/news/technology/rss.xml",
+        "http://feeds.bbci.co.uk/news/world/rss.xml",
+        "http://feeds.bbci.co.uk/news/science_and_environment/rss.xml",
+        "http://feeds.bbci.co.uk/news/THIS-FEED-IS-DEAD/rss.xml",   # dud -> [FAIL], not a crash
+    ]
+
+    # One shared session across all fetches (pools connections) — not one per URL.
+    async with aiohttp.ClientSession() as session:
+        results = await asyncio.gather(
+            *(fetch_rss(u, session, semaphore) for u in urls),
+            return_exceptions=True,                  # one dead feed won't sink the batch
+        )
+
+    # Print in main -> deterministic, input-order output regardless of who landed first.
+    for url, result in zip(urls, results):
+        if isinstance(result, Exception):
+            detail = (f"{result.status} {result.message}"
+                      if isinstance(result, aiohttp.ClientResponseError)
+                      else f"{type(result).__name__}: {result}")
+            print(f"\n[FAIL] {url}: {detail}")
+            continue
+        _, headlines = result
+        print(f"\n--- Top {len(headlines)} from {url} ---")
+        for title in headlines:
+            print(f" > {title}")
+
 
 if __name__ == "__main__":
     asyncio.run(main())
-
