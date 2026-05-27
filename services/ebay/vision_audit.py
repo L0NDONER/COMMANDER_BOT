@@ -28,7 +28,6 @@ GroqReader = Callable[[str], str]   # image_path -> raw model string
 
 # Sizes are noise for "is this the same product"; brand + type carry the signal.
 _SIZE_TOKENS = {"xs", "s", "m", "l", "xl", "xxl", "xxxl", "os"}
-_JACCARD_MIN = 0.30
 
 
 def _tokens(s: str) -> List[str]:
@@ -37,17 +36,22 @@ def _tokens(s: str) -> List[str]:
 
 
 def same_product(a: str, b: str) -> bool:
-    """Lenient agreement test on two free-form reads. Agree iff the brand (first
-    token) matches AND overall token overlap clears a floor. Deliberately
-    forgiving — the logged raw strings are the source of truth for the human
-    reviewing splits; this boolean only drives the aggregate rate."""
+    """Agreement test on two free-form reads: agree iff the brand (first token)
+    matches AND they share at least one non-brand content token.
+
+    Whole-string token overlap is the wrong metric here — the two models append
+    different tails (Gemini dumps multi-region size codes, Groq adds style
+    keywords), so a real match like "Rab shirt" vs "Rab shirt outdoor casual"
+    scores low overlap despite agreeing. Brand + shared item-type isolates the
+    decision-relevant head and ignores the noisy tail. Brand mismatch is always
+    a split — that's the dangerous confident-wrong case we're hunting."""
     ta, tb = _tokens(a), _tokens(b)
     if not ta or not tb:
         return False
-    brand_match = ta[0] == tb[0]
-    sa, sb = set(ta), set(tb)
-    jaccard = len(sa & sb) / len(sa | sb)
-    return brand_match and jaccard >= _JACCARD_MIN
+    if ta[0] != tb[0]:                              # brand disagreement
+        return False
+    shared_non_brand = (set(ta) & set(tb)) - {ta[0]}
+    return len(shared_non_brand) >= 1
 
 
 async def run_shadow(image_path: str, gemini_query: str, groq_reader: GroqReader) -> None:
@@ -85,7 +89,11 @@ def analyse(recs: List[dict]) -> None:
     if not n:
         print("no VISION_AUDIT records found.")
         return
-    splits = [r for r in recs if not r.get("agree")]
+    # Re-judge from the logged raw reads with the CURRENT comparator, so tuning
+    # same_product applies retroactively to logs already collected (the baked-in
+    # "agree" field reflects whatever comparator was live when the line was written).
+    splits = [r for r in recs
+              if not same_product(r.get("gemini", ""), r.get("groq", ""))]
     rate = len(splits) / n
     print(f"reads={n}  agree={n - len(splits)} ({1 - rate:.0%})  "
           f"split={len(splits)} ({rate:.0%})")

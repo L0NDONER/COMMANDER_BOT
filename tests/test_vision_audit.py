@@ -21,6 +21,14 @@ def test_brand_mismatch_is_a_split():
                                          "Uniqlo Polo Shirt")
 
 
+def test_noisy_tails_still_agree():
+    # Real case: same product (Rab shirt), but each model appends different
+    # noise — region size codes vs style keywords. Must NOT read as a split.
+    a = "Rab T-shirt EU 58 US XL JPN XXL UK XL"
+    b = "Rab, Shirt, UK XL, Outdoor, Casual, Active"
+    assert vision_audit.same_product(a, b)
+
+
 def test_low_overlap_is_a_split():
     assert not vision_audit.same_product("Nike Air Max 90 trainers",
                                          "Nike backpack rucksack bag")
