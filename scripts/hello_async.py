@@ -1,29 +1,34 @@
 import asyncio
-from datetime import datetime
 
-def interview(task_id):
-    """Blocking and sequential — one prompt at a time on the single terminal.
-    Plain sync; no async needed because nothing else should run mid-interview."""
-    print(f"\n--- Scout {task_id} checking in ---")
-    name = input(f"Scout {task_id}, what is your name? ")
-    dob_str = input(f"Hi {name}, enter your DOB (YYYY-MM-DD): ")
-    return name, dob_str
-
-
-async def lookup(name, dob_str):
-    """The slow part — these overlap across scouts."""
-    print(f"...looking up {name}...")
-    await asyncio.sleep(2)        # stand-in for a real DB/API call
-    age = (datetime.now() - datetime.strptime(dob_str, "%Y-%m-%d")).days // 365
-    print(f"Result for {name}: You are {age} years old.")
-
+async def ping_host(host, semaphore):
+    async with semaphore:
+        # Pinging with 1 packet (-c 1) and 1s timeout (-W 1)
+        # Using subprocess to call the system ping
+        proc = await asyncio.create_subprocess_exec(
+            'ping', '-c', '1', '-W', '1', host,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        
+        # Wait for the process to complete
+        await proc.wait()
+        
+        if proc.returncode == 0:
+            print(f"[UP] {host}")
+        else:
+            print(f"[DOWN] {host}")
 
 async def main():
-    # Phase 1 — collect everyone's answers, one at a time (clean terminal).
-    scouts = [interview(i) for i in range(5)]
-    # Phase 2 — run all the lookups together.
-    await asyncio.gather(*(lookup(name, dob) for name, dob in scouts))
+    # Set the bouncer to k=*
+    semaphore = asyncio.Semaphore(30)
+    
+    # List of targets
+    hosts = ["8.8.8.8", "1.1.1.1", "1.0.0.1"]
+    
+    # Fire all tasks at once; the semaphore will govern the flow
+    tasks = [ping_host(h, semaphore) for h in hosts]
+    await asyncio.gather(*tasks)
 
-
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
 
