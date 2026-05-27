@@ -10,8 +10,6 @@ services:
     environment:
       - VINTED_PROXY=socks5://host.docker.internal:1080
     volumes:
-      - ./stars.db:/app/stars.db
-      - ./sales.db:/app/sales.db
       - ./commander_saas.db:/app/commander_saas.db
       - ./credentials.py:/app/credentials.py
       - ./services/ebay:/app/services/ebay

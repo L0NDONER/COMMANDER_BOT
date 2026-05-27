@@ -263,6 +263,7 @@ async def main_async() -> None:
         await app.updater.stop()
         await app.stop()
         await app.shutdown()
+        await database.checkpoint()      # fold WAL into the .db before exit
 
 
 def main() -> None:

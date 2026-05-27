@@ -26,6 +26,7 @@ WEB_DIR = Path(__file__).parent / "web"
 async def lifespan(_app: FastAPI):
     await database.init_db()
     yield
+    await database.checkpoint()      # truncate WAL into the .db before shutdown
 
 
 app = FastAPI(title="Flaz", lifespan=lifespan)

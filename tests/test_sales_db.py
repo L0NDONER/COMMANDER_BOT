@@ -24,6 +24,13 @@ def _run(coro):
     return asyncio.run(coro)
 
 
+def test_checkpoint_runs_and_persists_sale(db):
+    # A logged sale survives a WAL checkpoint (the shutdown fold-down path).
+    _run(db.log_sale("12345", "Rab Hoodie XL", 30.0, "Rab Hoodie XL £30"))
+    _run(db.checkpoint())                      # must not raise
+    assert _run(db.recent_sales())             # sale still readable post-checkpoint
+
+
 def test_log_sale_returns_id_and_persists(db):
     rid = _run(db.log_sale("12345", "Jordan 1 Low uk 9", 55.0, "Jordan 1 Low uk 9 £55"))
     assert rid == 1

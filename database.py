@@ -38,6 +38,18 @@ def _iso(dt: datetime) -> str:
 # Schema
 # ------------------------------------------------------------------------------
 
+async def checkpoint() -> None:
+    """Fold the WAL back into the main .db on shutdown so a container recreation
+    (every deploy) never strands committed writes in an in-container -wal sidecar
+    — the per-file bind mount keeps -wal/-shm inside the container. Best-effort:
+    never raises, blocks nothing on the way down."""
+    try:
+        async with aiosqlite.connect(DB_PATH) as db:
+            await db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    except Exception:
+        pass
+
+
 async def init_db() -> None:
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("PRAGMA journal_mode=WAL")
