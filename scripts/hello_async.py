@@ -1,55 +1,83 @@
+"""Vinted cookie-prebake probe.
+
+Scout hits the homepage so aiohttp's cookie jar gets _vinted_fr_session /
+anon_id / CSRF tokens. The fan-out then reuses that warmed session, every
+request carrying the cookies + a Referer back to the homepage.
+
+Prints cookie names captured, then per-request status / latency so we can
+see whether the warmed session sails past Vinted's bot checks.
+"""
+
 import asyncio
+import random
+import time
+
 import aiohttp
-import xml.etree.ElementTree as ET
 
-TOP_N = 5
+UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/124.0.0.0 Safari/537.36"
+)
+HOME = "https://www.vinted.co.uk/"
+SEARCH_TERMS = ["nike", "zara", "uniqlo", "carhartt", "north face"]
+CONCURRENCY = 3
+JITTER = (1.0, 3.0)
 
 
-async def fetch_rss(url, session, semaphore):
-    """Fetch + parse one feed. Returns (url, [headlines]) or raises — the caller's
-    gather(return_exceptions=True) isolates a bad feed from the good ones."""
-    async with semaphore:
-        print(f"...fetching {url}...")
-        async with session.get(url) as response:
-            response.raise_for_status()              # a 4xx/5xx body isn't XML
-            content = await response.text()
-        root = ET.fromstring(content)
-        headlines = []
-        for item in root.findall('.//item')[:TOP_N]:
-            t = item.find('title')                   # some items have no <title>
-            headlines.append(t.text if t is not None else "(no title)")
-        return url, headlines
+async def warm_scout(session):
+    t0 = time.perf_counter()
+    async with session.get(HOME) as r:
+        await r.read()
+        dt = time.perf_counter() - t0
+        print(f"[scout] {r.status} in {dt:.2f}s")
+    cookies = sorted(c.key for c in session.cookie_jar)
+    print(f"[scout] baked cookies: {cookies or '(none)'}")
+    return bool(cookies)
+
+
+async def fetch_search(session, sem, term):
+    url = f"https://www.vinted.co.uk/catalog?search_text={term}"
+    async with sem:
+        await asyncio.sleep(random.uniform(*JITTER))
+        t0 = time.perf_counter()
+        try:
+            async with session.get(url, headers={"Referer": HOME}, timeout=15) as r:
+                body = await r.read()
+                dt = time.perf_counter() - t0
+                return term, r.status, len(body), dt, None
+        except asyncio.TimeoutError:
+            dt = time.perf_counter() - t0
+            return term, None, 0, dt, "timeout"
+        except aiohttp.ClientError as e:
+            dt = time.perf_counter() - t0
+            return term, None, 0, dt, f"client: {e!r}"
 
 
 async def main():
-    semaphore = asyncio.Semaphore(30)                # the throttle; slack at 1 URL
-    urls = [
-        "http://feeds.bbci.co.uk/news/business/rss.xml",
-        "http://feeds.bbci.co.uk/news/technology/rss.xml",
-        "http://feeds.bbci.co.uk/news/world/rss.xml",
-        "http://feeds.bbci.co.uk/news/science_and_environment/rss.xml",
-        "http://feeds.bbci.co.uk/news/THIS-FEED-IS-DEAD/rss.xml",   # dud -> [FAIL], not a crash
-    ]
+    sem = asyncio.Semaphore(CONCURRENCY)
+    async with aiohttp.ClientSession(headers={"User-Agent": UA}) as session:
+        print("--- warming scout ---")
+        if not await warm_scout(session):
+            print("[!] no cookies baked — Vinted may be blocking from this IP")
+        await asyncio.sleep(2)
 
-    # One shared session across all fetches (pools connections) — not one per URL.
-    async with aiohttp.ClientSession() as session:
+        print(f"\n--- fan-out x{len(SEARCH_TERMS)} (concurrency={CONCURRENCY}) ---")
         results = await asyncio.gather(
-            *(fetch_rss(u, session, semaphore) for u in urls),
-            return_exceptions=True,                  # one dead feed won't sink the batch
+            *(fetch_search(session, sem, t) for t in SEARCH_TERMS)
         )
 
-    # Print in main -> deterministic, input-order output regardless of who landed first.
-    for url, result in zip(urls, results):
-        if isinstance(result, Exception):
-            detail = (f"{result.status} {result.message}"
-                      if isinstance(result, aiohttp.ClientResponseError)
-                      else f"{type(result).__name__}: {result}")
-            print(f"\n[FAIL] {url}: {detail}")
-            continue
-        _, headlines = result
-        print(f"\n--- Top {len(headlines)} from {url} ---")
-        for title in headlines:
-            print(f" > {title}")
+    print("\n--- results ---")
+    ok = 0
+    for term, status, size, dt, err in results:
+        if err:
+            print(f"  {term:<12} FAIL {dt:.2f}s  {err}")
+        else:
+            tag = "OK " if status == 200 else "BAD"
+            print(f"  {term:<12} {tag} {status} {size/1024:>6.1f}KB {dt:.2f}s")
+            if status == 200:
+                ok += 1
+    print(f"\n{ok}/{len(results)} succeeded")
 
 
 if __name__ == "__main__":
