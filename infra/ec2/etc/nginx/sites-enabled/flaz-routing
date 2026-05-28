@@ -1,0 +1,56 @@
+server {
+    server_name flaz.co.uk www.flaz.co.uk;
+    include /etc/nginx/snippets/blocklist.conf;
+
+    client_max_body_size 4M;
+
+    # Public web feed stays static (BUY-tier item names + profit, no PII).
+    location /feed/ {
+        root /var/www/html;
+        add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
+        try_files $uri $uri/ =404;
+    }
+
+    location = /favicon.ico {
+        alias /var/www/html/favicon.png;
+        access_log off;
+        log_not_found off;
+        expires 7d;
+    }
+
+    # Everything else (page + API) goes to the FastAPI sidecar inside commander-leader.
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+    }
+
+    listen [::]:443 ssl ipv6only=on; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/flaz.co.uk/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/flaz.co.uk/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+    if ($host = www.flaz.co.uk) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    if ($host = flaz.co.uk) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    listen [::]:80;
+
+    server_name flaz.co.uk www.flaz.co.uk;
+    include /etc/nginx/snippets/blocklist.conf;
+    return 404; # managed by Certbot
+}
