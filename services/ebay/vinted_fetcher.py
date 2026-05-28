@@ -80,6 +80,7 @@ async def search_vinted(query: str, per_page: int = 20) -> List[float]:
         VINTED_SEARCH,
         params={"search_text": query, "per_page": str(per_page), "order": "relevance"},
         cookies=_cookies,
+        headers={"Referer": f"{VINTED_BASE}/catalog?search_text={query}"},
     )
 
     if resp.status_code == 401:
