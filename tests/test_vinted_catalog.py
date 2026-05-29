@@ -1,4 +1,4 @@
-"""Tests for services/ebay/vinted_fetcher.py."""
+"""Tests for services/ebay/vinted_catalog.py."""
 
 import asyncio
 import sys
@@ -46,20 +46,20 @@ def _make_item(price, title="Nike Air Max 90", age_days=5):
 
 @pytest.fixture
 def vinted(tmp_path, monkeypatch):
-    for name in ("database", "services.ebay.vinted_fetcher"):
+    for name in ("database", "services.ebay.vinted_catalog"):
         sys.modules.pop(name, None)
 
     import database
     database.DB_PATH = tmp_path / "test.db"
     asyncio.run(database.init_db())
 
-    import services.ebay.vinted_fetcher as mod
+    import services.ebay.vinted_catalog as mod
     fake = FakeVintedClient()
     mod._client = fake
     mod._cookies = None
     mod._cookie_lock = asyncio.Lock()
     # Skip random sleep in tests
-    monkeypatch.setattr("services.ebay.vinted_fetcher.random.uniform", lambda a, b: 0)
+    monkeypatch.setattr("services.ebay.vinted_catalog.random.uniform", lambda a, b: 0)
     return mod, fake, database
 
 

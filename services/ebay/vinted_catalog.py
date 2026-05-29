@@ -26,7 +26,6 @@ HEADERS = {
         "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
     ),
     "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "en-GB,en;q=0.9",
 }
 
 _client: Optional[httpx.AsyncClient] = None

@@ -132,7 +132,7 @@ def try_vinted_median(query: str) -> Optional[float]:
         import asyncio
         import sys, os
         sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-        from services.ebay.vinted_fetcher import search_vinted
+        from services.ebay.vinted_catalog import search_vinted
         prices = asyncio.run(search_vinted(query))
         return stats.median(prices) if prices else None
     except Exception as e:

@@ -84,7 +84,7 @@ async def _stub_vinted_vote(query, condition, index=0):
 async def _stub_warmup():
     pass
 
-_stub("services.ebay.vinted_fetcher", get_vinted_vote=_stub_vinted_vote, warmup=_stub_warmup)
+_stub("services.ebay.vinted_catalog", get_vinted_vote=_stub_vinted_vote, warmup=_stub_warmup)
 
 def _stub_record_consensus(base_query, condition, keywords, votes):
     pass

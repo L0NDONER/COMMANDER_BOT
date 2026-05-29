@@ -23,7 +23,7 @@ import uvicorn
 
 import database
 from services.ebay.scout_async import evaluate_with_consensus_saas
-from services.ebay.vinted_fetcher import warmup as vinted_warmup
+from services.ebay.vinted_catalog import warmup as vinted_warmup
 from web_app import app as web_app
 
 # ------------------------------------------------------------------------------

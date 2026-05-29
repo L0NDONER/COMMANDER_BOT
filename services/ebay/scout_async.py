@@ -19,7 +19,7 @@ from credentials import EBAY_APP_ID, EBAY_SECRET
 from services.ebay import scout_vision, vision_audit
 from services.ebay.brands import is_low_value
 from services.ebay.circuit_breaker import CircuitBreaker
-from services.ebay.vinted_fetcher import get_vinted_vote
+from services.ebay.vinted_catalog import get_vinted_vote
 from services.ebay.consensus_engine import (
     MIN_VOTES_FOR_CONSENSUS,
     build_variants,

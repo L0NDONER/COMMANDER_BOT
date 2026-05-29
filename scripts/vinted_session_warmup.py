@@ -1,11 +1,13 @@
-"""Vinted cookie-prebake probe.
+"""Vinted session warmup — prime cookies via the homepage before fanning out
+to the catalog API.
 
-Scout hits the homepage so aiohttp's cookie jar gets _vinted_fr_session /
-anon_id / CSRF tokens. The fan-out then reuses that warmed session, every
-request carrying the cookies + a Referer back to the homepage.
+Issues a single GET to vinted.co.uk so aiohttp's cookie jar picks up the
+session cookies the catalog endpoint expects on subsequent calls, then
+runs N parallel catalog searches reusing that session with a Referer back
+to the homepage.
 
-Prints cookie names captured, then per-request status / latency so we can
-see whether the warmed session sails past Vinted's bot checks.
+Prints captured cookie names and per-request status/latency so the session
+behaviour can be inspected.
 """
 
 import asyncio
