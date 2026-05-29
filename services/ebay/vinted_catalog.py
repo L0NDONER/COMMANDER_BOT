@@ -65,7 +65,6 @@ async def refresh_session() -> None:
 async def warmup() -> None:
     try:
         await _ensure_session()
-        LOGGER.info("Vinted session pre-warmed")
     except Exception:
         LOGGER.warning("Vinted warmup failed — will retry on first request")
 
