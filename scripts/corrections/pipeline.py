@@ -101,7 +101,9 @@ def _print_result(out: dict) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("trace", help="path to a gps_traces/*.json file")
-    ap.add_argument("--scorer", choices=("mode", "agreement"), default="mode")
+    ap.add_argument("--scorer",
+                    choices=("mode", "agreement", "surprise"),
+                    default="mode")
     ap.add_argument("--k", type=int, default=2)
     ap.add_argument("--L", type=int, default=10)
     ap.add_argument("--n-perm", type=int, default=2000)
