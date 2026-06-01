@@ -1,0 +1,45 @@
+{
+  "postcode": "NR19 2HJ",
+  "streets": [
+    "lyndale swanton avenue",
+    "swanton avenue"
+  ],
+  "preferred_entry": "LYNDALE SWANTON AVENUE",
+  "preferred_exit": "26 SWANTON AVENUE",
+  "estate_direction": null,
+  "typical_density": 3.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 2HH",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    3
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 3,
+      "stops": 3
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "LYNDALE SWANTON AVENUE",
+      "exit": "26 SWANTON AVENUE",
+      "next_postcode": "NR19 2HH"
+    }
+  ],
+  "coords": [
+    52.686398396237436,
+    0.9476060751247158
+  ]
+}

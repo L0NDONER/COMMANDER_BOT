@@ -1,0 +1,27 @@
+{
+  "postcode": "NR19 1EN",
+  "streets": [
+    "lydgate close"
+  ],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "known_addresses": [
+    {
+      "grid_id": "34",
+      "building_street": "9 Lydgate Close"
+    }
+  ],
+  "landmarks": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.669604194648635,
+    0.9383832422801641
+  ]
+}

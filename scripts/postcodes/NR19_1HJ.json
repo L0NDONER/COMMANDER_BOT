@@ -1,0 +1,27 @@
+{
+  "postcode": "NR19 1HJ",
+  "streets": [
+    "bishoptyne avenue"
+  ],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "known_addresses": [
+    {
+      "grid_id": "47",
+      "building_street": "33 Bishoptyne Avenue"
+    }
+  ],
+  "landmarks": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.6706956728533,
+    0.9559569796620868
+  ]
+}

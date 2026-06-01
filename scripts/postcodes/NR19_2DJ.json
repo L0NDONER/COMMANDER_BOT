@@ -1,0 +1,44 @@
+{
+  "postcode": "NR19 2DJ",
+  "streets": [
+    "quebec street dereham"
+  ],
+  "preferred_entry": "7A QUEBEC STREET DEREHAM",
+  "preferred_exit": "7A QUEBEC STREET DEREHAM",
+  "estate_direction": null,
+  "typical_density": 1.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 2YE",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    1
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 1,
+      "stops": 1
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "7A QUEBEC STREET DEREHAM",
+      "exit": "7A QUEBEC STREET DEREHAM",
+      "next_postcode": "NR19 2YE"
+    }
+  ],
+  "coords": [
+    52.68165683038635,
+    0.9397401464585426
+  ]
+}

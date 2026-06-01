@@ -1,0 +1,44 @@
+{
+  "postcode": "NR19 2AX",
+  "streets": [
+    "market place"
+  ],
+  "preferred_entry": "20 MARKET PLACE",
+  "preferred_exit": "20 MARKET PLACE",
+  "estate_direction": null,
+  "typical_density": 2.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 2AE",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    2
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 2,
+      "stops": 1
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "20 MARKET PLACE",
+      "exit": "20 MARKET PLACE",
+      "next_postcode": "NR19 2AE"
+    }
+  ],
+  "coords": [
+    52.682630822668834,
+    0.9403530943365681
+  ]
+}

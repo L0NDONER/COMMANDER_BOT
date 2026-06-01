@@ -1,0 +1,27 @@
+{
+  "postcode": "NR19 1AQ",
+  "streets": [
+    "beatrice avenue"
+  ],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "known_addresses": [
+    {
+      "grid_id": "06",
+      "building_street": "21 Beatrice Avenue"
+    }
+  ],
+  "landmarks": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.676126610891046,
+    0.9426235368520796
+  ]
+}

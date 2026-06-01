@@ -1,0 +1,27 @@
+{
+  "postcode": "NR19 1AX",
+  "streets": [
+    "mary unwin road"
+  ],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "known_addresses": [
+    {
+      "grid_id": "08",
+      "building_street": "9 Mary Unwin Road"
+    }
+  ],
+  "landmarks": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.67780808391652,
+    0.9404580802918798
+  ]
+}

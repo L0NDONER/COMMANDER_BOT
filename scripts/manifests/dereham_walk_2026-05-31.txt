@@ -1,0 +1,84 @@
+# Raw walk-order manifest. One postcode per line, in the order the
+# courier actually delivered them (not alphabetical print order).
+# Header line: <manifest_id> <date YYYY-MM-DD>
+# Lines starting with '#' are comments; blank lines ignored.
+# Consecutive duplicates are deduped by the loader so the sector-change
+# variant operates on the distinct-postcode chain, matching the way
+# reconstruct_route() handles breadcrumb-derived manifests.
+dereham_walk_route 2026-05-31
+NR19 2QF
+NR19 2QF
+NR19 2QG
+NR19 2QG
+NR19 2QG
+NR19 2QG
+NR19 2QR
+NR19 2QR
+NR19 2QR
+NR19 2QX
+NR19 2QX
+NR19 2QB
+NR19 2QB
+NR19 2BE
+NR19 2DG
+NR19 2DT
+NR19 2DT
+NR19 2DT
+NR19 2DT
+NR19 2DZ
+NR19 2EB
+NR19 2EB
+NR19 2EB
+NR19 2EB
+NR19 2ED
+NR19 2ED
+NR19 2EH
+NR19 2EH
+NR19 2EH
+NR19 2EH
+NR19 2EH
+NR19 2EQ
+NR19 2EU
+NR19 2EU
+NR19 2EU
+NR19 2EU
+NR19 2EY
+NR19 2EY
+NR19 2EZ
+NR19 2FD
+NR19 2FD
+NR19 2FD
+NR19 2GB
+NR19 2GB
+NR19 2GB
+NR19 2GB
+NR19 2GB
+NR19 2HA
+NR19 2HA
+NR19 2HA
+NR19 2HF
+NR19 2HF
+NR19 2HF
+NR19 2HF
+NR19 2HG
+NR19 2HQ
+NR19 2HQ
+NR19 2HQ
+NR19 2HQ
+NR19 2RY
+NR19 2RY
+NR19 2RY
+NR19 2RY
+NR19 2RY
+NR19 2SL
+NR19 2SP
+NR19 2SP
+NR19 2SS
+NR19 2SS
+NR19 2SU
+NR19 2SU
+NR19 2YD
+NR19 2YD
+NR19 2YD
+NR19 2YD
+NR20 4DS

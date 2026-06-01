@@ -1,0 +1,64 @@
+{
+  "postcode": "NR19 2EU",
+  "streets": [
+    "longfields allotment gardens northgate",
+    "northgate",
+    "weldon lodge"
+  ],
+  "preferred_entry": "LONGFIELDS ALLOTMENT GARDENS NORTHGATE",
+  "preferred_exit": "WELDON LODGE",
+  "estate_direction": null,
+  "typical_density": 5.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 1AD",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    5
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 5,
+      "stops": 4
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [
+    {
+      "name": "Longfields Allotment Gardens",
+      "area": "Northgate",
+      "doors": [
+        "Longfields",
+        "Toad Hall",
+        "The Rose"
+      ],
+      "visit_sequence": [
+        "Longfields",
+        "Toad Hall",
+        "The Rose"
+      ],
+      "source": "user-confirmed 2026-05-30",
+      "coords": null,
+      "door_coords": {}
+    }
+  ],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "LONGFIELDS ALLOTMENT GARDENS NORTHGATE",
+      "exit": "WELDON LODGE",
+      "next_postcode": "NR19 1AD"
+    }
+  ],
+  "coords": [
+    52.68819855265645,
+    0.9446491491976682
+  ]
+}

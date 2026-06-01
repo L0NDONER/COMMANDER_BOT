@@ -1,0 +1,20 @@
+{
+  "postcode": "NR19 2EQ",
+  "streets": [],
+  "known_addresses": [],
+  "landmarks": [],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.683994829520444,
+    0.9335786141019028
+  ]
+}

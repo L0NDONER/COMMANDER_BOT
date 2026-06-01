@@ -1,0 +1,44 @@
+{
+  "postcode": "NR19 2QR",
+  "streets": [
+    "brick kiln farm"
+  ],
+  "preferred_entry": "BRICK KILN FARM",
+  "preferred_exit": "BRICK KILN FARM",
+  "estate_direction": null,
+  "typical_density": 1.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 2UH",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    1
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 1,
+      "stops": 1
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "BRICK KILN FARM",
+      "exit": "BRICK KILN FARM",
+      "next_postcode": "NR19 2UH"
+    }
+  ],
+  "coords": [
+    52.69785846513516,
+    0.9351599694548444
+  ]
+}

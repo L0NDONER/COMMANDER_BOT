@@ -1,0 +1,45 @@
+{
+  "postcode": "NR19 2AW",
+  "streets": [
+    "ideal dereham news",
+    "market place"
+  ],
+  "preferred_entry": "IDEAL DEREHAM NEWS",
+  "preferred_exit": "12A MARKET PLACE",
+  "estate_direction": null,
+  "typical_density": 2.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 2AX",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    2
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 2,
+      "stops": 2
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "IDEAL DEREHAM NEWS",
+      "exit": "12A MARKET PLACE",
+      "next_postcode": "NR19 2AX"
+    }
+  ],
+  "coords": [
+    52.68140947450444,
+    0.9402858077572807
+  ]
+}

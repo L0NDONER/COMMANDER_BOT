@@ -1,0 +1,44 @@
+{
+  "postcode": "NR19 2HA",
+  "streets": [
+    "bulwer road"
+  ],
+  "preferred_entry": "2 BULWER ROAD",
+  "preferred_exit": "2 BULWER ROAD",
+  "estate_direction": null,
+  "typical_density": 2.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 1FG",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    2
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 2,
+      "stops": 1
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "2 BULWER ROAD",
+      "exit": "2 BULWER ROAD",
+      "next_postcode": "NR19 1FG"
+    }
+  ],
+  "coords": [
+    52.69066877924216,
+    0.9436758580067892
+  ]
+}

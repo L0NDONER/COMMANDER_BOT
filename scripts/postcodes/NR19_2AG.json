@@ -1,0 +1,44 @@
+{
+  "postcode": "NR19 2AG",
+  "streets": [
+    "kings road"
+  ],
+  "preferred_entry": "15 KINGS ROAD",
+  "preferred_exit": "19 KINGS ROAD",
+  "estate_direction": null,
+  "typical_density": 2.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 2FG",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    2
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 2,
+      "stops": 2
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "15 KINGS ROAD",
+      "exit": "19 KINGS ROAD",
+      "next_postcode": "NR19 2FG"
+    }
+  ],
+  "coords": [
+    52.68335239520296,
+    0.9442489566960193
+  ]
+}

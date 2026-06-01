@@ -1,0 +1,27 @@
+{
+  "postcode": "NR19 1GW",
+  "streets": [
+    "pippin close"
+  ],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "known_addresses": [
+    {
+      "grid_id": "42",
+      "building_street": "5 Pippin Close"
+    }
+  ],
+  "landmarks": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.67343651961764,
+    0.9437593378999983
+  ]
+}

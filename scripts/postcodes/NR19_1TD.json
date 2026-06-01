@@ -1,0 +1,275 @@
+{
+  "postcode": "NR19 1TD",
+  "streets": [
+    "becclesgate"
+  ],
+  "known_addresses": [
+    {
+      "grid_id": "01",
+      "building_street": "1 Becclesgate"
+    },
+    {
+      "grid_id": "02",
+      "building_street": "2 Becclesgate"
+    },
+    {
+      "grid_id": "03",
+      "building_street": "3 Becclesgate"
+    },
+    {
+      "grid_id": "04",
+      "building_street": "4 Becclesgate"
+    },
+    {
+      "grid_id": "05",
+      "building_street": "5 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "06",
+      "building_street": "6 Becclesgate"
+    },
+    {
+      "grid_id": "07",
+      "building_street": "7 Becclesgate"
+    },
+    {
+      "grid_id": "08",
+      "building_street": "8 Becclesgate"
+    },
+    {
+      "grid_id": "09",
+      "building_street": "9 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "10",
+      "building_street": "10 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "11",
+      "building_street": "11 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "12",
+      "building_street": "12 Becclesgate"
+    },
+    {
+      "grid_id": "13",
+      "building_street": "13 Becclesgate"
+    },
+    {
+      "grid_id": "14",
+      "building_street": "14 Becclesgate"
+    },
+    {
+      "grid_id": "15",
+      "building_street": "15 Becclesgate"
+    },
+    {
+      "grid_id": "16",
+      "building_street": "16 Becclesgate"
+    },
+    {
+      "grid_id": "17",
+      "building_street": "17 Becclesgate"
+    },
+    {
+      "grid_id": "18",
+      "building_street": "18 Becclesgate"
+    },
+    {
+      "grid_id": "19",
+      "building_street": "19 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "20",
+      "building_street": "20 Becclesgate"
+    },
+    {
+      "grid_id": "21",
+      "building_street": "21 Becclesgate"
+    },
+    {
+      "grid_id": "22",
+      "building_street": "22 Becclesgate"
+    },
+    {
+      "grid_id": "23",
+      "building_street": "23 Becclesgate"
+    },
+    {
+      "grid_id": "24",
+      "building_street": "24 Becclesgate"
+    },
+    {
+      "grid_id": "25",
+      "building_street": "25 Becclesgate"
+    },
+    {
+      "grid_id": "26",
+      "building_street": "26 Becclesgate"
+    },
+    {
+      "grid_id": "27",
+      "building_street": "27 Becclesgate"
+    },
+    {
+      "grid_id": "28",
+      "building_street": "28 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "29",
+      "building_street": "29 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "30",
+      "building_street": "30 Becclesgate"
+    },
+    {
+      "grid_id": "31",
+      "building_street": "31 Becclesgate"
+    },
+    {
+      "grid_id": "32",
+      "building_street": "32 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "33",
+      "building_street": "33 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "34",
+      "building_street": "34 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "35",
+      "building_street": "35 Becclesgate"
+    },
+    {
+      "grid_id": "36",
+      "building_street": "36 Becclesgate"
+    },
+    {
+      "grid_id": "37",
+      "building_street": "37 Becclesgate"
+    },
+    {
+      "grid_id": "38",
+      "building_street": "38 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "39",
+      "building_street": "39 Becclesgate"
+    },
+    {
+      "grid_id": "40",
+      "building_street": "40 Becclesgate"
+    },
+    {
+      "grid_id": "41",
+      "building_street": "41 Becclesgate"
+    },
+    {
+      "grid_id": "42",
+      "building_street": "42 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "43",
+      "building_street": "43 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "44",
+      "building_street": "44 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "45",
+      "building_street": "45 Becclesgate"
+    },
+    {
+      "grid_id": "46",
+      "building_street": "46 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "47",
+      "building_street": "47 Becclesgate",
+      "coords": null
+    },
+    {
+      "grid_id": "48",
+      "building_street": "48 Becclesgate"
+    },
+    {
+      "grid_id": "49",
+      "building_street": "49 Becclesgate"
+    },
+    {
+      "grid_id": "50",
+      "building_street": "50 Becclesgate"
+    }
+  ],
+  "landmarks": [],
+  "preferred_entry": "5 BECCLESGATE",
+  "preferred_exit": "47 BECCLESGATE",
+  "estate_direction": null,
+  "typical_density": 16.0,
+  "visit_count": 2,
+  "last_seen": "2026-05-30",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 1GB",
+      "count": 2
+    }
+  ],
+  "density_samples": [
+    16,
+    16
+  ],
+  "history": [
+    {
+      "manifest": "combined_dereham_grid_nodes",
+      "date": "2026-05-30",
+      "parcels": 16,
+      "stops": 16
+    },
+    {
+      "manifest": "combined_dereham_grid_nodes",
+      "date": "2026-05-30",
+      "parcels": 16,
+      "stops": 16
+    }
+  ],
+  "breadcrumbs": [
+    {
+      "date": "2026-05-30",
+      "manifest_id": "combined_dereham_grid_nodes",
+      "entry": "5 BECCLESGATE",
+      "exit": "47 BECCLESGATE",
+      "next_postcode": "NR19 1GB"
+    },
+    {
+      "date": "2026-05-30",
+      "manifest_id": "combined_dereham_grid_nodes",
+      "entry": "5 BECCLESGATE",
+      "exit": "47 BECCLESGATE",
+      "next_postcode": "NR19 1GB"
+    }
+  ],
+  "coords": [
+    52.6634570572336,
+    0.9313295752257005
+  ]
+}

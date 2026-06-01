@@ -1,0 +1,44 @@
+{
+  "postcode": "NR19 2SU",
+  "streets": [
+    "windsor park"
+  ],
+  "preferred_entry": "32 WINDSOR PARK",
+  "preferred_exit": "5 WINDSOR PARK",
+  "estate_direction": null,
+  "typical_density": 3.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 1TR",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    3
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 3,
+      "stops": 3
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "32 WINDSOR PARK",
+      "exit": "5 WINDSOR PARK",
+      "next_postcode": "NR19 1TR"
+    }
+  ],
+  "coords": [
+    52.693388993181934,
+    0.9398775011631754
+  ]
+}

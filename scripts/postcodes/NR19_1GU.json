@@ -1,0 +1,27 @@
+{
+  "postcode": "NR19 1GU",
+  "streets": [
+    "collins way"
+  ],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "known_addresses": [
+    {
+      "grid_id": "41",
+      "building_street": "12 Collins Way"
+    }
+  ],
+  "landmarks": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.66847685167039,
+    0.9479227036423088
+  ]
+}

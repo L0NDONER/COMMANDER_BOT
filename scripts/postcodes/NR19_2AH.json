@@ -1,0 +1,44 @@
+{
+  "postcode": "NR19 2AH",
+  "streets": [
+    "kings park"
+  ],
+  "preferred_entry": "37 KINGS PARK",
+  "preferred_exit": "37 KINGS PARK",
+  "estate_direction": null,
+  "typical_density": 1.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 2AG",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    1
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 1,
+      "stops": 1
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "37 KINGS PARK",
+      "exit": "37 KINGS PARK",
+      "next_postcode": "NR19 2AG"
+    }
+  ],
+  "coords": [
+    52.68320604843095,
+    0.9465179252053161
+  ]
+}

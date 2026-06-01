@@ -1,0 +1,20 @@
+{
+  "postcode": "NR19 2FA",
+  "streets": [],
+  "known_addresses": [],
+  "landmarks": [],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.68313357849558,
+    0.936036429377084
+  ]
+}

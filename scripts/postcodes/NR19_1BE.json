@@ -1,0 +1,64 @@
+{
+  "postcode": "NR19 1BE",
+  "streets": [
+    "courtenay close"
+  ],
+  "preferred_entry": "3 COURTENAY CLOSE",
+  "preferred_exit": "3 COURTENAY CLOSE",
+  "estate_direction": null,
+  "typical_density": 1.0,
+  "visit_count": 2,
+  "last_seen": "2026-05-30",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 1BF",
+      "count": 2
+    }
+  ],
+  "density_samples": [
+    1,
+    1
+  ],
+  "history": [
+    {
+      "manifest": "combined_dereham_grid_nodes",
+      "date": "2026-05-30",
+      "parcels": 1,
+      "stops": 1
+    },
+    {
+      "manifest": "combined_dereham_grid_nodes",
+      "date": "2026-05-30",
+      "parcels": 1,
+      "stops": 1
+    }
+  ],
+  "known_addresses": [
+    {
+      "grid_id": "10",
+      "building_street": "3 Courtenay Close",
+      "coords": null
+    }
+  ],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2026-05-30",
+      "manifest_id": "combined_dereham_grid_nodes",
+      "entry": "3 COURTENAY CLOSE",
+      "exit": "3 COURTENAY CLOSE",
+      "next_postcode": "NR19 1BF"
+    },
+    {
+      "date": "2026-05-30",
+      "manifest_id": "combined_dereham_grid_nodes",
+      "entry": "3 COURTENAY CLOSE",
+      "exit": "3 COURTENAY CLOSE",
+      "next_postcode": "NR19 1BF"
+    }
+  ],
+  "coords": [
+    52.67833759712172,
+    0.9401385638795962
+  ]
+}

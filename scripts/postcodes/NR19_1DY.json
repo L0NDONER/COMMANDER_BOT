@@ -1,0 +1,27 @@
+{
+  "postcode": "NR19 1DY",
+  "streets": [
+    "market place"
+  ],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "known_addresses": [
+    {
+      "grid_id": "25",
+      "building_street": "3 Market Place"
+    }
+  ],
+  "landmarks": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.68074620321918,
+    0.9409218800860534
+  ]
+}

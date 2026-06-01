@@ -1,0 +1,44 @@
+{
+  "postcode": "NR19 2HF",
+  "streets": [
+    "stigands gate"
+  ],
+  "preferred_entry": "19 STIGANDS GATE",
+  "preferred_exit": "9 STIGANDS GATE",
+  "estate_direction": null,
+  "typical_density": 2.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 2HJ",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    2
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 2,
+      "stops": 2
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "19 STIGANDS GATE",
+      "exit": "9 STIGANDS GATE",
+      "next_postcode": "NR19 2HJ"
+    }
+  ],
+  "coords": [
+    52.69186378813278,
+    0.94263145781871
+  ]
+}
