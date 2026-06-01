@@ -102,7 +102,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("trace", help="path to a gps_traces/*.json file")
     ap.add_argument("--scorer",
-                    choices=("mode", "agreement", "surprise"),
+                    choices=("mode", "agreement", "surprise", "runlength"),
                     default="mode")
     ap.add_argument("--k", type=int, default=2)
     ap.add_argument("--L", type=int, default=10)

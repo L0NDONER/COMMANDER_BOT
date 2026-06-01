@@ -4,11 +4,13 @@ Each scorer is `seq -> float` (signed Δ; future-minus-past convention).
 Reversal-symmetric by construction (forward and reverse pass the same
 data through the same window definition).
 
-Three scorers live here:
+Four scorers live here:
   mode       — lag_game mode-match Δ at lag k (binary per-position)
   agreement  — agreement-fraction Δ at lag k (continuous per-position)
   surprise   — local-distribution self-prediction Δ (full distribution
                per-position; Laplace add-1 smoothing)
+  runlength  — trend in the run-length series (does clumping grow or
+               shrink over the route?); k is ignored
 
 Sign-flip between them on the same sequence is informative — see
 [[courier-bubble-signature]] (2026-06-01 corroboration block).
@@ -79,18 +81,66 @@ def _surprise_scorer(seq, k):
     return fut - pas
 
 
+def _run_lengths(seq):
+    """Run-length encoding values only (lengths, not symbols). Empty seq
+    → empty list."""
+    if not seq:
+        return []
+    runs = [1]
+    for x, y in zip(seq, seq[1:]):
+        if x == y:
+            runs[-1] += 1
+        else:
+            runs.append(1)
+    return runs
+
+
+def _runlength_scorer(seq, _k):
+    """Run-length trend scorer.
+
+    Compute the run-length sequence R = [r_1, r_2, ..., r_m]. Reverse of
+    the original sequence reverses R exactly, so any
+    reversal-antisymmetric statistic on R is a valid directional scorer
+    of the original.
+
+    Statistic: linear-regression slope of R vs index, normalised by
+    mean(R) so the value is dimensionless and comparable across routes
+    of different scales. Positive slope = runs grow over time (clumping
+    increases late in the route, future runs are longer than past
+    runs); negative slope = runs shrink. k is ignored — run-length
+    structure has its own intrinsic granularity.
+
+    S = 0 by construction: reversing seq reverses R, which negates the
+    slope exactly."""
+    R = _run_lengths(seq)
+    m = len(R)
+    if m < 2:
+        return 0.0
+    mean_idx = (m - 1) / 2
+    mean_R = sum(R) / m
+    num = sum((i - mean_idx) * (R[i] - mean_R) for i in range(m))
+    denom = sum((i - mean_idx) ** 2 for i in range(m))
+    if denom == 0 or mean_R == 0:
+        return 0.0
+    return (num / denom) / mean_R
+
+
 def make_scorer(name: str = "mode", k: int = 2):
     """Canonical scorer-layer entrypoint: name → callable `seq -> float`.
-    Supported names: 'mode', 'agreement', 'surprise'. All three are
+    Supported names: 'mode', 'agreement', 'surprise', 'runlength'. All
     reversal-symmetric and substrate-internal. Pick one before looking
-    at the data; running all three and picking the winner is statistical
-    fishing — unless you're using the sign agreement / disagreement
-    across all three as the falsification, in which case it's a feature."""
+    at the data; running all of them and picking the winner is
+    statistical fishing — unless you're using the sign agreement /
+    disagreement across the whole set as the falsification, in which
+    case it's a feature."""
     if name == "mode":
         return lambda seq: _mode_scorer(seq, k)
     if name == "agreement":
         return lambda seq: _agreement_scorer(seq, k)
     if name == "surprise":
         return lambda seq: _surprise_scorer(seq, k)
+    if name == "runlength":
+        return lambda seq: _runlength_scorer(seq, k)
     raise ValueError(
-        f"unknown scorer {name!r}; valid: mode, agreement, surprise")
+        f"unknown scorer {name!r}; "
+        f"valid: mode, agreement, surprise, runlength")
