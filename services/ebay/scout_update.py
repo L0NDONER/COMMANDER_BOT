@@ -7,9 +7,11 @@ the side-effect-free pieces that scout_async (and the test suite) import.
 """
 
 import logging
+import math
 import os
 import re
 import statistics
+from datetime import datetime, timezone
 from typing import Dict, List
 
 from services.ebay.brands import STRONG_BRANDS, SLOW_KEYWORDS
@@ -53,6 +55,8 @@ FREE_STOCK_ROI_SENTINEL = 999
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
+FRESHNESS_HALFLIFE_DAYS = 15  # listing weight halves every N days (exp decay, no hard cutoff)
+
 CONDITION_FILTERS = {
     "new": "1000|1500",
     "used": "3000|4000|5000",
@@ -84,8 +88,35 @@ def _title_matches(title: str, query: str, min_tokens: int = 2) -> bool:
     return hits >= min(min_tokens, len(tokens))
 
 
+def _trust_score(pct: float) -> int:
+    if pct == 100:
+        return 3
+    if pct >= 98:
+        return 2
+    if pct >= 95:
+        return 1
+    return 0
+
+
+def _weighted_median(values: List[float], weights: List[float]) -> float:
+    pairs = sorted(zip(values, weights), key=lambda x: x[0])
+    total = sum(w for _, w in pairs)
+    half = total / 2
+    cumulative = 0.0
+    for idx, (v, w) in enumerate(pairs):
+        cumulative += w
+        if cumulative > half:
+            return v
+        if abs(cumulative - half) < 1e-10 and idx + 1 < len(pairs):
+            return (v + pairs[idx + 1][0]) / 2
+    return pairs[-1][0]
+
+
 def analyse(items: List[dict], query: str = "") -> Dict:
-    prices = []
+    prices: List[float] = []
+    weights: List[float] = []
+    trust_scores: List[int] = []
+    now = datetime.now(timezone.utc)
     for i in items:
         if "price" not in i:
             continue
@@ -95,8 +126,24 @@ def analyse(items: List[dict], query: str = "") -> Dict:
         country = i.get("itemLocation", {}).get("country", "")
         if country and country != "GB":
             continue
+        created = i.get("itemCreationDate")
+        age_days = 0.0
+        if created:
+            try:
+                age_days = (now - datetime.fromisoformat(created.replace("Z", "+00:00"))).total_seconds() / 86400
+            except ValueError:
+                pass
         prices.append(float(i["price"]["value"]))
-    return {"median": statistics.median(prices)} if prices else {}
+        weights.append(math.exp(-age_days / FRESHNESS_HALFLIFE_DAYS))
+        pct = i.get("seller", {}).get("feedbackPercentage")
+        if pct is not None:
+            trust_scores.append(_trust_score(float(pct)))
+    if not prices:
+        return {}
+    result = {"median": _weighted_median(prices, weights)}
+    if trust_scores:
+        result["trust"] = round(statistics.median(trust_scores))
+    return result
 
 
 def detect_condition(caption: str) -> str:
@@ -207,6 +254,8 @@ def _score(votes: List[Dict], base_query: str, clean_buy: float) -> Dict:
         roi = FREE_STOCK_ROI_SENTINEL
         verdict = "STRONG BUY" if sell_price >= FREE_STOCK_MIN_SELL else "PASS"
 
+    trust_vals = [v["trust"] for v in votes if "trust" in v]
+    trust = round(statistics.median(trust_vals)) if trust_vals else None
     return {
         "avg_median": avg_median,
         "sell_price": sell_price,
@@ -214,4 +263,5 @@ def _score(votes: List[Dict], base_query: str, clean_buy: float) -> Dict:
         "winner": winner["replica"],
         "roi": roi,
         "verdict": verdict,
+        "trust": trust,
     }

@@ -172,7 +172,10 @@ async def get_worker_vote_async(query: str, condition: str, index: int = 0) -> O
     stats = await get_stats_async(query, condition)
     if "median" not in stats:
         return None
-    return {"median": stats["median"], "query": query, "replica": f"#{index}"}
+    vote = {"median": stats["median"], "query": query, "replica": f"#{index}"}
+    if "trust" in stats:
+        vote["trust"] = stats["trust"]
+    return vote
 
 
 # ------------------------------------------------------------------------------
@@ -244,6 +247,8 @@ async def evaluate_with_consensus_saas(image_path: str, buy_price: str) -> Dict:
         "winner": scored["winner"],
         "roi": round(scored["roi"], 0),
         "verdict": scored["verdict"],
+        "spread": int(round(clean_buy - scored["avg_median"])),
+        "trust": scored["trust"],
         "query": base_query,
         "title": listing["title"],
         "description": listing["description"],

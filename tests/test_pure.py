@@ -155,6 +155,31 @@ def test_analyse_keeps_items_without_location():
     assert analyse(items, query="Gant Shirt") == {"median": 25.0}
 
 
+def test_analyse_freshness_weights_newer_listings_higher(monkeypatch):
+    from datetime import datetime, timedelta, timezone
+    # Half-life = 1 day so the 30-day-old listing has negligible weight.
+    # Fresh items: £10 and £20 → weighted median should be dominated by them, not £50.
+    monkeypatch.setattr(scout_update, "FRESHNESS_HALFLIFE_DAYS", 1)
+    fresh = (datetime.now(timezone.utc) - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    old   = (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    items = [
+        {"price": {"value": "10"}, "itemCreationDate": fresh},
+        {"price": {"value": "50"}, "itemCreationDate": old},
+        {"price": {"value": "20"}, "itemCreationDate": fresh},
+    ]
+    result = analyse(items)
+    assert result["median"] < 25.0, "old £50 outlier should be downweighted below simple median"
+
+
+def test_analyse_passes_items_without_creation_date():
+    # No date → age treated as 0 (weight 1.0), participates at full strength.
+    items = [
+        {"price": {"value": "10"}},
+        {"price": {"value": "20"}},
+    ]
+    assert analyse(items) == {"median": 15.0}
+
+
 def test_title_matches_requires_min_tokens():
     assert _title_matches("Gant Gingham Shirt XL", "Gant Shirt") is True
     assert _title_matches("Gant Polo Jumper", "Gant Shirt") is False
