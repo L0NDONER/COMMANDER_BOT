@@ -130,7 +130,7 @@ def bootstrap() -> dict:
 
 def main() -> None:
     s = bootstrap()
-    print(f"\n--- bootstrap summary ---")
+    print("\n--- bootstrap summary ---")
     for k, v in s.items():
         print(f"  {k:<22}  {v}")
     print(f"  corrections file: {CORRECTIONS_PATH}")

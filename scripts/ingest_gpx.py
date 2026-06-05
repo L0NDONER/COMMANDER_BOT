@@ -99,10 +99,10 @@ def parse_gpx(path: Path) -> list[dict]:
         hdop = tp.find(hdop_tag)
         raw.append({
             "ts": ts, "lat": lat, "lon": lon,
-            "heading_deg": float(course.text) if course is not None
-                                                 and course.text else None,
-            "speed_mps": float(speed.text) if speed is not None
-                                               and speed.text else None,
+            "heading_deg": (float(course.text)
+                            if course is not None and course.text else None),
+            "speed_mps": (float(speed.text)
+                          if speed is not None and speed.text else None),
             "accuracy_m": (float(hdop.text) * DEFAULT_BASE_ACCURACY_M
                            if hdop is not None and hdop.text
                            else FALLBACK_ACCURACY_M),

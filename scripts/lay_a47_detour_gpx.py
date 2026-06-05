@@ -20,7 +20,6 @@ Output: /tmp/a47_detour.gpx by default, then run through ingest_gpx.py:
     -m a47_detour_demo -d 2026-06-06
 """
 import argparse
-import math
 import random
 import sys
 from datetime import datetime, timezone
@@ -29,7 +28,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from courier_gps import _haversine_m  # noqa: E402
 from lay_synthetic_gpx import (  # noqa: E402
-    _bearing, _step_along, _jitter, _hdop, _to_iso, write_gpx,
+    _bearing, _step_along, _jitter, _hdop, write_gpx,
     WALK_MPS, DRIVE_MPS, COURSE_NOISE_DEG, TICK_JITTER_SECS,
     GAP_PROB, GAP_SECS_MIN, GAP_SECS_MAX,
 )

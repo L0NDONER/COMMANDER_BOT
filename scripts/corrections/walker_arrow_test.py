@@ -169,7 +169,7 @@ def main():
         if len(breadcrumbs) < 4:
             print(f"\n########  {path.stem}   n_ticks={len(ticks)}   "
                   f"n_stops={len(stops)}  ########")
-            print(f"  too few stops to walk — skipping")
+            print("  too few stops to walk — skipping")
             continue
         result = run_game(breadcrumbs)
         seq = [KIND_TO_SYM[r["kind"]] for r in result]
@@ -181,7 +181,7 @@ def main():
               f"n_stops={len(stops)}   n_legs={len(seq)}  ########")
         print(f"  leg-kind mix (pre-warmup): {kinds}")
         if len(seq) < max(4, BUBBLE_L + 1):
-            print(f"  too short for arrow_test — skipping")
+            print("  too short for arrow_test — skipping")
             continue
         rev = reversal_decompose(seq, scorer)
         A, S = rev["antisymmetric"], rev["symmetric"]
@@ -192,8 +192,8 @@ def main():
               f"   S={S:+.4f}  A={A:+.4f}  "
               f"|S|/|A|={contam:.0%} {'CLEAN' if clean else 'CONTAM'}")
         if abs(A) < 1e-9:
-            print(f"  A is structurally zero — alphabet too saturated; "
-                  f"skipping nulls")
+            print("  A is structurally zero — alphabet too saturated; "
+                  "skipping nulls")
             continue
         # Four nulls, hardest-to-easiest. The Markov-1 fit is the strongest
         # filter: if A survives it, the asymmetry is beyond first-order

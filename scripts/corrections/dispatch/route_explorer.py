@@ -295,9 +295,6 @@ def main() -> None:
     start_dt = (datetime.datetime.fromisoformat(args.start)
                 if args.start else None)
 
-    import zoneinfo
-    tz = zoneinfo.ZoneInfo("Europe/London")
-
     print(f"depot {args.depot}  clusters: {len(clusters)}  "
           f"walks: {args.n}  steps: {args.steps or 'full'}")
     print(f"weather: {args.weather}  temp: {args.temp}°C  "

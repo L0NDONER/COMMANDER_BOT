@@ -94,8 +94,8 @@ def main() -> None:
     n_cache = sum(1 for r in rows if r["geo"] is not None)
     n_nocache = n - n_cache
     n_suspect = sum(1 for r in rows if r["suspect"])
-    finite_deltas = sorted(r["delta"] for r in rows
-                            if r["delta"] != float("inf"))
+    finite_deltas = sorted(
+        r["delta"] for r in rows if r["delta"] != float("inf"))
     if finite_deltas:
         med = _percentile(finite_deltas, 0.5)
         p95 = _percentile(finite_deltas, 0.95)

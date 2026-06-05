@@ -295,6 +295,9 @@ def main():
                     help="min-max scale d and a at each step")
     ap.add_argument("--pin-tail", action="store_true",
                     help="force NR19 2EU Northgate then Allotment as final stops")
+    ap.add_argument("--pin-head", default=None,
+                    help="comma-separated postcode prefixes to run first "
+                         "before the greedy pool, e.g. 'NR20,NR19 2Q'")
     ap.add_argument("--rate", type=float, default=21.6,
                     help="drops per hour for time budget")
     ap.add_argument("--traffic-profile", default=None,
@@ -304,6 +307,11 @@ def main():
     ap.add_argument("--profile", default=topology.DEFAULT_PROFILE,
                     choices=list(topology.PROFILES),
                     help=f"route behaviour profile (default: {topology.DEFAULT_PROFILE})")
+    ap.add_argument("--lens", default=None,
+                    help="lens module name to score each leg, e.g. angle_lens "
+                         "or hello_world (must expose score_leg_sync)")
+    ap.add_argument("--lens-log", type=int, default=5,
+                    help="number of legs to log (0 = all, default 5)")
     args = ap.parse_args()
 
     centers = load_centroids()
@@ -327,6 +335,12 @@ def main():
     else:
         pool, tail = clusters, []
 
+    head = []
+    if args.pin_head:
+        prefixes = [p.strip() for p in args.pin_head.split(",")]
+        head = [c for c in pool if any(c[0].startswith(p) for p in prefixes)]
+        pool = [c for c in pool if not any(c[0].startswith(p) for p in prefixes)]
+
     depot_pt = centers[args.depot]
     home_pt = centers[args.home]
 
@@ -343,10 +357,27 @@ def main():
         print("# almanac: is_dark=True — LOW-lit zones scaled ×1.25", file=sys.stderr)
 
     print(f"# profile: {args.profile}", file=sys.stderr)
-    order = greedy_sequence(depot_pt, pool, args.alpha, args.beta,
-                            args.normalize, traffic_profile, dark,
-                            cluster_risks, cluster_detours, args.profile)
-    sequence = [pool[i] for i in order] + tail
+
+    lens_mod = None
+    if args.lens:
+        import importlib
+        lens_mod = importlib.import_module(args.lens)
+        print(f"# lens: {args.lens}", file=sys.stderr)
+
+    seq_kwargs = dict(alpha=args.alpha, beta=args.beta,
+                      normalize=args.normalize, traffic_profile=traffic_profile,
+                      is_dark=dark, cluster_risks=cluster_risks,
+                      cluster_detours=cluster_detours, route_profile=args.profile)
+
+    if head:
+        head_order = greedy_sequence(depot_pt, head, **seq_kwargs)
+        head_seq = [head[i] for i in head_order]
+        head_start = head_seq[-1][2]
+        pool_order = greedy_sequence(head_start, pool, **seq_kwargs)
+        sequence = head_seq + [pool[i] for i in pool_order] + tail
+    else:
+        order = greedy_sequence(depot_pt, pool, **seq_kwargs)
+        sequence = [pool[i] for i in order] + tail
 
     # report
     knob = 60.0 / args.rate
@@ -361,6 +392,9 @@ def main():
     centroids = [depot_pt] + [c[2] for c in sequence]
     # pts_m[0]=depot, pts_m[i+1]=cluster_i, pts_m[-1]=home.
     # turn at cluster_i is centered on pts_m[i+1].
+    lens_log_limit = args.lens_log if args.lens_log > 0 else len(sequence)
+    lens_logged = 0
+
     for i, (name, n, pt, tag) in enumerate(sequence):
         seg_km = hav(centroids[i], pt) / 1000.0
         total_km += seg_km
@@ -370,6 +404,23 @@ def main():
         total_masked += a_mask
         cum_drops += n
         rows.append((i + 1, name, n, seg_km, a_raw, a_mask, tag, cum_drops))
+
+        if lens_mod and lens_logged < lens_log_limit:
+            prev_name = sequence[i - 1][0] if i > 0 else args.depot
+            next_name = sequence[i + 1][0] if i + 1 < len(sequence) else args.home
+            vote = lens_mod.score_leg_sync(
+                (prev_name, name, next_name),
+                angle=a_raw,
+                centers={prev_name: centroids[i],
+                         name:      pt,
+                         next_name: (sequence[i + 1][2]
+                                     if i + 1 < len(sequence) else home_pt)},
+            )
+            total_cost = seg_km * 1000.0  # metres
+            print(f"lens  ({prev_name}, {name}, {next_name})"
+                  f"  angle={a_raw:.3f}  vote={vote:+d}"
+                  f"  total_cost={total_cost:.0f}m")
+            lens_logged += 1
 
     last_pt = sequence[-1][2]
     closing_km = hav(last_pt, home_pt) / 1000.0
@@ -381,7 +432,8 @@ def main():
     print(f"depot {args.depot} → home {args.home}")
     print(f"clusters: {len(sequence)}  drops: {total_drops}  "
           f"alpha={args.alpha} beta={args.beta} "
-          f"normalize={args.normalize} pin_tail={args.pin_tail}")
+          f"normalize={args.normalize} pin_tail={args.pin_tail}"
+          + (f" pin_head={args.pin_head}" if args.pin_head else ""))
     print()
     print(f"  {'#':>3} t {'cluster':<22} {'drops':>5} {'leg_km':>6} "
           f"{'C_raw':>5} {'C_mask':>6} {'cum':>5} {'cum_min':>7}")
@@ -391,7 +443,7 @@ def main():
         print(f"  {i:>3} {g} {name:<22} {n:>5} {km:>5.2f}  "
               f"{a_raw:>5.2f} {a_mask:>6.2f} {cum:>5} {cum * knob:>6.1f}m{flag}")
     print()
-    print(f"legend: ▲ TYPE_CLOSE (masked to 0)   ◆ TYPE_HYBRID (capped at 1.0)")
+    print("legend: ▲ TYPE_CLOSE (masked to 0)   ◆ TYPE_HYBRID (capped at 1.0)")
     print(f"closing leg → home: {closing_km:.2f} km")
     print(f"total km (depot→…→home): {total_km:.2f}")
     n_corners = max(1, len(rows))

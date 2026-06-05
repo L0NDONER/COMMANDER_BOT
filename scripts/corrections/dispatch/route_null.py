@@ -239,12 +239,15 @@ def main():
         random.shuffle(perm)
         seq = perm + tail
         km, raw, mask, ur, um = score(seq, depot, home)
-        km_s.append(km); raw_s.append(raw); mask_s.append(mask)
-        u_raw_s.append(ur); u_mask_s.append(um)
+        km_s.append(km)
+        raw_s.append(raw)
+        mask_s.append(mask)
+        u_raw_s.append(ur)
+        u_mask_s.append(um)
     rnd_km   = summarise(km_s,   "random km")
     rnd_raw  = summarise(raw_s,  "random raw C")
     rnd_mask = summarise(mask_s, "random masked C")
-    rnd_u    = summarise(u_mask_s, "random masked U")
+    summarise(u_mask_s, "random masked U")
 
     # --- greedy candidate ---
     traffic_profile = TRAFFIC_PROFILES.get(args.traffic_profile)
@@ -288,7 +291,7 @@ def main():
     pass_cost = cost_drop >= args.kill_cost
     pass_km = km_regress <= args.kill_km
     verdict = "PASS" if (pass_cost and pass_km) else "REFUTED"
-    print(f"greedy vs radial (masked cost):")
+    print("greedy vs radial (masked cost):")
     print(f"  masked C  : {rad_mask:.2f} → {g_mask:.2f}   "
           f"Δ = {-cost_drop * 100:+.1f}%   "
           f"(kill if < -{args.kill_cost * 100:.0f}%)  "

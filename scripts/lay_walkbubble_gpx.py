@@ -204,7 +204,7 @@ def main() -> None:
     print(f"  duration: {span_h:.2f}h ({span_h * 60:.0f} min)")
     print(f"  drive distance: {total_drive_m / 1000:.1f} km")
     print(f"  walk distance:  {total_walk_m / 1000:.2f} km")
-    print(f"  anchors in visit order:")
+    print("  anchors in visit order:")
     for (pc, _), n in zip(anchors, drops_per):
         print(f"    {pc}  ({n} drops)")
 

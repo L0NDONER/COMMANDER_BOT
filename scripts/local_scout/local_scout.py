@@ -24,8 +24,6 @@ from credentials import (
     tw_auth_k,
     twilio_from_number,
     my_mobile_number,
-    GROQ_API_KEY,
-    GROQ_MODEL,
 )
 from datetime import datetime
 from math import radians, sin, cos, sqrt, atan2
@@ -284,7 +282,7 @@ def run_scout(config, ebay_token, conn, home_lat, home_lon, twilio_cfg):
             continue
 
         if not listings:
-            log.info(f"  No listings found")
+            log.info("  No listings found")
             continue
 
         log.info(f"  Found {len(listings)} listings, fetching sold prices...")
@@ -296,7 +294,7 @@ def run_scout(config, ebay_token, conn, home_lat, home_lon, twilio_cfg):
             continue
 
         if not avg_sold:
-            log.info(f"  No sold price data available, skipping")
+            log.info("  No sold price data available, skipping")
             continue
 
         log.info(f"  Avg sold: £{avg_sold}")

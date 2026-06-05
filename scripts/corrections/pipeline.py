@@ -31,7 +31,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))      # scripts/correcti
 from symbolic_walker import classify_legs  # noqa: E402
 # Layer 2 — truth (used at address-resolution time; loaded here so the
 # pipeline owns a single CorrectionTable instance for callers that want it)
-from corrections import CorrectionTable, resolve_location  # noqa: E402
+from corrections import CorrectionTable  # noqa: E402
 # Layer 3 — context (stub; gates live here per [[variant-design-rules]] #5)
 from context import route_weight  # noqa: E402
 # Layer 4 — scorers
@@ -99,7 +99,7 @@ def _print_result(out: dict) -> None:
     rev = f["reversal"]
     print(f"reversal:  S={rev['symmetric']:+.4f}  A={rev['antisymmetric']:+.4f}"
           f"  (Δfwd={rev['delta_fwd']:+.4f}  Δrev={rev['delta_rev']:+.4f})")
-    print(f"nulls:")
+    print("nulls:")
     print(f"  {'name':<18}  {'p05':>8}  {'p50':>8}  {'p95':>8}  "
           f"{'pct':>5}  {'p':>6}")
     for name, r in f["nulls"].items():

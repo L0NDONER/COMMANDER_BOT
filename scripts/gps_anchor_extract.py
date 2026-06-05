@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 import csv
 import math
-from pathlib import Path
 from statistics import median
-from collections import defaultdict
 
 # 5 km/h in m/s — speed at or below this is treated as "on foot / committed
 # to the pocket".  Phone GPS loggers emit speed in m/s.
@@ -138,7 +136,8 @@ def build_anchor_map(gps_path, close_centroids):
 # CLI
 # ------------------------------------------------------------
 if __name__ == "__main__":
-    import argparse, json
+    import argparse
+    import json
     ap = argparse.ArgumentParser()
     ap.add_argument("gps_csv", help="raw GPS trace CSV")
     ap.add_argument("centroids_json", help="JSON: {close: [lat, lon]}")

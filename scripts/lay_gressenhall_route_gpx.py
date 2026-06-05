@@ -11,7 +11,6 @@ Run:
     python3 scripts/lay_gressenhall_route_gpx.py --n-drops 101 --drops-per-hour 21.6 --seed 7
 """
 import argparse
-import math
 import random
 import sys
 from datetime import datetime, timezone
@@ -26,12 +25,11 @@ from lay_synthetic_gpx import (  # noqa: E402
 )
 from lay_a47_detour_gpx import emit_walk, emit_dwell  # noqa: E402
 from lay_a47_detour_gpx import (  # noqa: E402
-    emit_drive as _emit_drive_clear,
     TRAFFIC_SLOW_MPS, TRAFFIC_HOLD_SECS_MIN, TRAFFIC_HOLD_SECS_MAX,
 )
 from lay_walkbubble_gpx import (  # noqa: E402
     place_drops_around, WALK_PRE_SECS, WALK_POST_SECS,
-    DWELL_SECS, SORT_AT_VAN_SECS,
+    SORT_AT_VAN_SECS,
 )
 sys.path.insert(0, str(Path(__file__).resolve().parent / "corrections" / "dispatch"))
 import topology  # noqa: E402
@@ -366,21 +364,21 @@ def main() -> None:
                           for z, _, _ in ROUTE_ZONES
                           if topology.throat_penalty(z) > 0]
         if active_throats:
-            print(f"  throats: " + "  ".join(
+            print("  throats: " + "  ".join(
                 f"{z}={int(p)}s" for z, p in active_throats))
     if profile_cfg["enforce_peak_hour_avoidance"]:
         active_xings = [(z, topology.intersection_delay(z))
                         for z, _, _ in ROUTE_ZONES
                         if topology.intersection_delay(z) > 0]
         if active_xings:
-            print(f"  crossings (peak): " + "  ".join(
+            print("  crossings (peak): " + "  ".join(
                 f"{z}={int(p)}s" for z, p in active_xings))
     if chosen_detour:
         scores = {c["name"]: score_detour(c,
                       ROUTE_ZONES[6][1], ROUTE_ZONES[7][1],
                       args.weather, args.gritted_bus_routes)
                   for c in DETOUR_CANDIDATES}
-        print(f"  collision: Quebec Road blocked before Quebec Hall")
+        print("  collision: Quebec Road blocked before Quebec Hall")
         for name, s in scores.items():
             flag = " ← CHOSEN" if name == chosen_detour["name"] else ""
             print(f"    {name:<30}  eff_m={s:.0f}{flag}")
@@ -388,14 +386,14 @@ def main() -> None:
     import zoneinfo as _zi2
     _LTZ = _zi2.ZoneInfo("Europe/London")
     print("  zones:")
-    for (name, _, _), n, (_, arr_ts) in zip(ROUTE_ZONES, drops_per_zone,
-                                              zone_arrivals):
+    for (name, _, _), n, (_, arr_ts) in zip(
+            ROUTE_ZONES, drops_per_zone, zone_arrivals):
         arr = datetime.fromtimestamp(arr_ts, tz=timezone.utc).astimezone(_LTZ)
         school = " ▶SCHOOL" if (name == "allotment_gardens"
-                                 and topology.school_multiplier(
-                                     next(a for z, a, _ in ROUTE_ZONES
-                                          if z == name),
-                                     arr) > 1.0) else ""
+                                and topology.school_multiplier(
+                                    next(a for z, a, _ in ROUTE_ZONES
+                                         if z == name),
+                                    arr) > 1.0) else ""
         print(f"    {name:<22}  {n:>3} drops  arrive {arr.strftime('%H:%M %Z')}{school}")
 
 

@@ -258,8 +258,8 @@ def infer_stops(trace: GPSTrace,
                 # Diagnostic features for the merged stop are inherited
                 # from the longer-running side rather than recomputed.
                 radius_m=max(prev.radius_m, s.radius_m),
-                linearity=prev.linearity if prev.n_ticks >= s.n_ticks
-                          else s.linearity,
+                linearity=(prev.linearity if prev.n_ticks >= s.n_ticks
+                           else s.linearity),
                 walking_frac=(prev.walking_frac * prev.n_ticks
                               + s.walking_frac * s.n_ticks) / n,
                 heading_sd_deg=max(prev.heading_sd_deg, s.heading_sd_deg),

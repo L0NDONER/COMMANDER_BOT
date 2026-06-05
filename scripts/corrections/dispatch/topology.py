@@ -314,10 +314,11 @@ def get_profile(name: str | None = None) -> dict:
     return PROFILES.get(name or DEFAULT_PROFILE, PROFILES[DEFAULT_PROFILE])
 
 
-def apply_profile_penalties(zone_name: str,
-                             latlon: tuple[float, float],
-                             dt: datetime.datetime | None = None,
-                             profile_name: str | None = None) -> float:
+def apply_profile_penalties(
+        zone_name: str,
+        latlon: tuple[float, float],
+        dt: datetime.datetime | None = None,
+        profile_name: str | None = None) -> float:
     """Return total additive time penalty (seconds) for a zone under the
     active profile.  Callers convert to equivalent metres as needed."""
     profile = get_profile(profile_name)
@@ -329,11 +330,12 @@ def apply_profile_penalties(zone_name: str,
     return total
 
 
-def apply_profile_multiplier(zone_name: str,
-                              latlon: tuple[float, float],
-                              is_dark: bool = False,
-                              dt: datetime.datetime | None = None,
-                              profile_name: str | None = None) -> float:
+def apply_profile_multiplier(
+        zone_name: str,
+        latlon: tuple[float, float],
+        is_dark: bool = False,
+        dt: datetime.datetime | None = None,
+        profile_name: str | None = None) -> float:
     """Return combined multiplicative cost factor for a zone under the
     active profile."""
     profile = get_profile(profile_name)
