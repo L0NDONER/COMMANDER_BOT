@@ -16,6 +16,7 @@ STREAMS = [
 BUCKET_SEC = 1
 WINDOW = 60
 BASELINE_RATIO = 64.0 / 60810.0  # example from your earlier snapshot
+DRIFT_WINDOW = 7  # median smoothing window for DBC operator
 
 
 class BucketState:
@@ -75,17 +76,21 @@ class BucketState:
         else:
             corr = float("nan")
 
-        if len(self.history) >= 3:
-            r1, r2, r3 = (self.history[-3][3],
-                          self.history[-2][3],
-                          self.history[-1][3])
-            curv = (r3 - r2) - (r2 - r1)
+        # Three-step DBC operator: drift → median-smooth → second derivative
+        needed = DRIFT_WINDOW + 3
+        if len(self.history) >= needed:
+            ratios = [h[3] for h in self.history[-needed:]]
+            drifts = [ratios[i] - ratios[i - 1] for i in range(1, len(ratios))]
+            d0 = statistics.median(drifts[-DRIFT_WINDOW:])
+            d1 = statistics.median(drifts[-DRIFT_WINDOW - 1:-1])
+            d2 = statistics.median(drifts[-DRIFT_WINDOW - 2:-2])
+            dbc = d0 - 2 * d1 + d2
         else:
-            curv = 0.0
+            dbc = 0.0
 
         print(
             f"{ts}  BTC={btc:9.2f}  SOL={sol:7.3f}  "
-            f"gap={gap:+7.4f}%  corr={corr:6.3f}  curv={curv:+.3e}"
+            f"gap={gap:+7.4f}%  corr={corr:6.3f}  dbc={dbc:+.3e}"
         )
 
 
