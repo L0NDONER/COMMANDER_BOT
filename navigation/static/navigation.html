@@ -31,7 +31,7 @@
       flex-direction: column;
     }
 
-    /* ── Setup screen ── */
+    /* ── Setup ── */
     #setup {
       flex: 1;
       padding: 24px 16px;
@@ -43,20 +43,11 @@
       margin: 0 auto;
     }
 
-    #setup h1 {
-      font-size: 1.4rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      color: var(--accent);
-      margin-bottom: 4px;
-    }
+    #setup h1 { font-size: 1.4rem; font-weight: 600; color: var(--accent); margin-bottom: 4px; }
 
-    .field-row {
-      display: flex;
-      gap: 8px;
-    }
-
+    .field-row { display: flex; gap: 8px; }
     .field-row input { flex: 1; }
+    .field-group { display: flex; flex-direction: column; gap: 4px; }
 
     input, textarea {
       background: var(--surface);
@@ -68,10 +59,7 @@
       width: 100%;
       outline: none;
     }
-
-    input:focus, textarea:focus {
-      border-color: var(--accent);
-    }
+    input:focus, textarea:focus { border-color: var(--accent); }
 
     textarea {
       height: 180px;
@@ -81,14 +69,7 @@
       line-height: 1.6;
     }
 
-    label {
-      font-size: 12px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .field-group { display: flex; flex-direction: column; gap: 4px; }
+    label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
 
     #btn-optimise {
       background: var(--accent);
@@ -100,19 +81,12 @@
       font-weight: 600;
       cursor: pointer;
       margin-top: 4px;
-      letter-spacing: 0.03em;
     }
-
-    #btn-optimise:active { opacity: 0.8; }
+    #btn-optimise:active  { opacity: 0.8; }
     #btn-optimise:disabled { background: var(--border); color: var(--muted); cursor: default; }
+    #setup-error { color: var(--danger); font-size: 13px; display: none; }
 
-    #setup-error {
-      color: var(--danger);
-      font-size: 13px;
-      display: none;
-    }
-
-    /* ── Nav screen ── */
+    /* ── Nav ── */
     #nav {
       flex: 1;
       display: none;
@@ -121,7 +95,7 @@
       overflow: hidden;
     }
 
-    /* Progress bar */
+    /* Progress */
     #progress {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
@@ -133,24 +107,10 @@
       color: var(--muted);
       flex-shrink: 0;
     }
+    #progress-track { flex: 1; height: 3px; background: var(--border); border-radius: 2px; margin: 0 12px; overflow: hidden; }
+    #progress-fill  { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s ease; }
 
-    #progress-track {
-      flex: 1;
-      height: 3px;
-      background: var(--border);
-      border-radius: 2px;
-      margin: 0 12px;
-      overflow: hidden;
-    }
-
-    #progress-fill {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 2px;
-      transition: width 0.3s ease;
-    }
-
-    /* Scrollable content */
+    /* Scroll body */
     #scroll-body {
       flex: 1;
       overflow-y: auto;
@@ -160,111 +120,86 @@
       gap: 10px;
     }
 
-    /* PC meta card */
-    #meta-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    #meta-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 14px;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    #meta-header .pc-tag {
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      color: var(--accent);
-    }
-
-    #meta-header .meta-streets {
-      font-size: 12px;
-      color: var(--muted);
-      margin-left: 8px;
-    }
-
-    #meta-header .chevron {
-      color: var(--muted);
-      font-size: 12px;
-      transition: transform 0.2s;
-    }
-
-    #meta-header.open .chevron { transform: rotate(180deg); }
-
-    #meta-body {
-      display: none;
-      padding: 0 14px 12px;
-      font-size: 13px;
-      line-height: 1.8;
-      border-top: 1px solid var(--border);
-      color: var(--muted);
-    }
-
-    #meta-body.visible { display: block; }
-
-    .meta-row { display: flex; gap: 6px; }
-    .meta-key { color: var(--muted); min-width: 80px; flex-shrink: 0; }
-    .meta-val { color: var(--text); }
-
-    .meta-order {
-      font-size: 12px;
-      color: var(--text);
-      margin-top: 4px;
-      word-break: break-word;
-    }
-
-    /* Warning banners */
-    .banner {
-      border-radius: 8px;
-      padding: 8px 14px;
-      font-size: 13px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
+    /* Warnings */
+    .banner { border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
     .banner-warn    { background: #2a1e00; color: var(--warn);   border: 1px solid #4a3500; }
     .banner-danger  { background: #2a0000; color: var(--danger); border: 1px solid #5a0000; }
     .banner-orange  { background: #2a1000; color: var(--orange); border: 1px solid #5a2000; }
     .banner-pattern { background: #001a30; color: var(--accent); border: 1px solid #003060; }
 
-    /* Current stop card */
-    #stop-card {
+    /* Nav card — arrow + drop + address */
+    #nav-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 18px 16px;
+      padding: 16px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
     }
 
-    #stop-card .stop-addr {
-      font-size: 1.35rem;
+    /* Arrow compass */
+    #arrow-wrap {
+      flex-shrink: 0;
+      width: 72px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      position: relative;
+    }
+
+    #arrow {
+      font-size: 2.2rem;
+      transition: transform 0.3s ease;
+      display: block;
+      line-height: 1;
+    }
+
+    #distance-label {
+      font-size: 10px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    /* Drop + address */
+    #nav-info { flex: 1; min-width: 0; }
+
+    #drop-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    #stop-addr {
+      font-size: 1.2rem;
       font-weight: 700;
       line-height: 1.2;
-      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    #stop-card .stop-pc {
-      font-size: 0.95rem;
+    #stop-pc {
+      font-size: 0.9rem;
       color: var(--accent);
       letter-spacing: 0.05em;
-      margin-bottom: 12px;
+      margin-top: 2px;
     }
 
-    #stop-card .stop-meta-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      font-size: 13px;
+    #stop-bubble {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
     }
 
+    .stop-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
     .badge {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -273,37 +208,52 @@
       font-size: 12px;
       color: var(--muted);
     }
-
     .badge-time { color: var(--text); font-weight: 600; }
 
-    /* Up-next list */
-    #upcoming { display: flex; flex-direction: column; gap: 6px; }
-
-    .upcoming-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      padding: 0 2px;
-    }
-
-    .upcoming-item {
-      background: var(--surface);
+    /* Throat bar */
+    #throat-bar-wrap {
+      background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 14px;
-      cursor: pointer;
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: none;
     }
+    #throat-bar-wrap.visible { display: block; }
+    #throat-bar-label { font-size: 12px; color: var(--warn); margin-bottom: 6px; font-weight: 600; }
+    #throat-bar-track { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    #throat-bar-fill  { height: 100%; background: var(--warn); border-radius: 3px; transition: width 0.5s ease; }
+    #throat-bar-dist  { font-size: 11px; color: var(--muted); margin-top: 4px; text-align: right; }
 
+    /* PC meta card */
+    #meta-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    #meta-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 14px; cursor: pointer; user-select: none;
+    }
+    #meta-header .pc-tag    { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; color: var(--accent); }
+    #meta-header .pc-streets{ font-size: 12px; color: var(--muted); margin-left: 8px; }
+    #meta-header .chevron   { color: var(--muted); font-size: 12px; transition: transform 0.2s; }
+    #meta-header.open .chevron { transform: rotate(180deg); }
+    #meta-body { display: none; padding: 0 14px 12px; font-size: 13px; line-height: 1.8; border-top: 1px solid var(--border); }
+    #meta-body.visible { display: block; }
+    .meta-row { display: flex; gap: 6px; }
+    .meta-key { color: var(--muted); min-width: 80px; flex-shrink: 0; }
+    .meta-val { color: var(--text); }
+    .meta-order { font-size: 12px; color: var(--text); margin-top: 4px; word-break: break-word; }
+
+    /* Upcoming */
+    #upcoming { display: flex; flex-direction: column; gap: 6px; }
+    .upcoming-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 0 2px; }
+    .upcoming-item {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;
+      font-size: 14px; cursor: pointer;
+    }
     .upcoming-item:active { opacity: 0.7; }
-
-    .upcoming-item .u-addr { font-weight: 500; }
-    .upcoming-item .u-pc   { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .upcoming-item .u-time { font-size: 12px; color: var(--muted); flex-shrink: 0; margin-left: 8px; }
+    .u-drop { font-size: 11px; color: var(--accent); font-weight: 700; min-width: 36px; }
+    .u-addr { font-weight: 500; }
+    .u-pc   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .u-time { font-size: 12px; color: var(--muted); flex-shrink: 0; margin-left: 8px; }
 
     /* Controls */
     #controls {
@@ -316,62 +266,27 @@
       align-items: center;
       flex-shrink: 0;
     }
-
     #controls button {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 0;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      background: var(--card);
-      color: var(--text);
+      border: 1px solid var(--border); border-radius: 10px; padding: 12px 0;
+      font-size: 15px; font-weight: 600; cursor: pointer; background: var(--card); color: var(--text);
     }
-
-    #btn-next-stop {
-      background: var(--accent) !important;
-      border-color: var(--accent) !important;
-      color: #fff !important;
-      font-size: 16px !important;
-    }
-
-    #controls button:active { opacity: 0.75; }
+    #btn-next-stop { background: var(--accent) !important; border-color: var(--accent) !important; color: #fff !important; font-size: 16px !important; }
+    #controls button:active   { opacity: 0.75; }
     #controls button:disabled { opacity: 0.3; cursor: default; }
-
-    #stop-counter {
-      text-align: center;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-
+    #stop-counter { text-align: center; font-size: 12px; color: var(--muted); line-height: 1.4; }
     #stop-counter strong { color: var(--text); font-size: 18px; display: block; }
 
-    /* Done screen */
+    /* Done */
     #done {
-      display: none;
-      flex: 1;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 16px;
-      padding: 32px;
-      text-align: center;
+      display: none; flex: 1; align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px; padding: 32px; text-align: center;
     }
-
     #done h2 { font-size: 1.8rem; color: var(--safe); }
     #done p  { color: var(--muted); }
     #done button {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 10px;
-      padding: 12px 24px;
-      font-size: 15px;
-      cursor: pointer;
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; padding: 12px 24px; font-size: 15px; cursor: pointer;
     }
-
-    .hidden { display: none !important; }
   </style>
 </head>
 <body>
@@ -384,7 +299,7 @@
     <label>Start</label>
     <div class="field-row">
       <input id="start-addr" placeholder="Address" value="3 Gordon Road">
-      <input id="start-pc" placeholder="Postcode" style="max-width:120px" value="NR20 4AW">
+      <input id="start-pc"   placeholder="Postcode" style="max-width:120px" value="NR20 4AW">
     </div>
   </div>
 
@@ -392,12 +307,12 @@
     <label>Finish (optional)</label>
     <div class="field-row">
       <input id="finish-addr" placeholder="Address" value="The Rose">
-      <input id="finish-pc" placeholder="Postcode" style="max-width:120px" value="NR19 2EU">
+      <input id="finish-pc"   placeholder="Postcode" style="max-width:120px" value="NR19 2EU">
     </div>
   </div>
 
   <div class="field-group">
-    <label>Parcels — one per line: Address, Postcode</label>
+    <label>Parcels — Address, Postcode (one per line)</label>
     <textarea id="parcels" spellcheck="false">4 Highfield Road, NR19 2EY
 7 Highfield Road, NR19 2EY
 12 Highfield Road, NR19 2EY
@@ -422,7 +337,6 @@ Longfields, NR19 2EU</textarea>
 
 <!-- ── Navigation ── -->
 <div id="nav">
-
   <div id="progress">
     <span id="prog-label">0 / 0</span>
     <div id="progress-track"><div id="progress-fill" style="width:0%"></div></div>
@@ -431,11 +345,39 @@ Longfields, NR19 2EU</textarea>
 
   <div id="scroll-body">
     <div id="warnings"></div>
+
+    <!-- Arrow + address card -->
+    <div id="nav-card">
+      <div>
+        <div id="arrow-wrap"><span id="arrow">↑</span></div>
+        <div id="distance-label">—</div>
+      </div>
+      <div id="nav-info">
+        <div id="drop-badge">DROP —</div>
+        <div id="stop-addr">—</div>
+        <div id="stop-pc">—</div>
+        <div id="stop-bubble">—</div>
+        <div class="stop-badges">
+          <span class="badge badge-time" id="stop-time">—</span>
+          <span class="badge" id="stop-type">—</span>
+          <span class="badge" id="stop-pkgs">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Throat proximity bar -->
+    <div id="throat-bar-wrap">
+      <div id="throat-bar-label">⚠ THROAT AHEAD</div>
+      <div id="throat-bar-track"><div id="throat-bar-fill" style="width:100%"></div></div>
+      <div id="throat-bar-dist">—</div>
+    </div>
+
+    <!-- PC meta -->
     <div id="meta-card">
       <div id="meta-header" onclick="toggleMeta()">
         <div>
-          <span class="pc-tag" id="meta-pc">—</span>
-          <span class="meta-streets" id="meta-streets"></span>
+          <span class="pc-tag"     id="meta-pc">—</span>
+          <span class="pc-streets" id="meta-streets"></span>
         </div>
         <span class="chevron">▼</span>
       </div>
@@ -444,19 +386,8 @@ Longfields, NR19 2EU</textarea>
       </div>
     </div>
 
-    <div id="stop-card">
-      <div class="stop-addr" id="stop-addr">—</div>
-      <div class="stop-pc"   id="stop-pc">—</div>
-      <div class="stop-meta-row">
-        <span class="badge badge-time" id="stop-time">—</span>
-        <span class="badge" id="stop-type">—</span>
-        <span class="badge" id="stop-pkgs">—</span>
-      </div>
-    </div>
-
-    <div id="upcoming">
-      <div class="upcoming-label">Up next</div>
-    </div>
+    <!-- Upcoming -->
+    <div id="upcoming"></div>
   </div>
 
   <div id="controls">
