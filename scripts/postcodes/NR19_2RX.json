@@ -396,9 +396,13 @@
       "dy_m": -51.98
     }
   ],
-  "preferred_entry": null,
-  "preferred_exit": null,
-  "estate_direction": null,
+  "streets": ["heath road"],
+  "preferred_entry": "5 Heath Road",
+  "preferred_exit": "Sandy Lane / Dereham Road junction",
+  "functional_throat": "Sandy Lane descent → Dereham Road → Quebec Road → Windsor Park",
+  "spine_role": "entry",
+  "next_cluster": "NR19 2SU",
+  "estate_direction": "descend Sandy Lane, up Dereham Road, into Quebec Road toward Windsor Park",
   "typical_density": null,
   "visit_count": 0,
   "last_seen": null,

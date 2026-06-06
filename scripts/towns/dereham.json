@@ -58,9 +58,11 @@
           "id": "colin_mclean_acorn",
           "label": "Colin McLean Road / Acorn Way / Oakapple Drive",
           "postcodes": ["NR19 2RY", "NR19 2SP", "NR19 2SR"],
-          "entry": "Colin McLean Road",
-          "exit": "Acorn Way",
-          "notes": "Colin McLean is linear with multiple throat points"
+          "entry": "43 Colin McLean Road",
+          "exit": "Sandy Lane / Dairy House end",
+          "functional_throat": "Gressenhall approach",
+          "descending": true,
+          "notes": "Enter at 43 from Gressenhall, descend to Sandy Lane"
         },
         {
           "id": "boton_stigands",
@@ -97,6 +99,25 @@
           "notes": "Sparse. Limited visit history"
         }
       ]
+    }
+  },
+  "route_spines": {
+    "heath_to_allotments": {
+      "label": "Heath Road → Sandy Lane → Dereham Road → Quebec Road → Windsor Park → Hoe Cottages → Allotment Gardens",
+      "flow": [
+        "5 Heath Road (NR19 2RX)  ← spine entry",
+        "Sandy Lane descending (NR19 2EA/EB/ED)",
+        "Dereham Road ascending",
+        "Quebec Road (NR19 2DR)  ← working toward Windsor Park",
+        "1 Windsor Park (NR19 2SU)  ← throat entry, left-hand ascending",
+        "31 Windsor Park  ← turning point",
+        "39 Windsor Park  ← reverse-out",
+        "34 Windsor Park  ← reverse-out",
+        "2 Windsor Park  ← exit",
+        "Hoe Lodge Cottages (NR19 2DQ)  ← rural terminus approach",
+        "Toad Hall (NR19 2EU)  ← NO-UTURN terminal"
+      ],
+      "notes": "Heath Road is the natural handoff from Sandy Lane. Dereham Road / Quebec Road bridge to Windsor Park. Toad Hall always last."
     }
   }
 }
