@@ -370,6 +370,12 @@ class Arc:
     sweep: float
 
 
+def latlon_to_vec2(lat: float, lon: float,
+                   ref_lat: float, ref_lon: float) -> Vec2:
+    """Public wrapper: (lat, lon) → local metres from ref point."""
+    return _latlon_to_xy(ref_lat, ref_lon, lat, lon)
+
+
 def _latlon_to_xy(ref_lat: float, ref_lon: float,
                   lat: float, lon: float) -> Vec2:
     """Equirectangular projection: (lat, lon) → local metres from ref point."""
