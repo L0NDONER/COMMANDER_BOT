@@ -83,8 +83,8 @@ PARCELS = [
     ("26 Townshend Road",              "NR19 2YD"),
 ]
 
-START_ADDR = "1 Windsor Park"
-START_PC   = "NR19 2SU"
+START_ADDR = "Bridge House Gressenhall"
+START_PC   = "NR19 2QE"
 FINISH_KEY = ("toad hall", "NR19 2EU")
 TRAVEL_MS  = 25 * 1000 / 3600   # 25 mph in m/s
 DWELL_S    = 90                  # seconds per parcel
@@ -132,7 +132,8 @@ def main():
         if pc not in pcs: continue
         geo = geocode_address(addr, pc, ref_lat, ref_lon)
         pos = geo['vec2'] if geo else _latlon_to_xy(ref_lat, ref_lon, *pcs[pc]['coords'])
-        s = Stop(label=f"{addr}, {pc}", position=pos, postcode=pc, address=addr)
+        s = Stop(label=f"{addr}, {pc}", position=pos, postcode=pc, address=addr,
+                 descending=bool(pcs.get(pc, {}).get('descending')))
         if key == FINISH_KEY:
             finish_stop = s
         else:
@@ -187,9 +188,12 @@ def main():
             print(f"\n┌─ {cur_pc}  {streets}")
             print(f"│  visits={pd.get('visit_count',0)}  last_seen={pd.get('last_seen','—')}  density={pd.get('typical_density','—')}")
             print(f"│  entry={pref_in}  exit={pref_out}")
-            if pd.get('dominant_throat'):
-                no_u = '  ⚠ NO-UTURN' if pd.get('no_uturn') else ''
-                print(f"│  throat={pd['dominant_throat']}  side={pd.get('delivery_side','—')}{no_u}")
+            if pd.get('dominant_throat') or pd.get('functional_throat'):
+                throat_label = pd.get('dominant_throat') or pd.get('functional_throat')
+                throat_type  = 'functional_throat' if pd.get('functional_throat') and not pd.get('dominant_throat') else 'throat'
+                no_u  = '  ⚠ NO-UTURN' if pd.get('no_uturn') else ''
+                desc  = '  ↓ descending' if pd.get('descending') else ''
+                print(f"│  {throat_type}={throat_label}  side={pd.get('delivery_side','—')}{no_u}{desc}")
             if pd.get('turning_point'):
                 rev = ', '.join(pd.get('reverse_required') or [])
                 print(f"│  turning_point={pd['turning_point']}  reverse=[{rev}]")

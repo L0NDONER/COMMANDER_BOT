@@ -89,7 +89,8 @@ def main():
         if pc not in pcs: continue
         geo = geocode_address(addr, pc, ref_lat, ref_lon)
         pos = geo['vec2'] if geo else _latlon_to_xy(ref_lat, ref_lon, *pcs[pc]['coords'])
-        s = Stop(label=f"{addr}, {pc}", position=pos, postcode=pc, address=addr)
+        s = Stop(label=f"{addr}, {pc}", position=pos, postcode=pc, address=addr,
+                 descending=bool(pcs.get(pc, {}).get('descending')))
         if key == FINISH_KEY:
             finish_stop = s
         else:

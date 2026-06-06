@@ -452,9 +452,13 @@
       "dy_m": 59.97
     }
   ],
-  "preferred_entry": null,
-  "preferred_exit": null,
-  "estate_direction": null,
+  "streets": ["colin mclean road"],
+  "preferred_entry": "43 Colin McLean Road",
+  "preferred_exit": "Dairy House Sandy Lane end",
+  "functional_throat": "Gressenhall approach",
+  "descending": true,
+  "delivery_side": "left",
+  "estate_direction": "enter at 43 descend to Sandy Lane",
   "typical_density": null,
   "visit_count": 0,
   "last_seen": null,

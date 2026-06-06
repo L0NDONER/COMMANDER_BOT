@@ -38,6 +38,7 @@ class Stop:
     position: Vec2
     postcode: str = ""
     address: str  = ""
+    descending: bool = False   # True = high→low house number (postcode metadata hint)
     # set by classify_throats
     throat_depth: Optional[int] = None   # step index where U-turn is lost
     uturn_side: Optional[str]   = None   # 'left' | 'right' | None
@@ -218,10 +219,14 @@ def _sequence_abc(
 ) -> List[Stop]:
     """
     Three-segment pattern for a linear road with a side-street detour:
-      A  ascending street stops up to the intercept
+      A  street stops up to the intercept (ascending or descending per hint)
       B  detour (sequenced via sequence_bubble — throat data already set)
       C  remaining street stops continuing from intercept
     """
+    # Respect descending hint: high→low house number
+    if any(s.descending for s in linear_stops):
+        linear_stops = list(reversed(linear_stops))
+
     if not detour_stops:
         return linear_stops
 
