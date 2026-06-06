@@ -11,8 +11,9 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from uuid import uuid4
 
-from fastapi import FastAPI, File, Form, UploadFile
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi import FastAPI, File, Form, Request, UploadFile
+from fastapi.exceptions import HTTPException
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 
 import database
 from navigation.router import router as nav_router
@@ -32,6 +33,30 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(title="Flaz", lifespan=lifespan)
 app.include_router(nav_router)
+
+
+@app.exception_handler(404)
+async def not_found(_req: Request, _exc: HTTPException) -> HTMLResponse:
+    path = _req.url.path
+    return HTMLResponse(
+        f"""<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Not found — flaz</title>
+<style>
+  body{{margin:0;background:#0e0e0e;color:#f0f0f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+       display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;gap:12px;padding:24px}}
+  h1{{font-size:4rem;font-weight:700;color:#4a9eff;margin:0}}
+  p{{color:#888;font-size:1rem;margin:0}}
+  code{{background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:2px 8px;font-size:0.9rem;color:#f0f0f0}}
+  a{{color:#4a9eff;text-decoration:none}}a:hover{{text-decoration:underline}}
+</style></head><body>
+<h1>404</h1>
+<p><code>{path}</code> not found</p>
+<p><a href="/">← flaz.co.uk</a></p>
+</body></html>""",
+        status_code=404,
+    )
 
 
 @app.get("/")
