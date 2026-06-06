@@ -117,22 +117,144 @@ function updateThroatBar(distToStop, throatM) {
     `throat in ~${fmtDist(Math.max(0, distToStop - (distToStop - throatM)))}`;
 }
 
-// ── Manifest parsing ──────────────────────────────────────────────────────────
+// ── Parcel list (draggable rows) ──────────────────────────────────────────────
+
+const DEFAULT_PARCELS = [
+  '4 Highfield Road, NR19 2EY',
+  '7 Highfield Road, NR19 2EY',
+  '12 Highfield Road, NR19 2EY',
+  '19 Highfield Road, NR19 2EY',
+  '26 Highfield Road, NR19 2EY',
+  '33 Highfield Road, NR19 2EY',
+  '21 Oakwood Road, NR19 2SS',
+  '2 Oakwood Close, NR19 2ST',
+  '3 Oakwood Close, NR19 2ST',
+  '4 Oakwood Close, NR19 2ST',
+  '8 Oakwood Close, NR19 2ST',
+  '19 Oakwood Close, NR19 2ST',
+  '22 Northgate, NR19 2EU',
+  '14 Northgate, NR19 2EU',
+  'Weldon Lodge, NR19 2EU',
+  'Longfields, NR19 2EU',
+];
+
+let _dragEl        = null;
+let _lpTimer       = null;
+
+function addParcelRow(text) {
+  const list = document.getElementById('parcel-list');
+  const row  = document.createElement('div');
+  row.className = 'parcel-row';
+
+  const handle = document.createElement('span');
+  handle.className   = 'drag-handle';
+  handle.textContent = '⠿';
+
+  const inp = document.createElement('input');
+  inp.className   = 'parcel-input';
+  inp.type        = 'text';
+  inp.placeholder = 'Address, Postcode';
+  inp.value       = text;
+
+  const del = document.createElement('span');
+  del.className   = 'parcel-del';
+  del.textContent = '✕';
+  del.onclick     = () => row.remove();
+
+  row.append(handle, inp, del);
+
+  // Long-press drag (touch)
+  handle.addEventListener('touchstart', e => {
+    const touch = e.touches[0];
+    _lpTimer = setTimeout(() => {
+      _dragEl = row;
+      row.classList.add('dragging');
+      navigator.vibrate && navigator.vibrate(15);
+    }, 350);
+  }, { passive: true });
+
+  // Immediate drag (mouse / desktop)
+  handle.addEventListener('mousedown', e => {
+    e.preventDefault();
+    _dragEl = row;
+    row.classList.add('dragging');
+  });
+
+  list.appendChild(row);
+}
+
+function getParcelLines() {
+  return Array.from(document.querySelectorAll('#parcel-list .parcel-input'))
+    .map(i => i.value.trim()).filter(Boolean);
+}
+
+// Global drag move + end
+document.addEventListener('touchmove', e => {
+  if (!_dragEl) { clearTimeout(_lpTimer); return; }
+  e.preventDefault();
+  const t      = e.touches[0];
+  const target = document.elementFromPoint(t.clientX, t.clientY);
+  const trow   = target && target.closest('#parcel-list .parcel-row');
+  if (trow && trow !== _dragEl) {
+    const mid = trow.getBoundingClientRect().top + trow.getBoundingClientRect().height / 2;
+    t.clientY < mid ? trow.before(_dragEl) : trow.after(_dragEl);
+  }
+}, { passive: false });
+
+document.addEventListener('touchend', () => {
+  clearTimeout(_lpTimer); _lpTimer = null;
+  if (_dragEl) { _dragEl.classList.remove('dragging'); _dragEl = null; }
+});
+
+document.addEventListener('mousemove', e => {
+  if (!_dragEl) return;
+  const target = document.elementFromPoint(e.clientX, e.clientY);
+  const trow   = target && target.closest('#parcel-list .parcel-row');
+  if (trow && trow !== _dragEl) {
+    const mid = trow.getBoundingClientRect().top + trow.getBoundingClientRect().height / 2;
+    e.clientY < mid ? trow.before(_dragEl) : trow.after(_dragEl);
+  }
+});
+
+document.addEventListener('mouseup', () => {
+  if (_dragEl) { _dragEl.classList.remove('dragging'); _dragEl = null; }
+});
+
+// Paste import
+function togglePaste() {
+  const ta  = document.getElementById('parcels');
+  const btn = document.getElementById('btn-import-paste');
+  const tog = document.getElementById('btn-paste-toggle');
+  const show = ta.style.display === 'none';
+  ta.style.display  = show ? 'block' : 'none';
+  btn.style.display = show ? 'block' : 'none';
+  tog.textContent   = show ? 'Paste ▴' : 'Paste ▾';
+  if (show) ta.focus();
+}
+
+function importPaste() {
+  const ta    = document.getElementById('parcels');
+  const lines = ta.value.trim().split('\n').map(l => l.trim()).filter(Boolean);
+  const list  = document.getElementById('parcel-list');
+  list.innerHTML = '';
+  lines.forEach(l => addParcelRow(l));
+  ta.value = '';
+  togglePaste();
+}
+
+// ── Postcode normalisation ────────────────────────────────────────────────────
 
 function normalizePostcode(pc) {
   const s = pc.replace(/\s+/g, '').toUpperCase();
   return s.length >= 5 ? s.slice(0, -3) + ' ' + s.slice(-3) : s;
 }
 
-function parseParcels(raw) {
-  return raw.trim().split('\n')
-    .map(l => l.trim()).filter(Boolean)
-    .map(line => {
-      const comma = line.lastIndexOf(',');
-      if (comma < 0) return null;
-      return { addr: line.slice(0, comma).trim(), pc: normalizePostcode(line.slice(comma + 1).trim()) };
-    })
-    .filter(Boolean);
+function parseParcels(lines) {
+  return lines.map(line => {
+    const comma = line.lastIndexOf(',');
+    if (comma < 0) return null;
+    return { addr: line.slice(0, comma).trim(), pc: normalizePostcode(line.slice(comma + 1).trim()) };
+  }).filter(Boolean);
 }
 
 // ── API ───────────────────────────────────────────────────────────────────────
@@ -161,7 +283,7 @@ async function startRoute() {
   const startPc    = normalizePostcode(document.getElementById('start-pc').value.trim());
   const finishAddr = document.getElementById('finish-addr').value.trim();
   const finishPc   = normalizePostcode(document.getElementById('finish-pc').value.trim());
-  const parcels    = parseParcels(document.getElementById('parcels').value);
+  const parcels    = parseParcels(getParcelLines());
 
   if (!startAddr || !startPc) { showError('Start address and postcode required'); return; }
   if (!parcels.length)         { showError('No valid parcels found'); return; }
@@ -371,6 +493,10 @@ async function scanBarcode(barcode) {
   }
   return null;
 }
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+
+DEFAULT_PARCELS.forEach(l => addParcelRow(l));
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

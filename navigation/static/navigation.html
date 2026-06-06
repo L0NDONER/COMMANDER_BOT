@@ -62,7 +62,7 @@
     input:focus, textarea:focus { border-color: var(--accent); }
 
     textarea {
-      height: 180px;
+      height: 130px;
       resize: vertical;
       font-family: monospace;
       font-size: 13px;
@@ -70,6 +70,37 @@
     }
 
     label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ── Parcel list ── */
+    #parcel-list { display: flex; flex-direction: column; gap: 4px; }
+    .parcel-row {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 2px 8px;
+      transition: opacity 0.12s, border-color 0.12s;
+      touch-action: pan-y;
+    }
+    .parcel-row.dragging  { opacity: 0.35; border-color: var(--accent); }
+    .parcel-row.drag-over { border-color: var(--accent); background: #1a2a3a; }
+    .drag-handle {
+      color: var(--muted); font-size: 20px; line-height: 1;
+      cursor: grab; user-select: none; touch-action: none;
+      padding: 8px 2px; flex-shrink: 0;
+    }
+    .parcel-input {
+      flex: 1; background: transparent; border: none;
+      color: var(--text); font-size: 13px; font-family: monospace;
+      outline: none; padding: 8px 0;
+    }
+    .parcel-del { color: var(--muted); font-size: 18px; padding: 6px 2px; cursor: pointer; flex-shrink: 0; }
+    .parcel-del:active { color: var(--danger); }
+    .row-actions { display: flex; gap: 8px; margin-top: 4px; }
+    .mini-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--muted); border-radius: 8px; padding: 7px 14px;
+      font-size: 13px; cursor: pointer; flex: 1;
+    }
+    .mini-btn:active { color: var(--text); border-color: var(--accent); }
 
     #btn-optimise {
       background: var(--accent);
@@ -312,23 +343,14 @@
   </div>
 
   <div class="field-group">
-    <label>Parcels — Address, Postcode (one per line)</label>
-    <textarea id="parcels" spellcheck="false">4 Highfield Road, NR19 2EY
-7 Highfield Road, NR19 2EY
-12 Highfield Road, NR19 2EY
-19 Highfield Road, NR19 2EY
-26 Highfield Road, NR19 2EY
-33 Highfield Road, NR19 2EY
-21 Oakwood Road, NR19 2SS
-2 Oakwood Close, NR19 2ST
-3 Oakwood Close, NR19 2ST
-4 Oakwood Close, NR19 2ST
-8 Oakwood Close, NR19 2ST
-19 Oakwood Close, NR19 2ST
-22 Northgate, NR19 2EU
-14 Northgate, NR19 2EU
-Weldon Lodge, NR19 2EU
-Longfields, NR19 2EU</textarea>
+    <label>Parcels — Address, Postcode</label>
+    <div id="parcel-list"></div>
+    <div class="row-actions">
+      <button class="mini-btn" onclick="addParcelRow('')">+ Add</button>
+      <button class="mini-btn" id="btn-paste-toggle" onclick="togglePaste()">Paste ▾</button>
+    </div>
+    <textarea id="parcels" spellcheck="false" style="display:none;margin-top:6px" placeholder="One per line: Address, Postcode"></textarea>
+    <button class="mini-btn" id="btn-import-paste" style="display:none;margin-top:6px" onclick="importPaste()">Import ↑</button>
   </div>
 
   <div id="setup-error"></div>
@@ -404,6 +426,6 @@ Longfields, NR19 2EU</textarea>
   <button onclick="resetApp()">New route</button>
 </div>
 
-<script src="/navigation/navigation.js?v=4"></script>
+<script src="/navigation/navigation.js?v=5"></script>
 </body>
 </html>
