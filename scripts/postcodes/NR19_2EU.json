@@ -5,9 +5,17 @@
     "northgate",
     "weldon lodge"
   ],
-  "preferred_entry": "LONGFIELDS ALLOTMENT GARDENS NORTHGATE",
-  "preferred_exit": "WELDON LODGE",
+  "preferred_entry": "WELDON LODGE",
+  "preferred_exit": "LONGFIELDS",
+  "internal_order": [
+    "WELDON LODGE",
+    "LONGFIELDS",
+    "CUL-DE-SUR",
+    "TOAD HALL",
+    "THE ROSE"
+  ],
   "estate_direction": "turn after 2 Northgate",
+  "prominent_landmark": "NORTHGATE SCHOOL",
   "typical_density": 5.0,
   "visit_count": 1,
   "last_seen": "2023-12-27",

@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 """
-run_route.py — optimise and print a manifest route.
+run_highfield.py — focused run: Hoe Cottages → Highfield Road → Toad Hall.
+
+Demonstrates the A-B-C segment pattern:
+  A  Highfield Road ascending (NR19 2EY)
+  B  Oakwood Road → Oakwood Close detour (NR19 2SS / NR19 2ST)
+  C  Highfield Road continuation
 
 Usage:
-    python3 scripts/run_route.py
+    python3 scripts/run_highfield.py
 """
 import json, math, sys, re
 from pathlib import Path
@@ -15,79 +20,31 @@ from geocoder import geocode_address
 from route_optimiser import Stop, make_bubbles, classify_throats, sequence_bubble, optimise_route, _dist
 
 PARCELS = [
-    ("2 William O'Callaghan Place",    "NR19 2BU"),
-    ("Gemma Le Claire",                "NR19 2DQ"),
+    # Hoe Lodge Cottages
     ("1 Hoe Lodge Cottages",           "NR19 2DQ"),
-    ("3 Sheddick Court",               "NR19 2DT"),
-    ("3 Sheddick Court",               "NR19 2DT"),
-    ("Woodacre 3A Stanton Close",      "NR19 2DZ"),
-    ("4A Sandy Lane",                  "NR19 2EA"),
-    ("4A Sandy Lane",                  "NR19 2EA"),
-    ("4A Sandy Lane",                  "NR19 2EA"),
-    ("4A Sandy Lane",                  "NR19 2EA"),
-    ("35 Sandy Lane",                  "NR19 2EB"),
-    ("46 Sandy Lane",                  "NR19 2EB"),
-    ("Norfolk",                        "NR19 2ED"),
-    ("165 Links View Sandy Lane East", "NR19 2ED"),
-    ("165 Links View Sandy Lane East", "NR19 2ED"),
-    ("173 Links View",                 "NR19 2ED"),
-    ("22 Northgate",                   "NR19 2EU"),
-    ("NR19 2EU",                       "NR19 2EU"),
-    ("NR19 2EU",                       "NR19 2EU"),
-    ("14 Northgate",                   "NR19 2EU"),
-    ("Toad Hall",                      "NR19 2EU"),
-    ("3 Armstrong Drive",              "NR19 2EZ"),
-    ("3 Dairy Crescent",               "NR19 2FD"),
-    ("Flat 1 Dairy House Sandy Lane",  "NR19 2FE"),
-    ("1 Magpie Court",                 "NR19 2FG"),
-    ("28 Normandy Drive",              "NR19 2GB"),
-    ("17 Stigands Gate",               "NR19 2HF"),
-    ("7 Stigands Gate",                "NR19 2HF"),
-    ("10 Boton Drive",                 "NR19 2HG"),
-    ("14 Boton Drive",                 "NR19 2HG"),
-    ("20",                             "NR19 2HQ"),
-    ("Drift Farm",                     "NR19 2QD"),
-    ("Solucki Old Bridge Gressenhall", "NR19 2QE"),
-    ("Hall Farm Church Lane",          "NR19 2QF"),
-    ("Columbine Cottage Church Lane",  "NR19 2QF"),
-    ("Rabbits Foot Barn Holt Road",    "NR19 2QR"),
-    ("2 Gingerbread Cottage",          "NR19 2QX"),
-    ("5 Heath Road",                   "NR19 2RX"),
-    ("11 Colin McLean Road",           "NR19 2RY"),
-    ("13 Colin McLean Road",           "NR19 2RY"),
-    ("24 Colin McLean Road",           "NR19 2RY"),
-    ("43 Colin McLean Road",           "NR19 2RY"),
-    ("20 Colin McLean Road",           "NR19 2RY"),
-    ("4 Colin McLean Road",            "NR19 2RY"),
-    ("21 Colin McLean Road",           "NR19 2RY"),
-    ("28 Colin McLean Road",           "NR19 2RY"),
-    ("4 Spelmans Meadow",              "NR19 2SL"),
-    ("5 Spelmans Meadow St Hilda Road","NR19 2SL"),
-    ("23",                             "NR19 2SP"),
-    ("17 Acorn Way",                   "NR19 2SP"),
-    ("2 Acorn Way",                    "NR19 2SP"),
-    ("3 Oakapple Drive",               "NR19 2SR"),
-    ("11 Oakapple Drive",              "NR19 2SR"),
-    ("11 Oakapple Drive",              "NR19 2SR"),
+    # Highfield Road — ascending run
+    ("4 Highfield Road",               "NR19 2EY"),
+    ("7 Highfield Road",               "NR19 2EY"),
+    ("12 Highfield Road",              "NR19 2EY"),
+    ("19 Highfield Road",              "NR19 2EY"),
+    ("26 Highfield Road",              "NR19 2EY"),
+    ("33 Highfield Road",              "NR19 2EY"),
+    # Oakwood Road (intercept) + Oakwood Close (detour bubble)
     ("21 Oakwood Road",                "NR19 2SS"),
     ("2 Oakwood Close",                "NR19 2ST"),
-    ("19 Oakwood Close",               "NR19 2ST"),
     ("3 Oakwood Close",                "NR19 2ST"),
+    ("4 Oakwood Close",                "NR19 2ST"),
     ("8 Oakwood Close",                "NR19 2ST"),
     ("19 Oakwood Close",               "NR19 2ST"),
-    ("4 Oakwood Close",                "NR19 2ST"),
-    ("1 Windsor Park",                 "NR19 2SU"),
-    ("21 Townshend Road",              "NR19 2YD"),
-    ("11 Townshend Road",              "NR19 2YD"),
-    ("9 Townshend Road",               "NR19 2YD"),
-    ("26 Townshend Road",              "NR19 2YD"),
+    # Finish
+    ("Toad Hall",                      "NR19 2EU"),
 ]
 
-START_ADDR = "1 Windsor Park"
-START_PC   = "NR19 2SU"
+START_ADDR = "4 Hoe Lodge Cottages"
+START_PC   = "NR19 2DQ"
 FINISH_KEY = ("toad hall", "NR19 2EU")
-TRAVEL_MS  = 25 * 1000 / 3600   # 25 mph in m/s
-DWELL_S    = 90                  # seconds per parcel
+TRAVEL_MS  = 25 * 1000 / 3600
+DWELL_S    = 90
 
 FARM_TOKENS     = {'farm','farmhouse','barn','barns','drift','grange','dairy farm'}
 COTTAGE_TOKENS  = {'cottage','cottages','lodge','lodges'}
