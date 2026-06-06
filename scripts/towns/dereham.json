@@ -1,0 +1,102 @@
+{
+  "town": "DEREHAM",
+  "super_bubbles": {
+    "NR19": {
+      "region": "north_of_railway",
+      "throats": ["Swaffham Road", "Norwich Road", "Northgate"],
+      "estate_clusters": [
+        {
+          "id": "sandy_lane",
+          "label": "Sandy Lane / Links View",
+          "postcodes": ["NR19 2EA", "NR19 2EB", "NR19 2ED"],
+          "entry": "Sandy Lane south end",
+          "exit": "Sandy Lane north end",
+          "notes": "Long linear road, Links View branches east"
+        },
+        {
+          "id": "highfield_oakwood",
+          "label": "Highfield Road / Oakwood",
+          "postcodes": ["NR19 2EY", "NR19 2SS", "NR19 2ST"],
+          "entry": "4 Highfield Road",
+          "exit": "Highfield Road north end",
+          "pattern": "A-B-C",
+          "notes": "Oakwood Close is cul-de-sac intercept mid-Highfield ascending"
+        },
+        {
+          "id": "denarde_bubble",
+          "label": "De-Narde / Townshend / Raynham Ride / Normandy",
+          "postcodes": ["NR19 2HQ", "NR19 2YD", "NR19 2YE", "NR19 2GB"],
+          "entry": "Denarde Road",
+          "exit": "Denarde Road",
+          "dominant_throat": "Denarde Road",
+          "delivery_side": "left",
+          "raynham_ride_intercept": "between 6 and 8 Townshend Road",
+          "notes": "Raynham Ride walk-of-shame — no uturn, on foot only"
+        },
+        {
+          "id": "windsor_park",
+          "label": "Windsor Park",
+          "postcodes": ["NR19 2SU"],
+          "entry": "1 Windsor Park",
+          "exit": "2 Windsor Park",
+          "dominant_throat": "1 Windsor Park",
+          "turning_point": "31 Windsor Park",
+          "no_uturn": true,
+          "delivery_side": "left"
+        },
+        {
+          "id": "northgate_allotments",
+          "label": "Northgate / Longfields / Weldon Lodge",
+          "postcodes": ["NR19 2EU"],
+          "entry": "Weldon Lodge",
+          "exit": "Longfields",
+          "prominent_landmark": "Northgate School",
+          "direction": "turn after 2 Northgate",
+          "notes": "Toad Hall is terminal — no uturn at allotment gate"
+        },
+        {
+          "id": "colin_mclean_acorn",
+          "label": "Colin McLean Road / Acorn Way / Oakapple Drive",
+          "postcodes": ["NR19 2RY", "NR19 2SP", "NR19 2SR"],
+          "entry": "Colin McLean Road",
+          "exit": "Acorn Way",
+          "notes": "Colin McLean is linear with multiple throat points"
+        },
+        {
+          "id": "boton_stigands",
+          "label": "Boton Drive / Stigands Gate",
+          "postcodes": ["NR19 2HG", "NR19 2HF"],
+          "entry": "Stigands Gate",
+          "exit": "Boton Drive",
+          "notes": "Stigands Gate runs east-west; Boton Drive north pocket"
+        },
+        {
+          "id": "hoe_stanton",
+          "label": "Hoe Lodge Cottages / Stanton Close",
+          "postcodes": ["NR19 2DQ", "NR19 2DZ"],
+          "entry": "Hoe Lodge Cottages",
+          "notes": "Rural approach; cottages on unmade lane"
+        },
+        {
+          "id": "gressenhall_rural",
+          "label": "Gressenhall / Church Lane / Holt Road",
+          "postcodes": ["NR19 2QD", "NR19 2QE", "NR19 2QF", "NR19 2QR", "NR19 2QX"],
+          "entry": "Bridge House Gressenhall",
+          "notes": "Widely spaced rural. Drift Farm and Brick Kiln Farm are long driveways"
+        }
+      ]
+    },
+    "NR20": {
+      "region": "south_of_railway",
+      "throats": ["Yaxham Road", "Shipdham Road"],
+      "estate_clusters": [
+        {
+          "id": "nr20_outer",
+          "label": "NR20 outer rural",
+          "postcodes": ["NR20 4BA", "NR20 4DS"],
+          "notes": "Sparse. Limited visit history"
+        }
+      ]
+    }
+  }
+}
