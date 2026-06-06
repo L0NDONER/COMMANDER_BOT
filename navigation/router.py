@@ -126,6 +126,12 @@ async def nav_js(response: Response):
     return FileResponse(_HERE / "static" / "navigation.js", media_type="application/javascript")
 
 
+@router.get("/navigation.js")
+async def nav_js_root(response: Response):
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return FileResponse(_HERE / "static" / "navigation.js", media_type="application/javascript")
+
+
 class Parcel(BaseModel):
     addr: str
     pc: str
