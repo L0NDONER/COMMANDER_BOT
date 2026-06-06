@@ -119,13 +119,18 @@ function updateThroatBar(distToStop, throatM) {
 
 // ── Manifest parsing ──────────────────────────────────────────────────────────
 
+function normalizePostcode(pc) {
+  const s = pc.replace(/\s+/g, '').toUpperCase();
+  return s.length >= 5 ? s.slice(0, -3) + ' ' + s.slice(-3) : s;
+}
+
 function parseParcels(raw) {
   return raw.trim().split('\n')
     .map(l => l.trim()).filter(Boolean)
     .map(line => {
       const comma = line.lastIndexOf(',');
       if (comma < 0) return null;
-      return { addr: line.slice(0, comma).trim(), pc: line.slice(comma + 1).trim().toUpperCase() };
+      return { addr: line.slice(0, comma).trim(), pc: normalizePostcode(line.slice(comma + 1).trim()) };
     })
     .filter(Boolean);
 }
@@ -153,9 +158,9 @@ async function startRoute() {
   errEl.style.display = 'none';
 
   const startAddr  = document.getElementById('start-addr').value.trim();
-  const startPc    = document.getElementById('start-pc').value.trim().toUpperCase();
+  const startPc    = normalizePostcode(document.getElementById('start-pc').value.trim());
   const finishAddr = document.getElementById('finish-addr').value.trim();
-  const finishPc   = document.getElementById('finish-pc').value.trim().toUpperCase();
+  const finishPc   = normalizePostcode(document.getElementById('finish-pc').value.trim());
   const parcels    = parseParcels(document.getElementById('parcels').value);
 
   if (!startAddr || !startPc) { showError('Start address and postcode required'); return; }

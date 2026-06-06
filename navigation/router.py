@@ -233,7 +233,7 @@ async def optimise(req: OptimiseRequest):
 
     start_geo = geocode_address(req.start_addr, req.start_pc, ref_lat, ref_lon)
     if not start_geo:
-        raise HTTPException(400, f"Could not geocode start: {req.start_addr}")
+        raise HTTPException(400, f"Could not geocode start: {req.start_addr}, {req.start_pc} — postcode not in index")
     start_pos = start_geo["vec2"]
 
     route = optimise_route(stops, world, start_pos, 0.0)
