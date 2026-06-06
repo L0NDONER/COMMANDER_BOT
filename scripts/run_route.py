@@ -191,8 +191,14 @@ def main():
                 print(f"│  throat={pd['dominant_throat']}  side={pd.get('delivery_side','—')}")
             if pd.get('internal_order'):
                 print(f"│  order={' → '.join(pd['internal_order'])}")
-            if pd.get('raynham_ride_intercept'):
-                print(f"│  raynham_intercept={pd['raynham_ride_intercept']}")
+            rr = pd.get('raynham_ride') or {}
+            if rr:
+                print(f"│  raynham_ride: intercept={rr.get('intercept','—')}  approach={rr.get('approach','—')}")
+                print(f"│    flow={rr.get('flow','—')}")
+                flags_rr = []
+                if rr.get('walk_of_shame'): flags_rr.append('WALK-OF-SHAME')
+                if rr.get('no_uturn'):      flags_rr.append('NO-UTURN')
+                if flags_rr: print(f"│    ⚠ {' '.join(flags_rr)}")
             if pd.get('prominent_landmark'):
                 print(f"│  landmark={pd['prominent_landmark']}")
             print(f"│  direction={direction}")

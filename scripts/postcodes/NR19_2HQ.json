@@ -12,7 +12,14 @@
     "RAYNHAM RIDE (1 → 12 → 10 → 9 → 8)",
     "NORMANDY ROAD"
   ],
-  "raynham_ride_intercept": "between 6 and 8 Townshend Road",
+  "raynham_ride": {
+    "intercept": "between 6 and 8 Townshend Road",
+    "walk_of_shame": true,
+    "no_uturn": true,
+    "side": "left",
+    "approach": "on foot only",
+    "flow": "commit-in → walk-out → rejoin Townsend at 8"
+  },
   "delivery_side": "left",
   "estate_direction": "follow left-hand side ascending",
   "typical_density": 1.0,
