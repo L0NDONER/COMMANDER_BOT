@@ -1,0 +1,27 @@
+{
+  "postcode": "NR19 1EF",
+  "streets": [
+    "howard crescent"
+  ],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "known_addresses": [
+    {
+      "grid_id": "29",
+      "building_street": "22 Howard Crescent"
+    }
+  ],
+  "landmarks": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.67695975432871,
+    0.9413035922899172
+  ]
+}

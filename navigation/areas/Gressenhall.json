@@ -1,0 +1,19 @@
+{
+  "name": "Gressenhall",
+  "postcodes": [
+    "NR20 4DS",
+    "NR19 2QE",
+    "NR19 2QF"
+  ],
+  "visit_count": 0,
+  "last_seen": null,
+  "preferred_entry_postcode": null,
+  "preferred_exit_postcode": null,
+  "observed_neighbours": [
+    {
+      "area": "Sandy Lane",
+      "count": 5
+    }
+  ],
+  "breadcrumbs": []
+}

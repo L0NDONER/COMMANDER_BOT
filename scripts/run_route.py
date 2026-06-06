@@ -5,14 +5,16 @@ run_route.py — optimise and print a manifest route.
 Usage:
     python3 scripts/run_route.py
 """
-import json, math, sys, re
+import json
+import sys
+import re
 from pathlib import Path
 from collections import defaultdict
 
 sys.path.insert(0, str(Path(__file__).parent))
 from courier_gps import Vec2, _latlon_to_xy
 from geocoder import geocode_address
-from route_optimiser import Stop, make_bubbles, classify_throats, sequence_bubble, optimise_route, _dist
+from route_optimiser import Stop, optimise_route, _dist
 
 PARCELS = [
     ("2 William O'Callaghan Place",    "NR19 2BU"),
@@ -97,12 +99,12 @@ BUSINESS_TOKENS = {'ltd','limited','co.','services','solutions','group','centre'
 
 def prop_type(addr):
     a = addr.lower()
-    if any(t in a for t in FLAT_TOKENS):     return 'FLAT'
-    if any(t in a for t in FARM_TOKENS):     return 'FARM'
-    if any(t in a for t in COTTAGE_TOKENS):  return 'COTTAGE'
-    if any(t in a for t in HOUSE_TOKENS):    return 'HOUSE'
+    if any(t in a for t in FLAT_TOKENS): return 'FLAT'
+    if any(t in a for t in FARM_TOKENS): return 'FARM'
+    if any(t in a for t in COTTAGE_TOKENS): return 'COTTAGE'
+    if any(t in a for t in HOUSE_TOKENS): return 'HOUSE'
     if any(t in a for t in BUSINESS_TOKENS): return 'BUSINESS'
-    if re.match(r'^\d+[a-z]?\s', a):         return 'HOUSE'
+    if re.match(r'^\d+[a-z]?\s', a): return 'HOUSE'
     return 'PROPERTY'
 
 
@@ -140,9 +142,13 @@ def main():
             stops.append(s)
 
     class Obj:
-        def __init__(self, x, y, sz): self.position = Vec2(x, y); self.size = sz
+        def __init__(self, x, y, sz):
+            self.position = Vec2(x, y)
+            self.size = sz
+
     class WorldImpl:
-        def __init__(self, obs): self.objects = obs
+        def __init__(self, obs):
+            self.objects = obs
 
     all_obs = []
     for pc in all_pc:
@@ -158,12 +164,13 @@ def main():
     if finish_stop:
         route.append(finish_stop)
 
-    elapsed = 0
+    elapsed  = 0
     prev_pos = start_pos
     cur_pc   = None
+    seen_pcs = set()
 
     print(f"  Start : {START_ADDR} ({START_PC})")
-    print(f"  Finish: Toad Hall (NR19 2EU)")
+    print("  Finish: Toad Hall (NR19 2EU)")
     print(f"  Manifest: {len(PARCELS)} parcels  →  {len(route)} stops\n")
     print("═" * 92)
 
@@ -173,61 +180,65 @@ def main():
         travel = _dist(prev_pos, s.position) / TRAVEL_MS
         elapsed += travel + DWELL_S * pkgs
         prev_pos = s.position
-        t_str  = f"{int(elapsed//3600)}h{int((elapsed%3600)//60):02d}m"
-        throat = f"⚠ THROAT@{s.throat_depth*2}m" if s.throat_depth is not None else ""
+        t_str  = f"{int(elapsed//3600)}h{int((elapsed % 3600)//60):02d}m"
+        throat = ("⚠ THROAT@entry" if s.throat_depth == 0 else f"⚠ THROAT@{s.throat_depth*2}m") if s.throat_depth is not None else ""
         uturn  = "" if s.uturn_side else "⚠ NO-UTURN"
         ptype  = prop_type(s.address)
 
         if s.postcode != cur_pc:
             cur_pc = s.postcode
             pd = pcs.get(cur_pc, {})
-            streets   = ', '.join(pd.get('streets') or ['—'])
-            direction = pd.get('estate_direction') or '—'
-            pref_in   = pd.get('preferred_entry') or '—'
-            pref_out  = pd.get('preferred_exit')  or '—'
-            print(f"\n┌─ {cur_pc}  {streets}")
-            print(f"│  visits={pd.get('visit_count',0)}  last_seen={pd.get('last_seen','—')}  density={pd.get('typical_density','—')}")
-            print(f"│  entry={pref_in}  exit={pref_out}")
-            if pd.get('pattern'):
-                print(f"│  pattern={pd['pattern']}  side={pd.get('delivery_side','—')}")
-                if pd.get('segment_a'): print(f"│    A: {pd['segment_a']}")
-                if pd.get('segment_b'): print(f"│    B: {pd['segment_b']}")
-                if pd.get('segment_c'): print(f"│    C: {pd['segment_c']}")
-            if pd.get('dominant_throat') or pd.get('functional_throat'):
-                throat_label = pd.get('dominant_throat') or pd.get('functional_throat')
-                throat_type  = 'functional_throat' if pd.get('functional_throat') and not pd.get('dominant_throat') else 'throat'
-                no_u  = '  ⚠ NO-UTURN' if pd.get('no_uturn') else ''
-                desc  = '  ↓ descending' if pd.get('descending') else ''
-                print(f"│  {throat_type}={throat_label}  side={pd.get('delivery_side','—')}{no_u}{desc}")
-            if pd.get('turning_point'):
-                rev = ', '.join(pd.get('reverse_required') or [])
-                print(f"│  turning_point={pd['turning_point']}  reverse=[{rev}]")
-            if pd.get('internal_order'):
-                print(f"│  order={' → '.join(pd['internal_order'])}")
-            rr = pd.get('raynham_ride') or {}
-            if rr:
-                print(f"│  raynham_ride: intercept={rr.get('intercept','—')}  approach={rr.get('approach','—')}")
-                print(f"│    flow={rr.get('flow','—')}")
-                flags_rr = []
-                if rr.get('walk_of_shame'): flags_rr.append('WALK-OF-SHAME')
-                if rr.get('no_uturn'):      flags_rr.append('NO-UTURN')
-                if flags_rr: print(f"│    ⚠ {' '.join(flags_rr)}")
-            if pd.get('prominent_landmark'):
-                print(f"│  landmark={pd['prominent_landmark']}")
-            print(f"│  direction={direction}")
-            crumbs = pd.get('breadcrumbs') or []
-            if crumbs:
-                for c in crumbs[-2:]:
-                    print(f"│  [{c.get('date','?')}] {c.get('entry','?')} → {c.get('next_postcode','?')}  (manifest {c.get('manifest_id','?')})")
+            if cur_pc in seen_pcs:
+                print(f"\n  ↩  {cur_pc}  (continued)")
             else:
-                print(f"│  breadcrumbs: none")
-            print(f"└{'─'*62}")
+                seen_pcs.add(cur_pc)
+                streets   = ', '.join(pd.get('streets') or ['—'])
+                direction = pd.get('estate_direction') or '—'
+                pref_in   = pd.get('preferred_entry') or '—'
+                pref_out = pd.get('preferred_exit') or '—'
+                print(f"\n┌─ {cur_pc}  {streets}")
+                print(f"│  visits={pd.get('visit_count',0)}  last_seen={pd.get('last_seen','—')}  density={pd.get('typical_density','—')}")
+                print(f"│  entry={pref_in}  exit={pref_out}")
+                if pd.get('pattern'):
+                    print(f"│  pattern={pd['pattern']}  side={pd.get('delivery_side','—')}")
+                    if pd.get('segment_a'): print(f"│    A: {pd['segment_a']}")
+                    if pd.get('segment_b'): print(f"│    B: {pd['segment_b']}")
+                    if pd.get('segment_c'): print(f"│    C: {pd['segment_c']}")
+                if pd.get('dominant_throat') or pd.get('functional_throat'):
+                    throat_label = pd.get('dominant_throat') or pd.get('functional_throat')
+                    throat_type  = 'functional_throat' if pd.get('functional_throat') and not pd.get('dominant_throat') else 'throat'
+                    no_u  = '  ⚠ NO-UTURN' if pd.get('no_uturn') else ''
+                    desc  = '  ↓ descending' if pd.get('descending') else ''
+                    print(f"│  {throat_type}={throat_label}  side={pd.get('delivery_side','—')}{no_u}{desc}")
+                if pd.get('turning_point'):
+                    rev = ', '.join(pd.get('reverse_required') or [])
+                    print(f"│  turning_point={pd['turning_point']}  reverse=[{rev}]")
+                if pd.get('internal_order'):
+                    print(f"│  order={' → '.join(pd['internal_order'])}")
+                rr = pd.get('raynham_ride') or {}
+                if rr:
+                    print(f"│  raynham_ride: intercept={rr.get('intercept','—')}  approach={rr.get('approach','—')}")
+                    print(f"│    flow={rr.get('flow','—')}")
+                    flags_rr = []
+                    if rr.get('walk_of_shame'): flags_rr.append('WALK-OF-SHAME')
+                    if rr.get('no_uturn'):      flags_rr.append('NO-UTURN')
+                    if flags_rr: print(f"│    ⚠ {' '.join(flags_rr)}")
+                if pd.get('prominent_landmark'):
+                    print(f"│  landmark={pd['prominent_landmark']}")
+                print(f"│  direction={direction}")
+                crumbs = pd.get('breadcrumbs') or []
+                if crumbs:
+                    for c in crumbs[-2:]:
+                        print(f"│  [{c.get('date','?')}] {c.get('entry','?')} → {c.get('next_postcode','?')}  (manifest {c.get('manifest_id','?')})")
+                else:
+                    print("│  breadcrumbs: none")
+                print(f"└{'─'*62}")
 
         flags = '  ' + '  '.join(filter(None, [throat, uturn]))
         print(f"  {i+1:>2}  {t_str}  [{ptype:<8}]  {pkgs}pkg  {s.address:<40}{flags}")
 
     print(f"\n{'═'*92}")
-    print(f"  Total: {int(elapsed//3600)}h {int((elapsed%3600)//60)}m  |  {len(PARCELS)} parcels  |  {len(route)} stops")
+    print(f"  Total: {int(elapsed//3600)}h {int((elapsed % 3600)//60)}m  |  {len(PARCELS)} parcels  |  {len(route)} stops")
 
 
 if __name__ == "__main__":

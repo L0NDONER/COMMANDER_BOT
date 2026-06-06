@@ -1,0 +1,61 @@
+{
+  "streets": [],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "known_addresses": [],
+  "landmarks": [
+    {
+      "type": "gate",
+      "lat": 52.6940446,
+      "lon": 0.9338634,
+      "size": 0.5,
+      "dx_m": -28.68,
+      "dy_m": -0.16
+    },
+    {
+      "type": "building",
+      "lat": 52.6943798,
+      "lon": 0.9347069,
+      "size": 1.5,
+      "dx_m": 28.16,
+      "dy_m": 37.12
+    },
+    {
+      "type": "building",
+      "lat": 52.6943685,
+      "lon": 0.9345728,
+      "size": 1.5,
+      "dx_m": 19.13,
+      "dy_m": 35.86
+    },
+    {
+      "type": "building",
+      "lat": 52.6941111,
+      "lon": 0.9343083,
+      "size": 1.5,
+      "dx_m": 1.3,
+      "dy_m": 7.24
+    },
+    {
+      "type": "building",
+      "lat": 52.6939892,
+      "lon": 0.9344006,
+      "size": 1.5,
+      "dx_m": 7.52,
+      "dy_m": -6.32
+    }
+  ],
+  "breadcrumbs": [],
+  "postcode": "NR19 2QX",
+  "coords": [
+    52.694046,
+    0.934289
+  ]
+}

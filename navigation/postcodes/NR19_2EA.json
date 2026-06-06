@@ -1,0 +1,581 @@
+{
+  "postcode": "NR19 2EA",
+  "streets": [],
+  "known_addresses": [],
+  "landmarks": [
+    {
+      "type": "gate",
+      "lat": 52.6841909,
+      "lon": 0.9358849,
+      "size": 0.5,
+      "dx_m": 26.73,
+      "dy_m": 45.06
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.683633,
+      "lon": 0.9357432,
+      "size": 1.0,
+      "dx_m": 17.18,
+      "dy_m": -16.97
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6834199,
+      "lon": 0.9358509,
+      "size": 1.0,
+      "dx_m": 24.44,
+      "dy_m": -40.67
+    },
+    {
+      "type": "building",
+      "lat": 52.6831221,
+      "lon": 0.9357675,
+      "size": 1.5,
+      "dx_m": 18.82,
+      "dy_m": -73.78
+    },
+    {
+      "type": "building",
+      "lat": 52.6843623,
+      "lon": 0.9354721,
+      "size": 1.5,
+      "dx_m": -1.09,
+      "dy_m": 64.12
+    },
+    {
+      "type": "building",
+      "lat": 52.6842337,
+      "lon": 0.9356057,
+      "size": 1.5,
+      "dx_m": 7.91,
+      "dy_m": 49.82
+    },
+    {
+      "type": "building",
+      "lat": 52.6842502,
+      "lon": 0.9358907,
+      "size": 1.5,
+      "dx_m": 27.13,
+      "dy_m": 51.66
+    },
+    {
+      "type": "building",
+      "lat": 52.6843191,
+      "lon": 0.9358798,
+      "size": 1.5,
+      "dx_m": 26.39,
+      "dy_m": 59.32
+    },
+    {
+      "type": "building",
+      "lat": 52.6843613,
+      "lon": 0.9358211,
+      "size": 1.5,
+      "dx_m": 22.43,
+      "dy_m": 64.01
+    },
+    {
+      "type": "building",
+      "lat": 52.68442,
+      "lon": 0.9358579,
+      "size": 1.5,
+      "dx_m": 24.91,
+      "dy_m": 70.54
+    },
+    {
+      "type": "building",
+      "lat": 52.6843739,
+      "lon": 0.9358093,
+      "size": 1.5,
+      "dx_m": 21.64,
+      "dy_m": 65.41
+    },
+    {
+      "type": "building",
+      "lat": 52.684434,
+      "lon": 0.9356881,
+      "size": 1.5,
+      "dx_m": 13.47,
+      "dy_m": 72.09
+    },
+    {
+      "type": "building",
+      "lat": 52.6843686,
+      "lon": 0.9355806,
+      "size": 1.5,
+      "dx_m": 6.22,
+      "dy_m": 64.82
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6841143,
+      "lon": 0.9352692,
+      "size": 1.0,
+      "dx_m": -14.77,
+      "dy_m": 36.54
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6841225,
+      "lon": 0.9354363,
+      "size": 1.0,
+      "dx_m": -3.5,
+      "dy_m": 37.46
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6844073,
+      "lon": 0.9353903,
+      "size": 1.0,
+      "dx_m": -6.6,
+      "dy_m": 69.12
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6841522,
+      "lon": 0.9355216,
+      "size": 1.0,
+      "dx_m": 2.25,
+      "dy_m": 40.76
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6841565,
+      "lon": 0.9356171,
+      "size": 1.0,
+      "dx_m": 8.68,
+      "dy_m": 41.24
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6841679,
+      "lon": 0.9358696,
+      "size": 1.0,
+      "dx_m": 25.7,
+      "dy_m": 42.5
+    },
+    {
+      "type": "building",
+      "lat": 52.6835927,
+      "lon": 0.9345611,
+      "size": 1.5,
+      "dx_m": -62.5,
+      "dy_m": -21.46
+    },
+    {
+      "type": "building",
+      "lat": 52.6836866,
+      "lon": 0.9347395,
+      "size": 1.5,
+      "dx_m": -50.47,
+      "dy_m": -11.01
+    },
+    {
+      "type": "building",
+      "lat": 52.6835794,
+      "lon": 0.9356281,
+      "size": 1.5,
+      "dx_m": 9.42,
+      "dy_m": -22.93
+    },
+    {
+      "type": "building",
+      "lat": 52.6832889,
+      "lon": 0.935623,
+      "size": 1.5,
+      "dx_m": 9.08,
+      "dy_m": -55.24
+    },
+    {
+      "type": "building",
+      "lat": 52.683467,
+      "lon": 0.9352451,
+      "size": 1.5,
+      "dx_m": -16.39,
+      "dy_m": -35.43
+    },
+    {
+      "type": "building",
+      "lat": 52.6835641,
+      "lon": 0.9350837,
+      "size": 1.5,
+      "dx_m": -27.27,
+      "dy_m": -24.64
+    },
+    {
+      "type": "building",
+      "lat": 52.6840752,
+      "lon": 0.9351803,
+      "size": 1.5,
+      "dx_m": -20.76,
+      "dy_m": 32.2
+    },
+    {
+      "type": "building",
+      "lat": 52.6839818,
+      "lon": 0.9350154,
+      "size": 1.5,
+      "dx_m": -31.88,
+      "dy_m": 21.81
+    },
+    {
+      "type": "building",
+      "lat": 52.6836476,
+      "lon": 0.9363979,
+      "size": 1.5,
+      "dx_m": 61.32,
+      "dy_m": -15.35
+    },
+    {
+      "type": "building",
+      "lat": 52.6835353,
+      "lon": 0.9365134,
+      "size": 1.5,
+      "dx_m": 69.1,
+      "dy_m": -27.84
+    },
+    {
+      "type": "building",
+      "lat": 52.6839113,
+      "lon": 0.9354329,
+      "size": 1.5,
+      "dx_m": -3.73,
+      "dy_m": 13.97
+    },
+    {
+      "type": "building",
+      "lat": 52.6840284,
+      "lon": 0.935595,
+      "size": 1.5,
+      "dx_m": 7.19,
+      "dy_m": 26.99
+    },
+    {
+      "type": "building",
+      "lat": 52.6831327,
+      "lon": 0.9350595,
+      "size": 1.5,
+      "dx_m": -28.9,
+      "dy_m": -72.6
+    },
+    {
+      "type": "building",
+      "lat": 52.6837914,
+      "lon": 0.935452,
+      "size": 1.5,
+      "dx_m": -2.45,
+      "dy_m": 0.64
+    },
+    {
+      "type": "building",
+      "lat": 52.6838952,
+      "lon": 0.9356169,
+      "size": 1.5,
+      "dx_m": 8.67,
+      "dy_m": 12.18
+    },
+    {
+      "type": "building",
+      "lat": 52.6836847,
+      "lon": 0.9347794,
+      "size": 1.5,
+      "dx_m": -47.78,
+      "dy_m": -11.23
+    },
+    {
+      "type": "building",
+      "lat": 52.6835553,
+      "lon": 0.9349403,
+      "size": 1.5,
+      "dx_m": -36.94,
+      "dy_m": -25.61
+    },
+    {
+      "type": "building",
+      "lat": 52.6844072,
+      "lon": 0.9350741,
+      "size": 1.5,
+      "dx_m": -27.92,
+      "dy_m": 69.11
+    },
+    {
+      "type": "building",
+      "lat": 52.6842888,
+      "lon": 0.9348707,
+      "size": 1.5,
+      "dx_m": -41.63,
+      "dy_m": 55.95
+    },
+    {
+      "type": "building",
+      "lat": 52.683689,
+      "lon": 0.9352251,
+      "size": 1.5,
+      "dx_m": -17.74,
+      "dy_m": -10.75
+    },
+    {
+      "type": "building",
+      "lat": 52.6836327,
+      "lon": 0.9349901,
+      "size": 1.5,
+      "dx_m": -33.58,
+      "dy_m": -17.01
+    },
+    {
+      "type": "building",
+      "lat": 52.6837253,
+      "lon": 0.9361348,
+      "size": 1.5,
+      "dx_m": 43.58,
+      "dy_m": -6.71
+    },
+    {
+      "type": "building",
+      "lat": 52.6836652,
+      "lon": 0.936372,
+      "size": 1.5,
+      "dx_m": 59.57,
+      "dy_m": -13.39
+    },
+    {
+      "type": "building",
+      "lat": 52.6836367,
+      "lon": 0.9344573,
+      "size": 1.5,
+      "dx_m": -69.5,
+      "dy_m": -16.56
+    },
+    {
+      "type": "building",
+      "lat": 52.684059,
+      "lon": 0.9349442,
+      "size": 1.5,
+      "dx_m": -36.68,
+      "dy_m": 30.4
+    },
+    {
+      "type": "building",
+      "lat": 52.6839618,
+      "lon": 0.9347172,
+      "size": 1.5,
+      "dx_m": -51.98,
+      "dy_m": 19.59
+    },
+    {
+      "type": "building",
+      "lat": 52.6832612,
+      "lon": 0.9359671,
+      "size": 1.5,
+      "dx_m": 32.28,
+      "dy_m": -58.32
+    },
+    {
+      "type": "building",
+      "lat": 52.6833449,
+      "lon": 0.9360789,
+      "size": 1.5,
+      "dx_m": 39.81,
+      "dy_m": -49.01
+    },
+    {
+      "type": "building",
+      "lat": 52.6834205,
+      "lon": 0.9363057,
+      "size": 1.5,
+      "dx_m": 55.1,
+      "dy_m": -40.6
+    },
+    {
+      "type": "building",
+      "lat": 52.6835842,
+      "lon": 0.9360389,
+      "size": 1.5,
+      "dx_m": 37.12,
+      "dy_m": -22.4
+    },
+    {
+      "type": "building",
+      "lat": 52.6834775,
+      "lon": 0.9359187,
+      "size": 1.5,
+      "dx_m": 29.01,
+      "dy_m": -34.26
+    },
+    {
+      "type": "building",
+      "lat": 52.6834021,
+      "lon": 0.9345376,
+      "size": 1.5,
+      "dx_m": -64.08,
+      "dy_m": -42.65
+    },
+    {
+      "type": "building",
+      "lat": 52.6834414,
+      "lon": 0.9346258,
+      "size": 1.5,
+      "dx_m": -58.14,
+      "dy_m": -38.28
+    },
+    {
+      "type": "building",
+      "lat": 52.6839602,
+      "lon": 0.9346415,
+      "size": 1.5,
+      "dx_m": -57.08,
+      "dy_m": 19.41
+    },
+    {
+      "type": "building",
+      "lat": 52.6840433,
+      "lon": 0.9343831,
+      "size": 1.5,
+      "dx_m": -74.5,
+      "dy_m": 28.65
+    },
+    {
+      "type": "building",
+      "lat": 52.6832918,
+      "lon": 0.9357958,
+      "size": 1.5,
+      "dx_m": 20.73,
+      "dy_m": -54.91
+    },
+    {
+      "type": "building",
+      "lat": 52.6831929,
+      "lon": 0.9356967,
+      "size": 1.5,
+      "dx_m": 14.05,
+      "dy_m": -65.91
+    },
+    {
+      "type": "building",
+      "lat": 52.6839402,
+      "lon": 0.9343318,
+      "size": 1.5,
+      "dx_m": -77.96,
+      "dy_m": 17.19
+    },
+    {
+      "type": "building",
+      "lat": 52.6836976,
+      "lon": 0.9356841,
+      "size": 1.5,
+      "dx_m": 13.2,
+      "dy_m": -9.79
+    },
+    {
+      "type": "building",
+      "lat": 52.6837499,
+      "lon": 0.9354587,
+      "size": 1.5,
+      "dx_m": -1.99,
+      "dy_m": -3.98
+    },
+    {
+      "type": "building",
+      "lat": 52.6839095,
+      "lon": 0.9363836,
+      "size": 1.5,
+      "dx_m": 60.35,
+      "dy_m": 13.77
+    },
+    {
+      "type": "building",
+      "lat": 52.6839689,
+      "lon": 0.9359415,
+      "size": 1.5,
+      "dx_m": 30.55,
+      "dy_m": 20.38
+    },
+    {
+      "type": "building",
+      "lat": 52.6832377,
+      "lon": 0.9353598,
+      "size": 1.5,
+      "dx_m": -8.66,
+      "dy_m": -60.93
+    },
+    {
+      "type": "building",
+      "lat": 52.6830992,
+      "lon": 0.9353103,
+      "size": 1.5,
+      "dx_m": -12.0,
+      "dy_m": -76.33
+    },
+    {
+      "type": "building",
+      "lat": 52.6842952,
+      "lon": 0.9347929,
+      "size": 1.5,
+      "dx_m": -46.87,
+      "dy_m": 56.66
+    },
+    {
+      "type": "building",
+      "lat": 52.6842602,
+      "lon": 0.9346282,
+      "size": 1.5,
+      "dx_m": -57.98,
+      "dy_m": 52.77
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6834635,
+      "lon": 0.9353914,
+      "size": 1.0,
+      "dx_m": -6.53,
+      "dy_m": -35.82
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6833967,
+      "lon": 0.9349493,
+      "size": 1.0,
+      "dx_m": -36.33,
+      "dy_m": -43.25
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6833654,
+      "lon": 0.9347875,
+      "size": 1.0,
+      "dx_m": -47.24,
+      "dy_m": -46.73
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6833383,
+      "lon": 0.9346792,
+      "size": 1.0,
+      "dx_m": -54.54,
+      "dy_m": -49.74
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6833169,
+      "lon": 0.9345913,
+      "size": 1.0,
+      "dx_m": -60.46,
+      "dy_m": -52.12
+    }
+  ],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.68378565045616,
+    0.9354882849182307
+  ]
+}

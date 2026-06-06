@@ -1,0 +1,49 @@
+{
+  "postcode": "NR19 1EA",
+  "streets": [
+    "nelson place"
+  ],
+  "preferred_entry": "5 NELSON PLACE",
+  "preferred_exit": "5 NELSON PLACE",
+  "estate_direction": null,
+  "typical_density": 3.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 2EU",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    3
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 3,
+      "stops": 1
+    }
+  ],
+  "known_addresses": [
+    {
+      "grid_id": "26",
+      "building_street": "12 Nelson Place"
+    }
+  ],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "5 NELSON PLACE",
+      "exit": "5 NELSON PLACE",
+      "next_postcode": "NR19 2EU"
+    }
+  ],
+  "coords": [
+    52.68084494092666,
+    0.9416535555479443
+  ]
+}

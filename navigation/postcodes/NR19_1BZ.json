@@ -1,0 +1,27 @@
+{
+  "postcode": "NR19 1BZ",
+  "streets": [
+    "perkins court"
+  ],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "known_addresses": [
+    {
+      "grid_id": "18",
+      "building_street": "29 Perkins Court"
+    }
+  ],
+  "landmarks": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.67716534827522,
+    0.9402669345206793
+  ]
+}

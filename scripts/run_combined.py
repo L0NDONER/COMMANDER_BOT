@@ -2,7 +2,9 @@
 """
 run_combined.py — Windsor Park → Hoe Cottages → Highfield Road → Northgate → Toad Hall.
 """
-import json, math, sys, re
+import json
+import sys
+import re
 from pathlib import Path
 from collections import defaultdict
 
@@ -51,19 +53,19 @@ BUSINESS_TOKENS = {'ltd','limited','co.','services','solutions','group','centre'
 
 def prop_type(addr):
     a = addr.lower()
-    if any(t in a for t in FLAT_TOKENS):     return 'FLAT'
-    if any(t in a for t in FARM_TOKENS):     return 'FARM'
-    if any(t in a for t in COTTAGE_TOKENS):  return 'COTTAGE'
-    if any(t in a for t in HOUSE_TOKENS):    return 'HOUSE'
+    if any(t in a for t in FLAT_TOKENS): return 'FLAT'
+    if any(t in a for t in FARM_TOKENS): return 'FARM'
+    if any(t in a for t in COTTAGE_TOKENS): return 'COTTAGE'
+    if any(t in a for t in HOUSE_TOKENS): return 'HOUSE'
     if any(t in a for t in BUSINESS_TOKENS): return 'BUSINESS'
-    if re.match(r'^\d+[a-z]?\s', a):         return 'HOUSE'
+    if re.match(r'^\d+[a-z]?\s', a): return 'HOUSE'
     return 'PROPERTY'
 
 
 def print_pc_header(pd, cur_pc):
     streets   = ', '.join(pd.get('streets') or ['—'])
     pref_in   = pd.get('preferred_entry') or '—'
-    pref_out  = pd.get('preferred_exit')  or '—'
+    pref_out = pd.get('preferred_exit') or '—'
     direction = pd.get('estate_direction') or '—'
     print(f"\n┌─ {cur_pc}  {streets}")
     print(f"│  visits={pd.get('visit_count',0)}  last_seen={pd.get('last_seen','—')}  density={pd.get('typical_density','—')}")
@@ -100,7 +102,7 @@ def print_pc_header(pd, cur_pc):
         for c in crumbs[-2:]:
             print(f"│  [{c.get('date','?')}] {c.get('entry','?')} → {c.get('next_postcode','?')}  (manifest {c.get('manifest_id','?')})")
     else:
-        print(f"│  breadcrumbs: none")
+        print("│  breadcrumbs: none")
     print(f"└{'─'*62}")
 
 
@@ -138,9 +140,13 @@ def main():
             stops.append(s)
 
     class Obj:
-        def __init__(self, x, y, sz): self.position = Vec2(x, y); self.size = sz
+        def __init__(self, x, y, sz):
+            self.position = Vec2(x, y)
+            self.size = sz
+
     class WorldImpl:
-        def __init__(self, obs): self.objects = obs
+        def __init__(self, obs):
+            self.objects = obs
 
     all_obs = []
     for pc in all_pc:
@@ -156,12 +162,13 @@ def main():
     if finish_stop:
         route.append(finish_stop)
 
-    elapsed = 0
+    elapsed  = 0
     prev_pos = start_pos
     cur_pc   = None
+    seen_pcs = set()
 
     print(f"  Start : {START_ADDR} ({START_PC})")
-    print(f"  Finish: Toad Hall (NR19 2EU)")
+    print("  Finish: Toad Hall (NR19 2EU)")
     print(f"  Manifest: {len(PARCELS)} parcels  →  {len(route)} stops\n")
     print("═" * 92)
 
@@ -171,21 +178,25 @@ def main():
         travel = _dist(prev_pos, s.position) / TRAVEL_MS
         elapsed += travel + DWELL_S * pkgs
         prev_pos = s.position
-        t_str  = f"{int(elapsed//3600)}h{int((elapsed%3600)//60):02d}m"
-        throat = f"⚠ THROAT@{s.throat_depth*2}m" if s.throat_depth is not None else ""
+        t_str  = f"{int(elapsed//3600)}h{int((elapsed % 3600)//60):02d}m"
+        throat = ("⚠ THROAT@entry" if s.throat_depth == 0 else f"⚠ THROAT@{s.throat_depth*2}m") if s.throat_depth is not None else ""
         uturn  = "" if s.uturn_side else "⚠ NO-UTURN"
         ptype  = prop_type(s.address)
 
         if s.postcode != cur_pc:
             cur_pc = s.postcode
             pd = pcs.get(cur_pc, {})
-            print_pc_header(pd, cur_pc)
+            if cur_pc in seen_pcs:
+                print(f"\n  ↩  {cur_pc}  (continued)")
+            else:
+                seen_pcs.add(cur_pc)
+                print_pc_header(pd, cur_pc)
 
         flags = '  ' + '  '.join(filter(None, [throat, uturn]))
         print(f"  {i+1:>2}  {t_str}  [{ptype:<8}]  {pkgs}pkg  {s.address:<40}{flags}")
 
     print(f"\n{'═'*92}")
-    print(f"  Total: {int(elapsed//3600)}h {int((elapsed%3600)//60)}m  |  {len(PARCELS)} parcels  |  {len(route)} stops")
+    print(f"  Total: {int(elapsed//3600)}h {int((elapsed % 3600)//60)}m  |  {len(PARCELS)} parcels  |  {len(route)} stops")
 
 
 if __name__ == "__main__":

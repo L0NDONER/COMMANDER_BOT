@@ -1,4 +1,0 @@
-numpy>=1.24
-# Real semantics for E. Heavy (pulls torch). Skip it and use
-# `python sweep.py --backend random` for a deps-free mechanics smoke test.
-sentence-transformers>=2.2

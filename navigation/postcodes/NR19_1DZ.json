@@ -1,0 +1,45 @@
+{
+  "postcode": "NR19 1DZ",
+  "streets": [
+    "argos ltd",
+    "high street"
+  ],
+  "preferred_entry": "ARGOS LTD",
+  "preferred_exit": "11-13 HIGH STREET",
+  "estate_direction": null,
+  "typical_density": 7.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 2EY",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    7
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 7,
+      "stops": 2
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "ARGOS LTD",
+      "exit": "11-13 HIGH STREET",
+      "next_postcode": "NR19 2EY"
+    }
+  ],
+  "coords": [
+    52.679755152091516,
+    0.9413583408036496
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "Sandy Lane",
+  "postcodes": [
+    "NR19 2EA",
+    "NR19 2EB",
+    "NR19 2ED"
+  ],
+  "visit_count": 0,
+  "last_seen": null,
+  "preferred_entry_postcode": null,
+  "preferred_exit_postcode": null,
+  "observed_neighbours": [
+    {
+      "area": "Colin McLean Road",
+      "count": 5
+    }
+  ],
+  "breadcrumbs": []
+}

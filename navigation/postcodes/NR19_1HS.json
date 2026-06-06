@@ -1,0 +1,274 @@
+{
+  "postcode": "NR19 1HS",
+  "streets": [
+    "yaxham road"
+  ],
+  "known_addresses": [
+    {
+      "grid_id": "01",
+      "building_street": "1 Yaxham Road"
+    },
+    {
+      "grid_id": "02",
+      "building_street": "2 Yaxham Road",
+      "coords": null
+    },
+    {
+      "grid_id": "03",
+      "building_street": "3 Yaxham Road"
+    },
+    {
+      "grid_id": "04",
+      "building_street": "4 Yaxham Road"
+    },
+    {
+      "grid_id": "05",
+      "building_street": "5 Yaxham Road"
+    },
+    {
+      "grid_id": "06",
+      "building_street": "6 Yaxham Road",
+      "coords": null
+    },
+    {
+      "grid_id": "07",
+      "building_street": "7 Yaxham Road",
+      "coords": null
+    },
+    {
+      "grid_id": "08",
+      "building_street": "8 Yaxham Road"
+    },
+    {
+      "grid_id": "09",
+      "building_street": "9 Yaxham Road"
+    },
+    {
+      "grid_id": "10",
+      "building_street": "10 Yaxham Road"
+    },
+    {
+      "grid_id": "11",
+      "building_street": "11 Yaxham Road"
+    },
+    {
+      "grid_id": "12",
+      "building_street": "12 Yaxham Road"
+    },
+    {
+      "grid_id": "13",
+      "building_street": "13 Yaxham Road"
+    },
+    {
+      "grid_id": "14",
+      "building_street": "14 Yaxham Road"
+    },
+    {
+      "grid_id": "15",
+      "building_street": "15 Yaxham Road",
+      "coords": null
+    },
+    {
+      "grid_id": "16",
+      "building_street": "16 Yaxham Road",
+      "coords": null
+    },
+    {
+      "grid_id": "17",
+      "building_street": "17 Yaxham Road"
+    },
+    {
+      "grid_id": "18",
+      "building_street": "18 Yaxham Road"
+    },
+    {
+      "grid_id": "19",
+      "building_street": "19 Yaxham Road",
+      "coords": null
+    },
+    {
+      "grid_id": "20",
+      "building_street": "20 Yaxham Road",
+      "coords": null
+    },
+    {
+      "grid_id": "21",
+      "building_street": "21 Yaxham Road"
+    },
+    {
+      "grid_id": "22",
+      "building_street": "22 Yaxham Road"
+    },
+    {
+      "grid_id": "23",
+      "building_street": "23 Yaxham Road"
+    },
+    {
+      "grid_id": "24",
+      "building_street": "24 Yaxham Road",
+      "coords": null
+    },
+    {
+      "grid_id": "25",
+      "building_street": "25 Yaxham Road"
+    },
+    {
+      "grid_id": "26",
+      "building_street": "26 Yaxham Road",
+      "coords": null
+    },
+    {
+      "grid_id": "27",
+      "building_street": "27 Yaxham Road",
+      "coords": null
+    },
+    {
+      "grid_id": "28",
+      "building_street": "28 Yaxham Road"
+    },
+    {
+      "grid_id": "29",
+      "building_street": "29 Yaxham Road",
+      "coords": null
+    },
+    {
+      "grid_id": "30",
+      "building_street": "30 Yaxham Road"
+    },
+    {
+      "grid_id": "31",
+      "building_street": "31 Yaxham Road"
+    },
+    {
+      "grid_id": "32",
+      "building_street": "32 Yaxham Road",
+      "coords": null
+    },
+    {
+      "grid_id": "33",
+      "building_street": "33 Yaxham Road",
+      "coords": null
+    },
+    {
+      "grid_id": "34",
+      "building_street": "34 Yaxham Road"
+    },
+    {
+      "grid_id": "35",
+      "building_street": "35 Yaxham Road"
+    },
+    {
+      "grid_id": "36",
+      "building_street": "36 Yaxham Road",
+      "coords": null
+    },
+    {
+      "grid_id": "37",
+      "building_street": "37 Yaxham Road",
+      "coords": null
+    },
+    {
+      "grid_id": "38",
+      "building_street": "38 Yaxham Road"
+    },
+    {
+      "grid_id": "39",
+      "building_street": "39 Yaxham Road"
+    },
+    {
+      "grid_id": "40",
+      "building_street": "40 Yaxham Road"
+    },
+    {
+      "grid_id": "41",
+      "building_street": "41 Yaxham Road"
+    },
+    {
+      "grid_id": "42",
+      "building_street": "42 Yaxham Road"
+    },
+    {
+      "grid_id": "43",
+      "building_street": "43 Yaxham Road"
+    },
+    {
+      "grid_id": "44",
+      "building_street": "44 Yaxham Road"
+    },
+    {
+      "grid_id": "45",
+      "building_street": "45 Yaxham Road"
+    },
+    {
+      "grid_id": "46",
+      "building_street": "46 Yaxham Road"
+    },
+    {
+      "grid_id": "47",
+      "building_street": "47 Yaxham Road"
+    },
+    {
+      "grid_id": "48",
+      "building_street": "48 Yaxham Road"
+    },
+    {
+      "grid_id": "49",
+      "building_street": "49 Yaxham Road"
+    },
+    {
+      "grid_id": "50",
+      "building_street": "50 Yaxham Road"
+    }
+  ],
+  "preferred_entry": "2 YAXHAM ROAD",
+  "preferred_exit": "37 YAXHAM ROAD",
+  "estate_direction": null,
+  "typical_density": 15.0,
+  "visit_count": 2,
+  "last_seen": "2026-05-30",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 1BH",
+      "count": 2
+    }
+  ],
+  "density_samples": [
+    15,
+    15
+  ],
+  "history": [
+    {
+      "manifest": "combined_dereham_grid_nodes",
+      "date": "2026-05-30",
+      "parcels": 15,
+      "stops": 15
+    },
+    {
+      "manifest": "combined_dereham_grid_nodes",
+      "date": "2026-05-30",
+      "parcels": 15,
+      "stops": 15
+    }
+  ],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2026-05-30",
+      "manifest_id": "combined_dereham_grid_nodes",
+      "entry": "2 YAXHAM ROAD",
+      "exit": "37 YAXHAM ROAD",
+      "next_postcode": "NR19 1BH"
+    },
+    {
+      "date": "2026-05-30",
+      "manifest_id": "combined_dereham_grid_nodes",
+      "entry": "2 YAXHAM ROAD",
+      "exit": "37 YAXHAM ROAD",
+      "next_postcode": "NR19 1BH"
+    }
+  ],
+  "coords": [
+    52.66466897337431,
+    0.953494035180799
+  ]
+}

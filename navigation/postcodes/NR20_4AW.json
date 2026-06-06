@@ -1,0 +1,17 @@
+{
+  "postcode": "NR20 4AW",
+  "streets": ["gordon road"],
+  "preferred_entry": "3 Gordon Road",
+  "preferred_exit": "3 Gordon Road",
+  "pattern": "cul-de-sac-roundabout",
+  "segment_a": "Gordon Road approach (entry → roundabout)",
+  "segment_b": "Roundabout loop (circulate clockwise, deliver left-hand)",
+  "segment_c": "Return to entry spine (roundabout → exit)",
+  "intercept_cluster": null,
+  "delivery_side": "left",
+  "estate_direction": "left-hand ascending into cul-de-sac, loop clockwise, return same spine",
+  "typical_density": 1.0,
+  "visit_count": 0,
+  "last_seen": null,
+  "coords": [52.69090, 0.95810]
+}

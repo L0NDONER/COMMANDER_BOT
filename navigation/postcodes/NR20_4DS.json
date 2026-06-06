@@ -1,0 +1,213 @@
+{
+  "postcode": "NR20 4DS",
+  "streets": [],
+  "known_addresses": [],
+  "landmarks": [
+    {
+      "type": "kerb_node",
+      "lat": 52.7074164,
+      "lon": 0.9064292,
+      "size": 0.4,
+      "dx_m": -12.65,
+      "dy_m": -69.39
+    },
+    {
+      "type": "building",
+      "lat": 52.7080272,
+      "lon": 0.9057097,
+      "size": 1.5,
+      "dx_m": -61.12,
+      "dy_m": -1.48
+    },
+    {
+      "type": "building",
+      "lat": 52.7081261,
+      "lon": 0.905806,
+      "size": 1.5,
+      "dx_m": -54.63,
+      "dy_m": 9.52
+    },
+    {
+      "type": "building",
+      "lat": 52.7085718,
+      "lon": 0.9065784,
+      "size": 1.5,
+      "dx_m": -2.6,
+      "dy_m": 59.08
+    },
+    {
+      "type": "building",
+      "lat": 52.7087235,
+      "lon": 0.9065942,
+      "size": 1.5,
+      "dx_m": -1.53,
+      "dy_m": 75.95
+    },
+    {
+      "type": "building",
+      "lat": 52.7083986,
+      "lon": 0.9071889,
+      "size": 1.5,
+      "dx_m": 38.53,
+      "dy_m": 39.82
+    },
+    {
+      "type": "building",
+      "lat": 52.7083655,
+      "lon": 0.9069346,
+      "size": 1.5,
+      "dx_m": 21.4,
+      "dy_m": 36.14
+    },
+    {
+      "type": "building",
+      "lat": 52.7085818,
+      "lon": 0.9072116,
+      "size": 1.5,
+      "dx_m": 40.06,
+      "dy_m": 60.19
+    },
+    {
+      "type": "building",
+      "lat": 52.7080636,
+      "lon": 0.9072411,
+      "size": 1.5,
+      "dx_m": 42.05,
+      "dy_m": 2.57
+    },
+    {
+      "type": "building",
+      "lat": 52.7079447,
+      "lon": 0.9070335,
+      "size": 1.5,
+      "dx_m": 28.06,
+      "dy_m": -10.65
+    },
+    {
+      "type": "building",
+      "lat": 52.7085745,
+      "lon": 0.9064695,
+      "size": 1.5,
+      "dx_m": -9.93,
+      "dy_m": 59.38
+    },
+    {
+      "type": "building",
+      "lat": 52.7085669,
+      "lon": 0.9062019,
+      "size": 1.5,
+      "dx_m": -27.96,
+      "dy_m": 58.54
+    },
+    {
+      "type": "building",
+      "lat": 52.7079925,
+      "lon": 0.9066887,
+      "size": 1.5,
+      "dx_m": 4.84,
+      "dy_m": -5.33
+    },
+    {
+      "type": "building",
+      "lat": 52.7081274,
+      "lon": 0.9066407,
+      "size": 1.5,
+      "dx_m": 1.6,
+      "dy_m": 9.67
+    },
+    {
+      "type": "building",
+      "lat": 52.7077987,
+      "lon": 0.9060715,
+      "size": 1.5,
+      "dx_m": -36.75,
+      "dy_m": -26.88
+    },
+    {
+      "type": "building",
+      "lat": 52.7079396,
+      "lon": 0.9061608,
+      "size": 1.5,
+      "dx_m": -30.73,
+      "dy_m": -11.22
+    },
+    {
+      "type": "building",
+      "lat": 52.708043,
+      "lon": 0.9059958,
+      "size": 1.5,
+      "dx_m": -41.85,
+      "dy_m": 0.28
+    },
+    {
+      "type": "building",
+      "lat": 52.7081267,
+      "lon": 0.9061703,
+      "size": 1.5,
+      "dx_m": -30.09,
+      "dy_m": 9.59
+    },
+    {
+      "type": "building",
+      "lat": 52.7079217,
+      "lon": 0.9065084,
+      "size": 1.5,
+      "dx_m": -7.31,
+      "dy_m": -13.21
+    },
+    {
+      "type": "building",
+      "lat": 52.7078626,
+      "lon": 0.9069256,
+      "size": 1.5,
+      "dx_m": 20.8,
+      "dy_m": -19.78
+    },
+    {
+      "type": "building",
+      "lat": 52.7078638,
+      "lon": 0.9065394,
+      "size": 1.5,
+      "dx_m": -5.22,
+      "dy_m": -19.65
+    },
+    {
+      "type": "building",
+      "lat": 52.7082864,
+      "lon": 0.9068464,
+      "size": 1.5,
+      "dx_m": 15.46,
+      "dy_m": 27.35
+    },
+    {
+      "type": "building",
+      "lat": 52.7081649,
+      "lon": 0.9069754,
+      "size": 1.5,
+      "dx_m": 24.15,
+      "dy_m": 13.84
+    },
+    {
+      "type": "building",
+      "lat": 52.7081348,
+      "lon": 0.9067852,
+      "size": 1.5,
+      "dx_m": 11.34,
+      "dy_m": 10.49
+    }
+  ],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.708040476197766,
+    0.9066169274941702
+  ]
+}

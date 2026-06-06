@@ -1,0 +1,27 @@
+{
+  "postcode": "NR19 1AE",
+  "streets": [
+    "commercial road"
+  ],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "known_addresses": [
+    {
+      "grid_id": "02",
+      "building_street": "18 Commercial Road"
+    }
+  ],
+  "landmarks": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.67830925408976,
+    0.9441759259543628
+  ]
+}

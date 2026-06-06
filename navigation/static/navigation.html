@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Nav</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0e0e0e;
+      --surface: #1a1a1a;
+      --card:    #222;
+      --border:  #333;
+      --text:    #f0f0f0;
+      --muted:   #888;
+      --accent:  #4a9eff;
+      --warn:    #f0a500;
+      --danger:  #e04040;
+      --safe:    #3caa6e;
+      --orange:  #e06820;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Setup screen ── */
+    #setup {
+      flex: 1;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 540px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    #setup h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .field-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .field-row input { flex: 1; }
+
+    input, textarea {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 15px;
+      width: 100%;
+      outline: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+    }
+
+    textarea {
+      height: 180px;
+      resize: vertical;
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .field-group { display: flex; flex-direction: column; gap: 4px; }
+
+    #btn-optimise {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+      letter-spacing: 0.03em;
+    }
+
+    #btn-optimise:active { opacity: 0.8; }
+    #btn-optimise:disabled { background: var(--border); color: var(--muted); cursor: default; }
+
+    #setup-error {
+      color: var(--danger);
+      font-size: 13px;
+      display: none;
+    }
+
+    /* ── Nav screen ── */
+    #nav {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    /* Progress bar */
+    #progress {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    #progress-track {
+      flex: 1;
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 0 12px;
+      overflow: hidden;
+    }
+
+    #progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    /* Scrollable content */
+    #scroll-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* PC meta card */
+    #meta-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    #meta-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    #meta-header .pc-tag {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+    }
+
+    #meta-header .meta-streets {
+      font-size: 12px;
+      color: var(--muted);
+      margin-left: 8px;
+    }
+
+    #meta-header .chevron {
+      color: var(--muted);
+      font-size: 12px;
+      transition: transform 0.2s;
+    }
+
+    #meta-header.open .chevron { transform: rotate(180deg); }
+
+    #meta-body {
+      display: none;
+      padding: 0 14px 12px;
+      font-size: 13px;
+      line-height: 1.8;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    #meta-body.visible { display: block; }
+
+    .meta-row { display: flex; gap: 6px; }
+    .meta-key { color: var(--muted); min-width: 80px; flex-shrink: 0; }
+    .meta-val { color: var(--text); }
+
+    .meta-order {
+      font-size: 12px;
+      color: var(--text);
+      margin-top: 4px;
+      word-break: break-word;
+    }
+
+    /* Warning banners */
+    .banner {
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .banner-warn    { background: #2a1e00; color: var(--warn);   border: 1px solid #4a3500; }
+    .banner-danger  { background: #2a0000; color: var(--danger); border: 1px solid #5a0000; }
+    .banner-orange  { background: #2a1000; color: var(--orange); border: 1px solid #5a2000; }
+    .banner-pattern { background: #001a30; color: var(--accent); border: 1px solid #003060; }
+
+    /* Current stop card */
+    #stop-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 16px;
+    }
+
+    #stop-card .stop-addr {
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    #stop-card .stop-pc {
+      font-size: 0.95rem;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    #stop-card .stop-meta-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 13px;
+    }
+
+    .badge {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .badge-time { color: var(--text); font-weight: 600; }
+
+    /* Up-next list */
+    #upcoming { display: flex; flex-direction: column; gap: 6px; }
+
+    .upcoming-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      padding: 0 2px;
+    }
+
+    .upcoming-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .upcoming-item:active { opacity: 0.7; }
+
+    .upcoming-item .u-addr { font-weight: 500; }
+    .upcoming-item .u-pc   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .upcoming-item .u-time { font-size: 12px; color: var(--muted); flex-shrink: 0; margin-left: 8px; }
+
+    /* Controls */
+    #controls {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 12px 16px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    #controls button {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 0;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--card);
+      color: var(--text);
+    }
+
+    #btn-next-stop {
+      background: var(--accent) !important;
+      border-color: var(--accent) !important;
+      color: #fff !important;
+      font-size: 16px !important;
+    }
+
+    #controls button:active { opacity: 0.75; }
+    #controls button:disabled { opacity: 0.3; cursor: default; }
+
+    #stop-counter {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    #stop-counter strong { color: var(--text); font-size: 18px; display: block; }
+
+    /* Done screen */
+    #done {
+      display: none;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      padding: 32px;
+      text-align: center;
+    }
+
+    #done h2 { font-size: 1.8rem; color: var(--safe); }
+    #done p  { color: var(--muted); }
+    #done button {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- ── Setup ── -->
+<div id="setup">
+  <h1>Navigation</h1>
+
+  <div class="field-group">
+    <label>Start</label>
+    <div class="field-row">
+      <input id="start-addr" placeholder="Address" value="3 Gordon Road">
+      <input id="start-pc" placeholder="Postcode" style="max-width:120px" value="NR20 4AW">
+    </div>
+  </div>
+
+  <div class="field-group">
+    <label>Finish (optional)</label>
+    <div class="field-row">
+      <input id="finish-addr" placeholder="Address" value="The Rose">
+      <input id="finish-pc" placeholder="Postcode" style="max-width:120px" value="NR19 2EU">
+    </div>
+  </div>
+
+  <div class="field-group">
+    <label>Parcels — one per line: Address, Postcode</label>
+    <textarea id="parcels" spellcheck="false">4 Highfield Road, NR19 2EY
+7 Highfield Road, NR19 2EY
+12 Highfield Road, NR19 2EY
+19 Highfield Road, NR19 2EY
+26 Highfield Road, NR19 2EY
+33 Highfield Road, NR19 2EY
+21 Oakwood Road, NR19 2SS
+2 Oakwood Close, NR19 2ST
+3 Oakwood Close, NR19 2ST
+4 Oakwood Close, NR19 2ST
+8 Oakwood Close, NR19 2ST
+19 Oakwood Close, NR19 2ST
+22 Northgate, NR19 2EU
+14 Northgate, NR19 2EU
+Weldon Lodge, NR19 2EU
+Longfields, NR19 2EU</textarea>
+  </div>
+
+  <div id="setup-error"></div>
+  <button id="btn-optimise" onclick="startRoute()">Optimise Route</button>
+</div>
+
+<!-- ── Navigation ── -->
+<div id="nav">
+
+  <div id="progress">
+    <span id="prog-label">0 / 0</span>
+    <div id="progress-track"><div id="progress-fill" style="width:0%"></div></div>
+    <span id="prog-time">—</span>
+  </div>
+
+  <div id="scroll-body">
+    <div id="warnings"></div>
+    <div id="meta-card">
+      <div id="meta-header" onclick="toggleMeta()">
+        <div>
+          <span class="pc-tag" id="meta-pc">—</span>
+          <span class="meta-streets" id="meta-streets"></span>
+        </div>
+        <span class="chevron">▼</span>
+      </div>
+      <div id="meta-body">
+        <div id="meta-content"></div>
+      </div>
+    </div>
+
+    <div id="stop-card">
+      <div class="stop-addr" id="stop-addr">—</div>
+      <div class="stop-pc"   id="stop-pc">—</div>
+      <div class="stop-meta-row">
+        <span class="badge badge-time" id="stop-time">—</span>
+        <span class="badge" id="stop-type">—</span>
+        <span class="badge" id="stop-pkgs">—</span>
+      </div>
+    </div>
+
+    <div id="upcoming">
+      <div class="upcoming-label">Up next</div>
+    </div>
+  </div>
+
+  <div id="controls">
+    <button id="btn-prev" onclick="goPrev()" disabled>◀ Prev</button>
+    <div id="stop-counter"><strong id="ctr-cur">—</strong><span id="ctr-of"> of —</span></div>
+    <button id="btn-next-stop" onclick="goNext()">Next ▶</button>
+  </div>
+</div>
+
+<!-- ── Done ── -->
+<div id="done">
+  <h2>Route complete</h2>
+  <p id="done-summary"></p>
+  <button onclick="resetApp()">New route</button>
+</div>
+
+<script src="navigation.js"></script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "postcode": "NR19 2QA",
+  "streets": [],
+  "known_addresses": [],
+  "landmarks": [
+    {
+      "name": "Humbletoft",
+      "area": "Sandy Lane",
+      "doors": [
+        "Humbletoft Lodge",
+        "Ohana House",
+        "The Acorns"
+      ],
+      "visit_sequence": null,
+      "coords": null,
+      "door_coords": {},
+      "source": "user-confirmed 2026-05-30"
+    }
+  ],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.6894684213292,
+    0.9282478795562864
+  ]
+}

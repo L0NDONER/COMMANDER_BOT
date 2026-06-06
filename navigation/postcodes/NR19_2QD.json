@@ -1,0 +1,117 @@
+{
+  "streets": [],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "known_addresses": [],
+  "landmarks": [
+    {
+      "type": "building",
+      "lat": 52.6978826,
+      "lon": 0.9094166,
+      "size": 1.5,
+      "dx_m": -64.18,
+      "dy_m": -42.08
+    },
+    {
+      "type": "building",
+      "lat": 52.6982543,
+      "lon": 0.9091882,
+      "size": 1.5,
+      "dx_m": -79.57,
+      "dy_m": -0.75
+    },
+    {
+      "type": "building",
+      "lat": 52.6981944,
+      "lon": 0.9103755,
+      "size": 1.5,
+      "dx_m": 0.44,
+      "dy_m": -7.41
+    },
+    {
+      "type": "building",
+      "lat": 52.698341,
+      "lon": 0.9103474,
+      "size": 1.5,
+      "dx_m": -1.46,
+      "dy_m": 8.9
+    },
+    {
+      "type": "building",
+      "lat": 52.6980252,
+      "lon": 0.9093427,
+      "size": 1.5,
+      "dx_m": -69.16,
+      "dy_m": -26.22
+    },
+    {
+      "type": "building",
+      "lat": 52.6980914,
+      "lon": 0.9093991,
+      "size": 1.5,
+      "dx_m": -65.36,
+      "dy_m": -18.86
+    },
+    {
+      "type": "building",
+      "lat": 52.6981662,
+      "lon": 0.9092531,
+      "size": 1.5,
+      "dx_m": -75.2,
+      "dy_m": -10.54
+    },
+    {
+      "type": "building",
+      "lat": 52.6976534,
+      "lon": 0.9103176,
+      "size": 1.5,
+      "dx_m": -3.46,
+      "dy_m": -67.56
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6982138,
+      "lon": 0.9094064,
+      "size": 1.0,
+      "dx_m": -64.87,
+      "dy_m": -5.25
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6980771,
+      "lon": 0.9099389,
+      "size": 1.0,
+      "dx_m": -28.98,
+      "dy_m": -20.45
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6979654,
+      "lon": 0.9103803,
+      "size": 1.0,
+      "dx_m": 0.76,
+      "dy_m": -32.87
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6976744,
+      "lon": 0.9104489,
+      "size": 1.0,
+      "dx_m": 5.38,
+      "dy_m": -65.23
+    }
+  ],
+  "breadcrumbs": [],
+  "postcode": "NR19 2QD",
+  "coords": [
+    52.698261,
+    0.910369
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "postcode": "NR20 4BA",
+  "streets": [],
+  "known_addresses": [],
+  "landmarks": [],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.69570435877098,
+    0.9552493712116289
+  ]
+}

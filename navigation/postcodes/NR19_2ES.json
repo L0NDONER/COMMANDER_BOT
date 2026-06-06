@@ -1,0 +1,44 @@
+{
+  "postcode": "NR19 2ES",
+  "streets": [
+    "emelson close"
+  ],
+  "preferred_entry": "1 EMELSON CLOSE",
+  "preferred_exit": "5 EMELSON CLOSE",
+  "estate_direction": null,
+  "typical_density": 4.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 2QY",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    4
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 4,
+      "stops": 3
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "1 EMELSON CLOSE",
+      "exit": "5 EMELSON CLOSE",
+      "next_postcode": "NR19 2QY"
+    }
+  ],
+  "coords": [
+    52.68517531655217,
+    0.942906627501275
+  ]
+}

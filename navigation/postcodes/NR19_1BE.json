@@ -1,0 +1,521 @@
+{
+  "postcode": "NR19 1BE",
+  "streets": [
+    "courtenay close"
+  ],
+  "preferred_entry": "3 COURTENAY CLOSE",
+  "preferred_exit": "3 COURTENAY CLOSE",
+  "estate_direction": null,
+  "typical_density": 1.0,
+  "visit_count": 2,
+  "last_seen": "2026-05-30",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 1BF",
+      "count": 2
+    }
+  ],
+  "density_samples": [
+    1,
+    1
+  ],
+  "history": [
+    {
+      "manifest": "combined_dereham_grid_nodes",
+      "date": "2026-05-30",
+      "parcels": 1,
+      "stops": 1
+    },
+    {
+      "manifest": "combined_dereham_grid_nodes",
+      "date": "2026-05-30",
+      "parcels": 1,
+      "stops": 1
+    }
+  ],
+  "known_addresses": [
+    {
+      "grid_id": "10",
+      "building_street": "3 Courtenay Close",
+      "coords": null
+    }
+  ],
+  "landmarks": [
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6784471,
+      "lon": 0.9411993,
+      "size": 1.0,
+      "dx_m": 71.51,
+      "dy_m": 12.18
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6788981,
+      "lon": 0.9403707,
+      "size": 1.0,
+      "dx_m": 15.65,
+      "dy_m": 62.33
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6788926,
+      "lon": 0.9406146,
+      "size": 1.0,
+      "dx_m": 32.09,
+      "dy_m": 61.71
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.678889,
+      "lon": 0.9407743,
+      "size": 1.0,
+      "dx_m": 42.86,
+      "dy_m": 61.31
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6787023,
+      "lon": 0.9407684,
+      "size": 1.0,
+      "dx_m": 42.46,
+      "dy_m": 40.55
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6786606,
+      "lon": 0.9407672,
+      "size": 1.0,
+      "dx_m": 42.38,
+      "dy_m": 35.92
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6786606,
+      "lon": 0.9405645,
+      "size": 1.0,
+      "dx_m": 28.72,
+      "dy_m": 35.92
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6788999,
+      "lon": 0.9402936,
+      "size": 1.0,
+      "dx_m": 10.45,
+      "dy_m": 62.53
+    },
+    {
+      "type": "building",
+      "lat": 52.6779876,
+      "lon": 0.9406912,
+      "size": 1.5,
+      "dx_m": 37.26,
+      "dy_m": -38.92
+    },
+    {
+      "type": "building",
+      "lat": 52.677794,
+      "lon": 0.9407769,
+      "size": 1.5,
+      "dx_m": 43.03,
+      "dy_m": -60.45
+    },
+    {
+      "type": "building",
+      "lat": 52.677856,
+      "lon": 0.9404455,
+      "size": 1.5,
+      "dx_m": 20.69,
+      "dy_m": -53.55
+    },
+    {
+      "type": "building",
+      "lat": 52.6779878,
+      "lon": 0.9406764,
+      "size": 1.5,
+      "dx_m": 36.26,
+      "dy_m": -38.9
+    },
+    {
+      "type": "building",
+      "lat": 52.6778909,
+      "lon": 0.9401331,
+      "size": 1.5,
+      "dx_m": -0.37,
+      "dy_m": -49.67
+    },
+    {
+      "type": "building",
+      "lat": 52.6779643,
+      "lon": 0.9398797,
+      "size": 1.5,
+      "dx_m": -17.45,
+      "dy_m": -41.51
+    },
+    {
+      "type": "building",
+      "lat": 52.678693,
+      "lon": 0.9410509,
+      "size": 1.5,
+      "dx_m": 61.51,
+      "dy_m": 39.52
+    },
+    {
+      "type": "building",
+      "lat": 52.6785991,
+      "lon": 0.9409056,
+      "size": 1.5,
+      "dx_m": 51.71,
+      "dy_m": 29.08
+    },
+    {
+      "type": "building",
+      "lat": 52.6783835,
+      "lon": 0.939692,
+      "size": 1.5,
+      "dx_m": -30.11,
+      "dy_m": 5.1
+    },
+    {
+      "type": "building",
+      "lat": 52.6782542,
+      "lon": 0.9395969,
+      "size": 1.5,
+      "dx_m": -36.52,
+      "dy_m": -9.27
+    },
+    {
+      "type": "building",
+      "lat": 52.6780685,
+      "lon": 0.9405314,
+      "size": 1.5,
+      "dx_m": 26.48,
+      "dy_m": -29.92
+    },
+    {
+      "type": "building",
+      "lat": 52.6781205,
+      "lon": 0.9401045,
+      "size": 1.5,
+      "dx_m": -2.3,
+      "dy_m": -24.14
+    },
+    {
+      "type": "building",
+      "lat": 52.6778119,
+      "lon": 0.9393358,
+      "size": 1.5,
+      "dx_m": -54.12,
+      "dy_m": -58.45
+    },
+    {
+      "type": "building",
+      "lat": 52.6777904,
+      "lon": 0.9394421,
+      "size": 1.5,
+      "dx_m": -46.95,
+      "dy_m": -60.85
+    },
+    {
+      "type": "building",
+      "lat": 52.6777418,
+      "lon": 0.9395035,
+      "size": 1.5,
+      "dx_m": -42.81,
+      "dy_m": -66.25
+    },
+    {
+      "type": "building",
+      "lat": 52.6783987,
+      "lon": 0.9390639,
+      "size": 1.5,
+      "dx_m": -72.45,
+      "dy_m": 6.79
+    },
+    {
+      "type": "building",
+      "lat": 52.6782003,
+      "lon": 0.9399333,
+      "size": 1.5,
+      "dx_m": -13.84,
+      "dy_m": -15.27
+    },
+    {
+      "type": "building",
+      "lat": 52.678258,
+      "lon": 0.9397195,
+      "size": 1.5,
+      "dx_m": -28.25,
+      "dy_m": -8.85
+    },
+    {
+      "type": "building",
+      "lat": 52.6790263,
+      "lon": 0.9402389,
+      "size": 1.5,
+      "dx_m": 6.76,
+      "dy_m": 76.58
+    },
+    {
+      "type": "building",
+      "lat": 52.6784993,
+      "lon": 0.9401101,
+      "size": 1.5,
+      "dx_m": -1.92,
+      "dy_m": 17.98
+    },
+    {
+      "type": "building",
+      "lat": 52.6783874,
+      "lon": 0.940153,
+      "size": 1.5,
+      "dx_m": 0.97,
+      "dy_m": 5.54
+    },
+    {
+      "type": "building",
+      "lat": 52.6783318,
+      "lon": 0.9405837,
+      "size": 1.5,
+      "dx_m": 30.01,
+      "dy_m": -0.64
+    },
+    {
+      "type": "building",
+      "lat": 52.6787711,
+      "lon": 0.9406822,
+      "size": 1.5,
+      "dx_m": 36.65,
+      "dy_m": 48.2
+    },
+    {
+      "type": "building",
+      "lat": 52.6788721,
+      "lon": 0.940309,
+      "size": 1.5,
+      "dx_m": 11.49,
+      "dy_m": 59.43
+    },
+    {
+      "type": "building",
+      "lat": 52.6783795,
+      "lon": 0.9390561,
+      "size": 1.5,
+      "dx_m": -72.98,
+      "dy_m": 4.66
+    },
+    {
+      "type": "building",
+      "lat": 52.678242,
+      "lon": 0.9391985,
+      "size": 1.5,
+      "dx_m": -63.38,
+      "dy_m": -10.63
+    },
+    {
+      "type": "building",
+      "lat": 52.6782066,
+      "lon": 0.9393449,
+      "size": 1.5,
+      "dx_m": -53.51,
+      "dy_m": -14.57
+    },
+    {
+      "type": "building",
+      "lat": 52.6778684,
+      "lon": 0.9394426,
+      "size": 1.5,
+      "dx_m": -46.92,
+      "dy_m": -52.17
+    },
+    {
+      "type": "building",
+      "lat": 52.6782403,
+      "lon": 0.9399811,
+      "size": 1.5,
+      "dx_m": -10.62,
+      "dy_m": -10.82
+    },
+    {
+      "type": "building",
+      "lat": 52.6783856,
+      "lon": 0.9400955,
+      "size": 1.5,
+      "dx_m": -2.9,
+      "dy_m": 5.34
+    },
+    {
+      "type": "building",
+      "lat": 52.6779366,
+      "lon": 0.9403842,
+      "size": 1.5,
+      "dx_m": 16.56,
+      "dy_m": -44.59
+    },
+    {
+      "type": "building",
+      "lat": 52.6778404,
+      "lon": 0.9402008,
+      "size": 1.5,
+      "dx_m": 4.2,
+      "dy_m": -55.29
+    },
+    {
+      "type": "building",
+      "lat": 52.6784897,
+      "lon": 0.9410259,
+      "size": 1.5,
+      "dx_m": 59.82,
+      "dy_m": 16.91
+    },
+    {
+      "type": "building",
+      "lat": 52.6785866,
+      "lon": 0.9403053,
+      "size": 1.5,
+      "dx_m": 11.24,
+      "dy_m": 27.69
+    },
+    {
+      "type": "building",
+      "lat": 52.6784337,
+      "lon": 0.9408529,
+      "size": 1.5,
+      "dx_m": 48.16,
+      "dy_m": 10.69
+    },
+    {
+      "type": "building",
+      "lat": 52.6781679,
+      "lon": 0.9406211,
+      "size": 1.5,
+      "dx_m": 32.53,
+      "dy_m": -18.87
+    },
+    {
+      "type": "building",
+      "lat": 52.6781915,
+      "lon": 0.9407197,
+      "size": 1.5,
+      "dx_m": 39.18,
+      "dy_m": -16.25
+    },
+    {
+      "type": "building",
+      "lat": 52.678461,
+      "lon": 0.9398899,
+      "size": 1.5,
+      "dx_m": -16.76,
+      "dy_m": 13.72
+    },
+    {
+      "type": "building",
+      "lat": 52.6785381,
+      "lon": 0.9395775,
+      "size": 1.5,
+      "dx_m": -37.82,
+      "dy_m": 22.29
+    },
+    {
+      "type": "building",
+      "lat": 52.6788026,
+      "lon": 0.9397418,
+      "size": 1.5,
+      "dx_m": -26.75,
+      "dy_m": 51.71
+    },
+    {
+      "type": "building",
+      "lat": 52.6781917,
+      "lon": 0.9412636,
+      "size": 1.5,
+      "dx_m": 75.85,
+      "dy_m": -16.22
+    },
+    {
+      "type": "building",
+      "lat": 52.6780572,
+      "lon": 0.9411709,
+      "size": 1.5,
+      "dx_m": 69.6,
+      "dy_m": -31.18
+    },
+    {
+      "type": "building",
+      "lat": 52.6782777,
+      "lon": 0.941098,
+      "size": 1.5,
+      "dx_m": 64.68,
+      "dy_m": -6.66
+    },
+    {
+      "type": "building",
+      "lat": 52.6782639,
+      "lon": 0.9412175,
+      "size": 1.5,
+      "dx_m": 72.74,
+      "dy_m": -8.19
+    },
+    {
+      "type": "building",
+      "lat": 52.6781356,
+      "lon": 0.9408095,
+      "size": 1.5,
+      "dx_m": 45.23,
+      "dy_m": -22.46
+    },
+    {
+      "type": "building",
+      "lat": 52.6780047,
+      "lon": 0.9406925,
+      "size": 1.5,
+      "dx_m": 37.34,
+      "dy_m": -37.02
+    },
+    {
+      "type": "building",
+      "lat": 52.6787103,
+      "lon": 0.9409104,
+      "size": 1.5,
+      "dx_m": 52.03,
+      "dy_m": 41.44
+    },
+    {
+      "type": "building",
+      "lat": 52.6787954,
+      "lon": 0.9408507,
+      "size": 1.5,
+      "dx_m": 48.01,
+      "dy_m": 50.91
+    },
+    {
+      "type": "building",
+      "lat": 52.6788433,
+      "lon": 0.9409246,
+      "size": 1.5,
+      "dx_m": 52.99,
+      "dy_m": 56.23
+    }
+  ],
+  "breadcrumbs": [
+    {
+      "date": "2026-05-30",
+      "manifest_id": "combined_dereham_grid_nodes",
+      "entry": "3 COURTENAY CLOSE",
+      "exit": "3 COURTENAY CLOSE",
+      "next_postcode": "NR19 1BF"
+    },
+    {
+      "date": "2026-05-30",
+      "manifest_id": "combined_dereham_grid_nodes",
+      "entry": "3 COURTENAY CLOSE",
+      "exit": "3 COURTENAY CLOSE",
+      "next_postcode": "NR19 1BF"
+    }
+  ],
+  "coords": [
+    52.67833759712172,
+    0.9401385638795962
+  ]
+}

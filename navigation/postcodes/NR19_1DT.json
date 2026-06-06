@@ -1,0 +1,27 @@
+{
+  "postcode": "NR19 1DT",
+  "streets": [
+    "drusilla way"
+  ],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "known_addresses": [
+    {
+      "grid_id": "24",
+      "building_street": "9 Drusilla Way"
+    }
+  ],
+  "landmarks": [],
+  "breadcrumbs": [],
+  "coords": [
+    52.65911626881323,
+    0.9905663850521397
+  ]
+}

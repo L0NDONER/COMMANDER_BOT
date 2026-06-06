@@ -1,0 +1,633 @@
+{
+  "postcode": "NR19 2SU",
+  "streets": [
+    "windsor park"
+  ],
+  "preferred_entry": "1 WINDSOR PARK",
+  "preferred_exit": "2 WINDSOR PARK",
+  "dominant_throat": "1 WINDSOR PARK",
+  "internal_order": [
+    "1 WINDSOR PARK",
+    "31 WINDSOR PARK (turning point)",
+    "39 WINDSOR PARK (reverse-out)",
+    "34 WINDSOR PARK (reverse-out)",
+    "2 WINDSOR PARK"
+  ],
+  "turning_point": "31 WINDSOR PARK",
+  "reverse_required": ["39 WINDSOR PARK", "34 WINDSOR PARK"],
+  "no_uturn": true,
+  "delivery_side": "left",
+  "estate_direction": "follow left-hand side ascending",
+  "typical_density": 3.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 1TR",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    3
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 3,
+      "stops": 3
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6931436,
+      "lon": 0.9395787,
+      "size": 1.0,
+      "dx_m": -20.14,
+      "dy_m": -27.29
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6934036,
+      "lon": 0.9392456,
+      "size": 1.0,
+      "dx_m": -42.59,
+      "dy_m": 1.62
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6931764,
+      "lon": 0.9396411,
+      "size": 1.0,
+      "dx_m": -15.93,
+      "dy_m": -23.64
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6930514,
+      "lon": 0.9397079,
+      "size": 1.0,
+      "dx_m": -11.43,
+      "dy_m": -37.54
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6929779,
+      "lon": 0.9397471,
+      "size": 1.0,
+      "dx_m": -8.79,
+      "dy_m": -45.71
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6929214,
+      "lon": 0.9397937,
+      "size": 1.0,
+      "dx_m": -5.65,
+      "dy_m": -51.99
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6928603,
+      "lon": 0.9398553,
+      "size": 1.0,
+      "dx_m": -1.5,
+      "dy_m": -58.79
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.692806,
+      "lon": 0.9399616,
+      "size": 1.0,
+      "dx_m": 5.67,
+      "dy_m": -64.83
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6927902,
+      "lon": 0.9400531,
+      "size": 1.0,
+      "dx_m": 11.83,
+      "dy_m": -66.58
+    },
+    {
+      "type": "narrow_mouth",
+      "lat": 52.6928706,
+      "lon": 0.9392976,
+      "size": 1.0,
+      "dx_m": -39.08,
+      "dy_m": -57.64
+    },
+    {
+      "type": "building",
+      "lat": 52.6938778,
+      "lon": 0.9392492,
+      "size": 1.5,
+      "dx_m": -42.34,
+      "dy_m": 54.35
+    },
+    {
+      "type": "building",
+      "lat": 52.6933499,
+      "lon": 0.9395281,
+      "size": 1.5,
+      "dx_m": -23.55,
+      "dy_m": -4.35
+    },
+    {
+      "type": "building",
+      "lat": 52.693299,
+      "lon": 0.9397492,
+      "size": 1.5,
+      "dx_m": -8.65,
+      "dy_m": -10.01
+    },
+    {
+      "type": "building",
+      "lat": 52.6929994,
+      "lon": 0.9390184,
+      "size": 1.5,
+      "dx_m": -57.9,
+      "dy_m": -43.32
+    },
+    {
+      "type": "building",
+      "lat": 52.6935534,
+      "lon": 0.9393336,
+      "size": 1.5,
+      "dx_m": -36.66,
+      "dy_m": 18.28
+    },
+    {
+      "type": "building",
+      "lat": 52.6935262,
+      "lon": 0.939494,
+      "size": 1.5,
+      "dx_m": -25.85,
+      "dy_m": 15.26
+    },
+    {
+      "type": "building",
+      "lat": 52.6939694,
+      "lon": 0.9397286,
+      "size": 1.5,
+      "dx_m": -10.03,
+      "dy_m": 64.54
+    },
+    {
+      "type": "building",
+      "lat": 52.6934109,
+      "lon": 0.9396233,
+      "size": 1.5,
+      "dx_m": -17.13,
+      "dy_m": 2.44
+    },
+    {
+      "type": "building",
+      "lat": 52.6934607,
+      "lon": 0.9394024,
+      "size": 1.5,
+      "dx_m": -32.02,
+      "dy_m": 7.97
+    },
+    {
+      "type": "building",
+      "lat": 52.6932419,
+      "lon": 0.939372,
+      "size": 1.5,
+      "dx_m": -34.07,
+      "dy_m": -16.36
+    },
+    {
+      "type": "building",
+      "lat": 52.693112,
+      "lon": 0.9392741,
+      "size": 1.5,
+      "dx_m": -40.67,
+      "dy_m": -30.8
+    },
+    {
+      "type": "building",
+      "lat": 52.693454,
+      "lon": 0.9391916,
+      "size": 1.5,
+      "dx_m": -46.22,
+      "dy_m": 7.23
+    },
+    {
+      "type": "building",
+      "lat": 52.6935186,
+      "lon": 0.9392255,
+      "size": 1.5,
+      "dx_m": -43.94,
+      "dy_m": 14.41
+    },
+    {
+      "type": "building",
+      "lat": 52.6933317,
+      "lon": 0.9390628,
+      "size": 1.5,
+      "dx_m": -54.91,
+      "dy_m": -6.37
+    },
+    {
+      "type": "building",
+      "lat": 52.6934431,
+      "lon": 0.9391315,
+      "size": 1.5,
+      "dx_m": -50.28,
+      "dy_m": 6.02
+    },
+    {
+      "type": "building",
+      "lat": 52.6933199,
+      "lon": 0.9391275,
+      "size": 1.5,
+      "dx_m": -50.54,
+      "dy_m": -7.68
+    },
+    {
+      "type": "building",
+      "lat": 52.6930781,
+      "lon": 0.939026,
+      "size": 1.5,
+      "dx_m": -57.39,
+      "dy_m": -34.57
+    },
+    {
+      "type": "building",
+      "lat": 52.69306,
+      "lon": 0.9392471,
+      "size": 1.5,
+      "dx_m": -42.48,
+      "dy_m": -36.58
+    },
+    {
+      "type": "building",
+      "lat": 52.6930015,
+      "lon": 0.9391639,
+      "size": 1.5,
+      "dx_m": -48.09,
+      "dy_m": -43.09
+    },
+    {
+      "type": "building",
+      "lat": 52.6931607,
+      "lon": 0.9387751,
+      "size": 1.5,
+      "dx_m": -74.29,
+      "dy_m": -25.39
+    },
+    {
+      "type": "building",
+      "lat": 52.6937608,
+      "lon": 0.9390339,
+      "size": 1.5,
+      "dx_m": -56.85,
+      "dy_m": 41.34
+    },
+    {
+      "type": "building",
+      "lat": 52.69388,
+      "lon": 0.9391741,
+      "size": 1.5,
+      "dx_m": -47.4,
+      "dy_m": 54.6
+    },
+    {
+      "type": "building",
+      "lat": 52.6938214,
+      "lon": 0.9390541,
+      "size": 1.5,
+      "dx_m": -55.49,
+      "dy_m": 48.08
+    },
+    {
+      "type": "building",
+      "lat": 52.6937193,
+      "lon": 0.9399669,
+      "size": 1.5,
+      "dx_m": 6.02,
+      "dy_m": 36.73
+    },
+    {
+      "type": "building",
+      "lat": 52.6936576,
+      "lon": 0.9401432,
+      "size": 1.5,
+      "dx_m": 17.91,
+      "dy_m": 29.87
+    },
+    {
+      "type": "building",
+      "lat": 52.6939136,
+      "lon": 0.9403309,
+      "size": 1.5,
+      "dx_m": 30.56,
+      "dy_m": 58.33
+    },
+    {
+      "type": "building",
+      "lat": 52.693787,
+      "lon": 0.9403313,
+      "size": 1.5,
+      "dx_m": 30.58,
+      "dy_m": 44.26
+    },
+    {
+      "type": "building",
+      "lat": 52.6936371,
+      "lon": 0.9407386,
+      "size": 1.5,
+      "dx_m": 58.03,
+      "dy_m": 27.59
+    },
+    {
+      "type": "building",
+      "lat": 52.6936169,
+      "lon": 0.9408474,
+      "size": 1.5,
+      "dx_m": 65.36,
+      "dy_m": 25.34
+    },
+    {
+      "type": "building",
+      "lat": 52.6936118,
+      "lon": 0.940144,
+      "size": 1.5,
+      "dx_m": 17.96,
+      "dy_m": 24.77
+    },
+    {
+      "type": "building",
+      "lat": 52.693549,
+      "lon": 0.9401119,
+      "size": 1.5,
+      "dx_m": 15.8,
+      "dy_m": 17.79
+    },
+    {
+      "type": "building",
+      "lat": 52.6929465,
+      "lon": 0.9407614,
+      "size": 1.5,
+      "dx_m": 59.57,
+      "dy_m": -49.2
+    },
+    {
+      "type": "building",
+      "lat": 52.693037,
+      "lon": 0.9401637,
+      "size": 1.5,
+      "dx_m": 19.29,
+      "dy_m": -39.14
+    },
+    {
+      "type": "building",
+      "lat": 52.6931015,
+      "lon": 0.9405988,
+      "size": 1.5,
+      "dx_m": 48.61,
+      "dy_m": -31.97
+    },
+    {
+      "type": "building",
+      "lat": 52.6930017,
+      "lon": 0.9398428,
+      "size": 1.5,
+      "dx_m": -2.34,
+      "dy_m": -43.07
+    },
+    {
+      "type": "building",
+      "lat": 52.6929372,
+      "lon": 0.940051,
+      "size": 1.5,
+      "dx_m": 11.69,
+      "dy_m": -50.24
+    },
+    {
+      "type": "building",
+      "lat": 52.6927079,
+      "lon": 0.9400776,
+      "size": 1.5,
+      "dx_m": 13.49,
+      "dy_m": -75.73
+    },
+    {
+      "type": "building",
+      "lat": 52.6928495,
+      "lon": 0.9402253,
+      "size": 1.5,
+      "dx_m": 23.44,
+      "dy_m": -59.99
+    },
+    {
+      "type": "building",
+      "lat": 52.6936319,
+      "lon": 0.9409943,
+      "size": 1.5,
+      "dx_m": 75.26,
+      "dy_m": 27.01
+    },
+    {
+      "type": "building",
+      "lat": 52.6934118,
+      "lon": 0.9400706,
+      "size": 1.5,
+      "dx_m": 13.01,
+      "dy_m": 2.54
+    },
+    {
+      "type": "building",
+      "lat": 52.6934004,
+      "lon": 0.9398514,
+      "size": 1.5,
+      "dx_m": -1.76,
+      "dy_m": 1.27
+    },
+    {
+      "type": "building",
+      "lat": 52.6935471,
+      "lon": 0.9408375,
+      "size": 1.5,
+      "dx_m": 64.7,
+      "dy_m": 17.58
+    },
+    {
+      "type": "building",
+      "lat": 52.6932686,
+      "lon": 0.940521,
+      "size": 1.5,
+      "dx_m": 43.37,
+      "dy_m": -13.39
+    },
+    {
+      "type": "building",
+      "lat": 52.6932036,
+      "lon": 0.9404935,
+      "size": 1.5,
+      "dx_m": 41.51,
+      "dy_m": -20.61
+    },
+    {
+      "type": "building",
+      "lat": 52.6931172,
+      "lon": 0.9400711,
+      "size": 1.5,
+      "dx_m": 13.05,
+      "dy_m": -30.22
+    },
+    {
+      "type": "building",
+      "lat": 52.6930526,
+      "lon": 0.9400385,
+      "size": 1.5,
+      "dx_m": 10.85,
+      "dy_m": -37.41
+    },
+    {
+      "type": "building",
+      "lat": 52.6937661,
+      "lon": 0.9403083,
+      "size": 1.5,
+      "dx_m": 29.03,
+      "dy_m": 41.93
+    },
+    {
+      "type": "building",
+      "lat": 52.6937873,
+      "lon": 0.9400858,
+      "size": 1.5,
+      "dx_m": 14.04,
+      "dy_m": 44.29
+    },
+    {
+      "type": "building",
+      "lat": 52.6938747,
+      "lon": 0.9404572,
+      "size": 1.5,
+      "dx_m": 39.07,
+      "dy_m": 54.01
+    },
+    {
+      "type": "building",
+      "lat": 52.6937405,
+      "lon": 0.9404709,
+      "size": 1.5,
+      "dx_m": 39.99,
+      "dy_m": 39.09
+    },
+    {
+      "type": "building",
+      "lat": 52.6938455,
+      "lon": 0.9405719,
+      "size": 1.5,
+      "dx_m": 46.8,
+      "dy_m": 50.76
+    },
+    {
+      "type": "building",
+      "lat": 52.6932463,
+      "lon": 0.9399816,
+      "size": 1.5,
+      "dx_m": 7.02,
+      "dy_m": -15.87
+    },
+    {
+      "type": "building",
+      "lat": 52.693112,
+      "lon": 0.9399667,
+      "size": 1.5,
+      "dx_m": 6.01,
+      "dy_m": -30.8
+    },
+    {
+      "type": "building",
+      "lat": 52.6928553,
+      "lon": 0.9406301,
+      "size": 1.5,
+      "dx_m": 50.72,
+      "dy_m": -59.34
+    },
+    {
+      "type": "building",
+      "lat": 52.6931447,
+      "lon": 0.9407955,
+      "size": 1.5,
+      "dx_m": 61.87,
+      "dy_m": -27.16
+    },
+    {
+      "type": "building",
+      "lat": 52.6931609,
+      "lon": 0.9405775,
+      "size": 1.5,
+      "dx_m": 47.18,
+      "dy_m": -25.36
+    },
+    {
+      "type": "building",
+      "lat": 52.6934383,
+      "lon": 0.9408044,
+      "size": 1.5,
+      "dx_m": 62.47,
+      "dy_m": 5.48
+    },
+    {
+      "type": "building",
+      "lat": 52.6934018,
+      "lon": 0.9407848,
+      "size": 1.5,
+      "dx_m": 61.15,
+      "dy_m": 1.42
+    },
+    {
+      "type": "building",
+      "lat": 52.6932503,
+      "lon": 0.9407718,
+      "size": 1.5,
+      "dx_m": 60.27,
+      "dy_m": -15.42
+    },
+    {
+      "type": "building",
+      "lat": 52.6935906,
+      "lon": 0.9406316,
+      "size": 1.5,
+      "dx_m": 50.82,
+      "dy_m": 22.42
+    },
+    {
+      "type": "building",
+      "lat": 52.6936318,
+      "lon": 0.9406622,
+      "size": 1.5,
+      "dx_m": 52.88,
+      "dy_m": 27.0
+    },
+    {
+      "type": "building",
+      "lat": 52.6934817,
+      "lon": 0.9405991,
+      "size": 1.5,
+      "dx_m": 48.63,
+      "dy_m": 10.31
+    }
+  ],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "32 WINDSOR PARK",
+      "exit": "5 WINDSOR PARK",
+      "next_postcode": "NR19 1TR"
+    }
+  ],
+  "coords": [
+    52.693388993181934,
+    0.9398775011631754
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "Beeston",
+  "postcodes": [
+    "NR20 4BA",
+    "NR19 2QA"
+  ],
+  "visit_count": 0,
+  "last_seen": null,
+  "preferred_entry_postcode": null,
+  "preferred_exit_postcode": null,
+  "observed_neighbours": [
+    {
+      "area": "Gressenhall",
+      "count": 5
+    }
+  ],
+  "breadcrumbs": []
+}

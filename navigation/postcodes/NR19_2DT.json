@@ -1,0 +1,309 @@
+{
+  "postcode": "NR19 2DT",
+  "streets": [
+    "sheddick court"
+  ],
+  "preferred_entry": "14 SHEDDICK COURT",
+  "preferred_exit": "14 SHEDDICK COURT",
+  "estate_direction": null,
+  "typical_density": 1.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 2HF",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    1
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 1,
+      "stops": 1
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [
+    {
+      "type": "building",
+      "lat": 52.6855062,
+      "lon": 0.9379961,
+      "size": 1.5,
+      "dx_m": 38.49,
+      "dy_m": -26.33
+    },
+    {
+      "type": "building",
+      "lat": 52.6854563,
+      "lon": 0.9373017,
+      "size": 1.5,
+      "dx_m": -8.31,
+      "dy_m": -31.88
+    },
+    {
+      "type": "building",
+      "lat": 52.6854241,
+      "lon": 0.9375401,
+      "size": 1.5,
+      "dx_m": 7.76,
+      "dy_m": -35.46
+    },
+    {
+      "type": "building",
+      "lat": 52.6854654,
+      "lon": 0.9375723,
+      "size": 1.5,
+      "dx_m": 9.93,
+      "dy_m": -30.87
+    },
+    {
+      "type": "building",
+      "lat": 52.6857606,
+      "lon": 0.9377558,
+      "size": 1.5,
+      "dx_m": 22.3,
+      "dy_m": 1.95
+    },
+    {
+      "type": "building",
+      "lat": 52.6858002,
+      "lon": 0.9375185,
+      "size": 1.5,
+      "dx_m": 6.3,
+      "dy_m": 6.36
+    },
+    {
+      "type": "building",
+      "lat": 52.6857122,
+      "lon": 0.9373419,
+      "size": 1.5,
+      "dx_m": -5.6,
+      "dy_m": -3.43
+    },
+    {
+      "type": "building",
+      "lat": 52.685576,
+      "lon": 0.9370265,
+      "size": 1.5,
+      "dx_m": -26.86,
+      "dy_m": -18.57
+    },
+    {
+      "type": "building",
+      "lat": 52.6856979,
+      "lon": 0.9371147,
+      "size": 1.5,
+      "dx_m": -20.92,
+      "dy_m": -5.02
+    },
+    {
+      "type": "building",
+      "lat": 52.6856469,
+      "lon": 0.9372273,
+      "size": 1.5,
+      "dx_m": -13.33,
+      "dy_m": -10.69
+    },
+    {
+      "type": "building",
+      "lat": 52.6857387,
+      "lon": 0.9373524,
+      "size": 1.5,
+      "dx_m": -4.9,
+      "dy_m": -0.48
+    },
+    {
+      "type": "building",
+      "lat": 52.6859104,
+      "lon": 0.9378599,
+      "size": 1.5,
+      "dx_m": 29.31,
+      "dy_m": 18.61
+    },
+    {
+      "type": "building",
+      "lat": 52.6860166,
+      "lon": 0.9382944,
+      "size": 1.5,
+      "dx_m": 58.6,
+      "dy_m": 30.42
+    },
+    {
+      "type": "building",
+      "lat": 52.6859011,
+      "lon": 0.9381608,
+      "size": 1.5,
+      "dx_m": 49.59,
+      "dy_m": 17.58
+    },
+    {
+      "type": "building",
+      "lat": 52.6860356,
+      "lon": 0.9368692,
+      "size": 1.5,
+      "dx_m": -37.47,
+      "dy_m": 32.53
+    },
+    {
+      "type": "building",
+      "lat": 52.686131,
+      "lon": 0.9379533,
+      "size": 1.5,
+      "dx_m": 35.61,
+      "dy_m": 43.14
+    },
+    {
+      "type": "building",
+      "lat": 52.6859415,
+      "lon": 0.9385412,
+      "size": 1.5,
+      "dx_m": 75.24,
+      "dy_m": 22.07
+    },
+    {
+      "type": "building",
+      "lat": 52.6858157,
+      "lon": 0.9382363,
+      "size": 1.5,
+      "dx_m": 54.68,
+      "dy_m": 8.08
+    },
+    {
+      "type": "building",
+      "lat": 52.685402,
+      "lon": 0.9372982,
+      "size": 1.5,
+      "dx_m": -8.55,
+      "dy_m": -37.92
+    },
+    {
+      "type": "building",
+      "lat": 52.6853884,
+      "lon": 0.9368752,
+      "size": 1.5,
+      "dx_m": -37.06,
+      "dy_m": -39.43
+    },
+    {
+      "type": "building",
+      "lat": 52.6859401,
+      "lon": 0.9368418,
+      "size": 1.5,
+      "dx_m": -39.31,
+      "dy_m": 21.91
+    },
+    {
+      "type": "building",
+      "lat": 52.6856865,
+      "lon": 0.9368008,
+      "size": 1.5,
+      "dx_m": -42.08,
+      "dy_m": -6.29
+    },
+    {
+      "type": "building",
+      "lat": 52.6851973,
+      "lon": 0.937936,
+      "size": 1.5,
+      "dx_m": 34.44,
+      "dy_m": -60.68
+    },
+    {
+      "type": "building",
+      "lat": 52.6853283,
+      "lon": 0.9381857,
+      "size": 1.5,
+      "dx_m": 51.27,
+      "dy_m": -46.12
+    },
+    {
+      "type": "building",
+      "lat": 52.686162,
+      "lon": 0.9379738,
+      "size": 1.5,
+      "dx_m": 36.99,
+      "dy_m": 46.59
+    },
+    {
+      "type": "building",
+      "lat": 52.6860729,
+      "lon": 0.9383056,
+      "size": 1.5,
+      "dx_m": 59.35,
+      "dy_m": 36.68
+    },
+    {
+      "type": "building",
+      "lat": 52.6861351,
+      "lon": 0.9381885,
+      "size": 1.5,
+      "dx_m": 51.46,
+      "dy_m": 43.6
+    },
+    {
+      "type": "building",
+      "lat": 52.6854064,
+      "lon": 0.9383769,
+      "size": 1.5,
+      "dx_m": 64.16,
+      "dy_m": -37.43
+    },
+    {
+      "type": "building",
+      "lat": 52.6851282,
+      "lon": 0.9376503,
+      "size": 1.5,
+      "dx_m": 15.18,
+      "dy_m": -68.37
+    },
+    {
+      "type": "building",
+      "lat": 52.6850693,
+      "lon": 0.937112,
+      "size": 1.5,
+      "dx_m": -21.1,
+      "dy_m": -74.92
+    },
+    {
+      "type": "building",
+      "lat": 52.6852444,
+      "lon": 0.9378807,
+      "size": 1.5,
+      "dx_m": 30.71,
+      "dy_m": -55.44
+    },
+    {
+      "type": "building",
+      "lat": 52.685097,
+      "lon": 0.937881,
+      "size": 1.5,
+      "dx_m": 30.73,
+      "dy_m": -71.83
+    },
+    {
+      "type": "building",
+      "lat": 52.6851228,
+      "lon": 0.936918,
+      "size": 1.5,
+      "dx_m": -34.18,
+      "dy_m": -68.97
+    }
+  ],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "14 SHEDDICK COURT",
+      "exit": "14 SHEDDICK COURT",
+      "next_postcode": "NR19 2HF"
+    }
+  ],
+  "coords": [
+    52.68574302727827,
+    0.9374250328380485
+  ]
+}

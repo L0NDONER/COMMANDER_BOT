@@ -1,0 +1,45 @@
+{
+  "postcode": "NR19 1BX",
+  "streets": [
+    "jayne vertigan",
+    "quote four ltd"
+  ],
+  "preferred_entry": "JAYNE VERTIGAN",
+  "preferred_exit": "QUOTE FOUR LTD",
+  "estate_direction": null,
+  "typical_density": 2.0,
+  "visit_count": 1,
+  "last_seen": "2023-12-27",
+  "observed_neighbours": [
+    {
+      "postcode": "NR19 2AP",
+      "count": 1
+    }
+  ],
+  "density_samples": [
+    2
+  ],
+  "history": [
+    {
+      "manifest": "0289286389121",
+      "date": "2023-12-27",
+      "parcels": 2,
+      "stops": 2
+    }
+  ],
+  "known_addresses": [],
+  "landmarks": [],
+  "breadcrumbs": [
+    {
+      "date": "2023-12-27",
+      "manifest_id": "0289286389121",
+      "entry": "JAYNE VERTIGAN",
+      "exit": "QUOTE FOUR LTD",
+      "next_postcode": "NR19 2AP"
+    }
+  ],
+  "coords": [
+    52.68020986784478,
+    0.9426022220693939
+  ]
+}
