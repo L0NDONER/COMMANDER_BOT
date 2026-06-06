@@ -145,7 +145,11 @@ def main():
             print(f"│  visits={pd.get('visit_count',0)}  last_seen={pd.get('last_seen','—')}  density={pd.get('typical_density','—')}")
             print(f"│  entry={pref_in}  exit={pref_out}")
             if pd.get('dominant_throat'):
-                print(f"│  throat={pd['dominant_throat']}  side={pd.get('delivery_side','—')}")
+                no_u = '  ⚠ NO-UTURN' if pd.get('no_uturn') else ''
+                print(f"│  throat={pd['dominant_throat']}  side={pd.get('delivery_side','—')}{no_u}")
+            if pd.get('turning_point'):
+                rev = ', '.join(pd.get('reverse_required') or [])
+                print(f"│  turning_point={pd['turning_point']}  reverse=[{rev}]")
             if pd.get('internal_order'):
                 print(f"│  order={' → '.join(pd['internal_order'])}")
             rr = pd.get('raynham_ride') or {}
