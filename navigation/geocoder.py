@@ -31,9 +31,14 @@ _UNIT_TOKENS = frozenset([
 # Level 0 — postcode centroid
 # ---------------------------------------------------------------------------
 
+def _normalise_pc(postcode: str) -> str:
+    s = postcode.replace(" ", "").upper()
+    return f"{s[:-3]} {s[-3:]}" if len(s) >= 5 else s
+
+
 def geocode_postcode(postcode: str) -> Optional[tuple[float, float]]:
     """Return (lat, lon) centroid for postcode, or None if not found."""
-    fn = POSTCODES_DIR / f"{postcode.replace(' ', '_')}.json"
+    fn = POSTCODES_DIR / f"{_normalise_pc(postcode).replace(' ', '_')}.json"
     if not fn.exists():
         return None
     import json

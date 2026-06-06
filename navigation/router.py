@@ -24,7 +24,7 @@ _HERE = Path(__file__).parent
 sys.path.insert(0, str(_HERE))
 
 from courier_gps import Vec2, _latlon_to_xy
-from geocoder import geocode_address
+from geocoder import _normalise_pc, geocode_address
 from route_optimiser import Stop, _dist, optimise_route
 
 POSTCODES: dict = {}
@@ -161,6 +161,11 @@ class ScanRequest(BaseModel):
 
 @router.post("/api/navigation/optimise")
 async def optimise(req: OptimiseRequest):
+    for p in req.parcels:
+        p.pc = _normalise_pc(p.pc)
+    req.start_pc  = _normalise_pc(req.start_pc)
+    if req.finish_pc:
+        req.finish_pc = _normalise_pc(req.finish_pc)
     all_pc = sorted(set(p.pc for p in req.parcels if p.pc in POSTCODES))
     if req.start_pc in POSTCODES and req.start_pc not in all_pc:
         all_pc.append(req.start_pc)
