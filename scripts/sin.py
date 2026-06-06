@@ -7,7 +7,10 @@ States: PLATEAU <55 | RECOVERY 55-70 | PANIC >70
 """
 import time
 
-HYSTERESIS = 3  # samples required to confirm a state transition
+# Asymmetric hysteresis: escalation is fast, de-escalation is slow
+HYSTERESIS_UP   = 2  # samples to confirm worsening state (↑ trend)
+HYSTERESIS_DOWN = 5  # samples to confirm improving state (↓ trend)
+HYSTERESIS_FLAT = 3  # samples when trend is neutral
 
 # Minimum seconds between outbound frames per state (0 = no limit)
 MPI = {
@@ -64,9 +67,21 @@ def run():
             continue
 
         fusion = (c + e + b) / 3
-        candidate = classify(fusion)
+        history.append(fusion)
 
-        # hysteresis: only transition after HYSTERESIS consecutive matching samples
+        delta = history[-1] - history[-3] if len(history) >= 3 else 0
+        trend = " ↑" if delta > 2 else " ↓" if delta < -2 else " →"
+
+        candidate = classify(fusion)
+        states_ordered = ["PLATEAU", "RECOVERY", "PANIC"]
+        escalating = states_ordered.index(candidate) > states_ordered.index(state)
+        if trend == " ↑":
+            threshold = HYSTERESIS_UP
+        elif trend == " ↓":
+            threshold = HYSTERESIS_DOWN
+        else:
+            threshold = HYSTERESIS_FLAT
+
         if candidate != state:
             if candidate == pending:
                 pending_count += 1
@@ -74,19 +89,13 @@ def run():
                 pending = candidate
                 pending_count = 1
 
-            if pending_count >= HYSTERESIS:
+            if pending_count >= threshold:
                 state = candidate
                 pending = None
                 pending_count = 0
         else:
             pending = None
             pending_count = 0
-
-        history.append(fusion)
-        trend = ""
-        if len(history) >= 3:
-            delta = history[-1] - history[-3]
-            trend = " ↑" if delta > 2 else " ↓" if delta < -2 else " →"
 
         now = time.time()
         mpi = MPI[state]
@@ -97,7 +106,7 @@ def run():
             print(f"  fusion={fusion:.1f}{trend}  [{state}]  {ENVELOPES[state]}")
             last_emit = now
         if pending:
-            print(f"  (transitioning → {pending}, {pending_count}/{HYSTERESIS})")
+            print(f"  (transitioning → {pending}, {pending_count}/{threshold})")
 
 if __name__ == "__main__":
     run()
