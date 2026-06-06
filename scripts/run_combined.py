@@ -68,6 +68,11 @@ def print_pc_header(pd, cur_pc):
     print(f"\n┌─ {cur_pc}  {streets}")
     print(f"│  visits={pd.get('visit_count',0)}  last_seen={pd.get('last_seen','—')}  density={pd.get('typical_density','—')}")
     print(f"│  entry={pref_in}  exit={pref_out}")
+    if pd.get('pattern'):
+        print(f"│  pattern={pd['pattern']}  side={pd.get('delivery_side','—')}")
+        if pd.get('segment_a'): print(f"│    A: {pd['segment_a']}")
+        if pd.get('segment_b'): print(f"│    B: {pd['segment_b']}")
+        if pd.get('segment_c'): print(f"│    C: {pd['segment_c']}")
     if pd.get('dominant_throat') or pd.get('functional_throat'):
         throat_label = pd.get('dominant_throat') or pd.get('functional_throat')
         throat_type  = 'functional_throat' if pd.get('functional_throat') and not pd.get('dominant_throat') else 'throat'

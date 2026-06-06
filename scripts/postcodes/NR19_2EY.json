@@ -3,9 +3,15 @@
   "streets": [
     "highfield road"
   ],
-  "preferred_entry": "4 HIGHFIELD ROAD",
-  "preferred_exit": "4 HIGHFIELD ROAD",
-  "estate_direction": null,
+  "preferred_entry": "4 Highfield Road",
+  "preferred_exit": "Highfield Road north end",
+  "pattern": "A-B-C",
+  "segment_a": "Highfield Road ascending (low → intercept)",
+  "segment_b": "Oakwood Close detour (NR19 2ST)",
+  "segment_c": "Highfield Road continuation (intercept → high)",
+  "intercept_cluster": "NR19 2ST",
+  "delivery_side": "left",
+  "estate_direction": "ascending left-hand, detour at Oakwood Close, continue ascending",
   "typical_density": 1.0,
   "visit_count": 1,
   "last_seen": "2023-12-27",

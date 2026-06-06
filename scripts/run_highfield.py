@@ -145,6 +145,11 @@ def main():
             print(f"\n┌─ {cur_pc}  {streets}")
             print(f"│  visits={pd.get('visit_count',0)}  last_seen={pd.get('last_seen','—')}  density={pd.get('typical_density','—')}")
             print(f"│  entry={pref_in}  exit={pref_out}")
+            if pd.get('pattern'):
+                print(f"│  pattern={pd['pattern']}  side={pd.get('delivery_side','—')}")
+                if pd.get('segment_a'): print(f"│    A: {pd['segment_a']}")
+                if pd.get('segment_b'): print(f"│    B: {pd['segment_b']}")
+                if pd.get('segment_c'): print(f"│    C: {pd['segment_c']}")
             if pd.get('dominant_throat'):
                 no_u = '  ⚠ NO-UTURN' if pd.get('no_uturn') else ''
                 print(f"│  throat={pd['dominant_throat']}  side={pd.get('delivery_side','—')}{no_u}")
