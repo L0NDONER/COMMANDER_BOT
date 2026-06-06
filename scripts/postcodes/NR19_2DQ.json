@@ -1,0 +1,93 @@
+{
+  "streets": [],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "known_addresses": [],
+  "landmarks": [
+    {
+      "type": "kerb_node",
+      "lat": 52.6953169,
+      "lon": 0.9515145,
+      "size": 0.4,
+      "dx_m": 18.03,
+      "dy_m": -46.94
+    },
+    {
+      "type": "kerb_node",
+      "lat": 52.6951747,
+      "lon": 0.9512289,
+      "size": 0.4,
+      "dx_m": -1.22,
+      "dy_m": -62.75
+    },
+    {
+      "type": "kerb_node",
+      "lat": 52.6950427,
+      "lon": 0.9510341,
+      "size": 0.4,
+      "dx_m": -14.35,
+      "dy_m": -77.43
+    },
+    {
+      "type": "building",
+      "lat": 52.6956054,
+      "lon": 0.9511212,
+      "size": 1.5,
+      "dx_m": -8.48,
+      "dy_m": -14.86
+    },
+    {
+      "type": "building",
+      "lat": 52.6955352,
+      "lon": 0.9513003,
+      "size": 1.5,
+      "dx_m": 3.59,
+      "dy_m": -22.66
+    },
+    {
+      "type": "building",
+      "lat": 52.695473,
+      "lon": 0.95118,
+      "size": 1.5,
+      "dx_m": -4.52,
+      "dy_m": -29.58
+    },
+    {
+      "type": "building",
+      "lat": 52.6953989,
+      "lon": 0.9513611,
+      "size": 1.5,
+      "dx_m": 7.69,
+      "dy_m": -37.82
+    },
+    {
+      "type": "building",
+      "lat": 52.6958133,
+      "lon": 0.9512084,
+      "size": 1.5,
+      "dx_m": -2.6,
+      "dy_m": 8.26
+    },
+    {
+      "type": "building",
+      "lat": 52.6956363,
+      "lon": 0.9511205,
+      "size": 1.5,
+      "dx_m": -8.52,
+      "dy_m": -11.42
+    }
+  ],
+  "breadcrumbs": [],
+  "postcode": "NR19 2DQ",
+  "coords": [
+    52.695739,
+    0.951247
+  ]
+}

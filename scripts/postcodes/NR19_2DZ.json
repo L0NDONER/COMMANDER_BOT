@@ -1,0 +1,20 @@
+{
+  "streets": [],
+  "preferred_entry": null,
+  "preferred_exit": null,
+  "estate_direction": null,
+  "typical_density": null,
+  "visit_count": 0,
+  "last_seen": null,
+  "observed_neighbours": [],
+  "density_samples": [],
+  "history": [],
+  "known_addresses": [],
+  "landmarks": [],
+  "breadcrumbs": [],
+  "postcode": "NR19 2DZ",
+  "coords": [
+    52.684358,
+    0.937694
+  ]
+}
