@@ -350,3 +350,113 @@ def speed_variance(ticks: list[GPSTick]) -> float | None:
     mean = sum(speeds) / len(speeds)
     var = sum((s - mean) ** 2 for s in speeds) / len(speeds)
     return math.sqrt(var)
+
+
+# ---------------------------------------------------------------------------
+# Van360 — local-frame obstacle sensing, U-turn and throat geometry
+# ---------------------------------------------------------------------------
+
+@dataclass
+class Vec2:
+    x: float
+    y: float
+
+
+@dataclass
+class Arc:
+    center: Vec2
+    radius: float
+    start_angle: float
+    sweep: float
+
+
+def _latlon_to_xy(ref_lat: float, ref_lon: float,
+                  lat: float, lon: float) -> Vec2:
+    """Equirectangular projection: (lat, lon) → local metres from ref point."""
+    x = math.radians(lon - ref_lon) * math.cos(math.radians(ref_lat)) * 6_371_000.0
+    y = math.radians(lat - ref_lat) * 6_371_000.0
+    return Vec2(x, y)
+
+
+def _vec2_distance(a: Vec2, b: Vec2) -> float:
+    return math.hypot(b.x - a.x, b.y - a.y)
+
+
+def _intersects_arc(point: Vec2, size: float, arc: Arc) -> bool:
+    d = _vec2_distance(point, arc.center)
+    if not (arc.radius - size <= d <= arc.radius + size):
+        return False
+    angle = math.atan2(point.y - arc.center.y, point.x - arc.center.x)
+    delta = (angle - arc.start_angle) % (2 * math.pi)
+    return delta <= arc.sweep
+
+
+@dataclass
+class Van360:
+    position: Vec2
+    heading: float          # radians
+    radius: float = 4.0     # sensing bubble (metres)
+    turn_radius: float = 6.0
+
+    def sense(self, world) -> list:
+        return [obj for obj in world.objects
+                if _vec2_distance(self.position, obj.position) <= self.radius]
+
+    def clearance_arc(self, direction: str,
+                      sweep: float = math.radians(45)) -> Arc:
+        sign = +1 if direction == 'left' else -1
+        cx = self.position.x + sign * self.turn_radius * math.sin(self.heading)
+        cy = self.position.y - sign * self.turn_radius * math.cos(self.heading)
+        start_angle = math.atan2(self.position.y - cy, self.position.x - cx)
+        return Arc(center=Vec2(cx, cy), radius=self.turn_radius,
+                   start_angle=start_angle, sweep=sweep)
+
+    def arc_is_clear(self, arc: Arc, world) -> bool:
+        return not any(_intersects_arc(obj.position, obj.size, arc)
+                       for obj in world.objects)
+
+    def can_turn(self, world, direction: str) -> bool:
+        return self.arc_is_clear(self.clearance_arc(direction), world)
+
+    def can_uturn(self, world) -> str | None:
+        """Returns 'left', 'right', or None if no U-turn is geometrically possible."""
+        for direction in ('left', 'right'):
+            if self.arc_is_clear(
+                    self.clearance_arc(direction, sweep=math.pi), world):
+                return direction
+        return None
+
+    def throat_probe(self, world, steps: int = 6,
+                     step_size: float = 2.0) -> int | None:
+        """
+        Step forward along heading; return the step index where U-turn
+        capability is lost, or None if the van can always turn around.
+        A non-None result means the entry is a throat at depth
+        (result * step_size) metres in.
+        """
+        probe = Van360(
+            position=Vec2(self.position.x, self.position.y),
+            heading=self.heading,
+            radius=self.radius,
+            turn_radius=self.turn_radius,
+        )
+        for i in range(steps):
+            probe.position = Vec2(
+                probe.position.x + step_size * math.cos(probe.heading),
+                probe.position.y + step_size * math.sin(probe.heading),
+            )
+            if probe.can_uturn(world) is None:
+                return i
+        return None
+
+
+def van_from_tick(tick: GPSTick, ref_lat: float, ref_lon: float,
+                  radius: float = 4.0, turn_radius: float = 6.0) -> Van360:
+    """Project a GPSTick into local metres and return a Van360.
+
+    ref_lat/ref_lon is the anchor/mouth point of the close — used as the
+    local coordinate origin so Van360 geometry stays in metres.
+    """
+    pos = _latlon_to_xy(ref_lat, ref_lon, tick.lat, tick.lon)
+    return Van360(position=pos, heading=math.radians(tick.heading_deg),
+                  radius=radius, turn_radius=turn_radius)
