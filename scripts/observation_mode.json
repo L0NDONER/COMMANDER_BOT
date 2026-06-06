@@ -1,0 +1,26 @@
+{
+  "observation_only_mode": {
+    "behavioural_fields": {
+      "entry_throat": "auto",
+      "direction": "auto",
+      "terminal": "auto",
+      "run_vector": "auto"
+    },
+    "structural_fields": {
+      "bubble_boundary": "frozen",
+      "turning_point": "frozen",
+      "reverse_out_list": "frozen",
+      "side_rule": "frozen",
+      "estate_order": "frozen",
+      "landmark": "frozen",
+      "density": "frozen"
+    },
+    "update_policy": {
+      "behavioural": "update_every_run",
+      "structural": "update_only_after_three_consistent_runs"
+    },
+    "meta_burden": "none",
+    "user_role": "drive_only",
+    "engine_role": "observe_and_infer"
+  }
+}
