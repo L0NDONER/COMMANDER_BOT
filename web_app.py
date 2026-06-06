@@ -15,6 +15,7 @@ from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 
 import database
+from navigation.router import router as nav_router
 from services.ebay.scout_async import evaluate_with_consensus_saas
 
 LOGGER = logging.getLogger(__name__)
@@ -30,6 +31,7 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="Flaz", lifespan=lifespan)
+app.include_router(nav_router)
 
 
 @app.get("/")
