@@ -16,7 +16,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
@@ -115,12 +115,14 @@ router = APIRouter()
 
 
 @router.get("/navigation")
-async def nav_page():
+async def nav_page(response: Response):
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     return FileResponse(_HERE / "static" / "navigation.html")
 
 
 @router.get("/navigation/navigation.js")
-async def nav_js():
+async def nav_js(response: Response):
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     return FileResponse(_HERE / "static" / "navigation.js", media_type="application/javascript")
 
 
