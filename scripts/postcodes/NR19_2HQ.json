@@ -3,9 +3,18 @@
   "streets": [
     "de-narde road"
   ],
-  "preferred_entry": "23 DE-NARDE ROAD",
-  "preferred_exit": "23 DE-NARDE ROAD",
-  "estate_direction": null,
+  "preferred_entry": "DENARDE ROAD",
+  "preferred_exit": "DENARDE ROAD",
+  "dominant_throat": "DENARDE ROAD",
+  "internal_order": [
+    "DENARDE ROAD",
+    "TOWNSEND ROAD",
+    "RAYNHAM RIDE (1 → 12 → 10 → 9 → 8)",
+    "NORMANDY ROAD"
+  ],
+  "raynham_ride_intercept": "between 6 and 8 Townshend Road",
+  "delivery_side": "left",
+  "estate_direction": "follow left-hand side ascending",
   "typical_density": 1.0,
   "visit_count": 1,
   "last_seen": "2023-12-27",

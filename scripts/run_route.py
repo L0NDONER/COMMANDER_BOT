@@ -187,8 +187,12 @@ def main():
             print(f"\n┌─ {cur_pc}  {streets}")
             print(f"│  visits={pd.get('visit_count',0)}  last_seen={pd.get('last_seen','—')}  density={pd.get('typical_density','—')}")
             print(f"│  entry={pref_in}  exit={pref_out}")
+            if pd.get('dominant_throat'):
+                print(f"│  throat={pd['dominant_throat']}  side={pd.get('delivery_side','—')}")
             if pd.get('internal_order'):
                 print(f"│  order={' → '.join(pd['internal_order'])}")
+            if pd.get('raynham_ride_intercept'):
+                print(f"│  raynham_intercept={pd['raynham_ride_intercept']}")
             if pd.get('prominent_landmark'):
                 print(f"│  landmark={pd['prominent_landmark']}")
             print(f"│  direction={direction}")
