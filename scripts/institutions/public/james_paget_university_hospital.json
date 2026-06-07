@@ -1,0 +1,152 @@
+{
+  "_licence": "CC0 1.0 Universal — public domain dedication. No rights reserved.",
+  "_source": "OSM way/220773458 (ODbL) + NHS jpaget.nhs.uk + NaPTAN bus stop survey. Coords from OSM unless noted.",
+  "_surveyed": "2026-06-07",
+  "_osm_way": 220773458,
+  "_cqc_location": "RGP75",
+
+  "name": "James Paget University Hospital",
+  "short_name": "JPUH",
+  "nhs_trust": "James Paget University Hospitals NHS Foundation Trust",
+  "type": "hospital",
+  "subtype": "district_general",
+  "country": "GB",
+  "region": "East of England",
+  "icb": "NHS Norfolk and Waveney Integrated Care Board",
+
+  "address": {
+    "street": "Lowestoft Road",
+    "locality": "Gorleston-on-Sea",
+    "town": "Great Yarmouth",
+    "county": "Norfolk",
+    "postcode_delivery": "NR31 6LA",
+    "postcode_campus": "NR31 7HA"
+  },
+
+  "centroid": { "lat": 52.56183, "lon": 1.71553 },
+
+  "bounding_box": {
+    "south": 52.55979, "north": 52.56387,
+    "west":  1.70942,  "east":  1.72165
+  },
+
+  "road_access": {
+    "primary_road": "A47 Lowestoft Road",
+    "approach_north": "Breydon Bridge → A47 south signed Gorleston/Lowestoft, hospital on right",
+    "approach_south": "A12/A47 north from Lowestoft/Ipswich, hospital on left",
+    "notes": "Main vehicle entrance is a signalised junction on the A47. Entrance road runs west into the campus."
+  },
+
+  "entrances": [
+    {
+      "id": "main_vehicle",
+      "label": "Main vehicle entrance (A47 junction)",
+      "type": "vehicle",
+      "lat": 52.56140, "lon": 1.72121,
+      "coord_source": "OSM traffic_signals node 52.561399,1.721203",
+      "notes": "Signalised junction on A47 Lowestoft Road. Access road bears right toward main drop-off, left toward Car Parks A & B."
+    },
+    {
+      "id": "main_pedestrian",
+      "label": "Main entrance (pedestrian / drop-off)",
+      "type": "pedestrian_and_dropoff",
+      "lat": 52.56183, "lon": 1.71553,
+      "coord_source": "OSM hospital way centroid — precise entrance not yet surveyed",
+      "notes": "Front of main building. 10-minute free drop-off bay directly outside. Extended 30-min free for patients requiring assistance."
+    },
+    {
+      "id": "ae_ambulance",
+      "label": "A&E / Emergency Department entrance",
+      "type": "ae_and_ambulance",
+      "lat": 52.56101, "lon": 1.71980,
+      "coord_source": "Inferred — south-east corner of main building, opposite NaPTAN bus stop Stand A (52.561014,1.719799)",
+      "notes": "Dedicated A&E entrance at front of hospital, south-east corner. Ambulance bays immediately adjacent. Bus stop Stand A is forecourt-side opposite ambulance bays."
+    },
+    {
+      "id": "cdc_dropoff",
+      "label": "Community Diagnostic Centre drop-off",
+      "type": "dropoff",
+      "lat": 52.56214, "lon": 1.71464,
+      "coord_source": "Inferred from Car Park 220773459 center (52.5621,1.7146)",
+      "notes": "30-minute max free parking. EV charging (2 bays, paid). Orthopaedic Centre adjacent."
+    }
+  ],
+
+  "car_parks": [
+    {
+      "id": "cp_a_b",
+      "label": "Car Parks A & B (main visitor)",
+      "lat": 52.56214, "lon": 1.71464,
+      "osm_way": 220773459,
+      "notes": "Front of hospital, left after entering from A47. Blue badge spaces front row of Car Park A, free. Motorcycle bays near exit barrier, free."
+    },
+    {
+      "id": "cp_south_east_1",
+      "label": "South-east car park 1",
+      "lat": 52.56086, "lon": 1.71844,
+      "osm_way": 220773892
+    },
+    {
+      "id": "cp_south_east_2",
+      "label": "South-east car park 2",
+      "lat": 52.56068, "lon": 1.71971,
+      "osm_way": 220774081
+    },
+    {
+      "id": "cp_north",
+      "label": "North car park",
+      "lat": 52.56246, "lon": 1.71949,
+      "osm_way": 220774476
+    },
+    {
+      "id": "cp_far_south_east",
+      "label": "Far south-east car park",
+      "lat": 52.56086, "lon": 1.72295,
+      "osm_way": 219520787
+    },
+    {
+      "id": "cp_far_north_east",
+      "label": "Far north-east car park",
+      "lat": 52.56281, "lon": 1.72401,
+      "osm_way": 219521331
+    }
+  ],
+
+  "bus_stops": [
+    {
+      "naptan": "2900G172",
+      "label": "James Paget Hospital, Stand A",
+      "lat": 52.56101, "lon": 1.71980,
+      "bearing": "E",
+      "notes": "On-site forecourt stop, opposite ambulance bays. Routes X1, 1, 1A."
+    },
+    {
+      "naptan": "2900G1788",
+      "label": "James Paget Hospital, adj (Lowestoft Rd northbound)",
+      "lat": 52.56276, "lon": 1.72162,
+      "bearing": "N"
+    },
+    {
+      "naptan": "2900G1789",
+      "label": "James Paget Hospital, opp (Lowestoft Rd southbound)",
+      "lat": 52.56237, "lon": 1.72178,
+      "bearing": "S"
+    }
+  ],
+
+  "delivery": {
+    "preferred_vehicle_entry": "main_vehicle",
+    "preferred_dropoff": "main_pedestrian",
+    "ae_dropoff": "ae_ambulance",
+    "throat_on_approach": null,
+    "internal_road_notes": "Access road from A47 junction is two-lane. Bear right at first island for main entrance / drop-off. Bear left for Car Parks A & B. Speed bumps throughout campus.",
+    "turning_available": true,
+    "turning_notes": "Turning circle at 52.563544,1.715789 (north of campus, Brasenose Avenue end)."
+  },
+
+  "contacts": {
+    "switchboard": "01493 452452",
+    "ae_direct": ["01493 452200", "01493 452436"],
+    "website": "https://www.jpaget.nhs.uk"
+  }
+}
