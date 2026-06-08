@@ -8,13 +8,8 @@
   "dominant_throat": "1 WINDSOR PARK",
   "internal_order": [
     "1 WINDSOR PARK",
-    "31 WINDSOR PARK (turning point)",
-    "39 WINDSOR PARK (reverse-out)",
-    "34 WINDSOR PARK (reverse-out)",
     "2 WINDSOR PARK"
   ],
-  "turning_point": "31 WINDSOR PARK",
-  "reverse_required": ["39 WINDSOR PARK", "34 WINDSOR PARK"],
   "no_uturn": true,
   "delivery_side": "left",
   "estate_direction": "follow left-hand side ascending",

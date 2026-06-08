@@ -414,6 +414,14 @@ function renderMeta(stop) {
   if (m.reverse_required && m.reverse_required.length)
                                        rows.push(['reverse',   m.reverse_required.join(' → ')]);
   if (m.prominent_landmark)            rows.push(['landmark',  m.prominent_landmark]);
+  if (m.complex_throat)               rows.push(['enter via', m.complex_throat]);
+  if (m.complex_spine)                rows.push(['spine',     m.complex_spine]);
+  if (m.complex_cluster)              rows.push(['cluster',   m.complex_cluster]);
+  if (m.complex_door)                 rows.push(['door',      m.complex_door]);
+  if (m.complex_side)                 rows.push(['side',      m.complex_side]);
+  if (m.complex_walk)                 rows.push(['access',    'walk required']);
+  if (m.complex_security)             rows.push(['security',  'check required']);
+  if (m.complex_note)                 rows.push(['note',      m.complex_note]);
 
   let html = rows.map(([k, v]) =>
     `<div class="meta-row"><span class="meta-key">${esc(k)}</span><span class="meta-val">${esc(v)}</span></div>`
