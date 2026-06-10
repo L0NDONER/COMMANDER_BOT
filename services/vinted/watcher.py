@@ -40,6 +40,7 @@ BRANDS: List[BrandConfig] = [
     BrandConfig("Penfield", 20),
     BrandConfig("Patagonia", 35),
     BrandConfig("MKI Miyuki Zoku", 30),
+    BrandConfig("Barbour", 40),
     BrandConfig("Reiss", 20),
     BrandConfig("Boss Orange", 25),
     BrandConfig("Gant", 20),
