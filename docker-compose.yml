@@ -9,6 +9,7 @@ services:
       - "host.docker.internal:172.18.0.1"
     environment:
       - VINTED_PROXY=socks5://host.docker.internal:1080
+      - VINTED_TOKEN=
     volumes:
       - ./commander_saas.db:/app/commander_saas.db
       - ./credentials.py:/app/credentials.py
