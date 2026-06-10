@@ -24,6 +24,7 @@ import uvicorn
 import database
 from services.ebay.scout_async import evaluate_with_consensus_saas
 from services.ebay.vinted_catalog import warmup as vinted_warmup
+from services.vinted.watcher import nugget_loop, load_token as vinted_load_token, token_expires_in
 from web_app import app as web_app
 
 # ------------------------------------------------------------------------------
@@ -228,6 +229,53 @@ async def handle_pnl(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     await update.message.reply_text("\n".join(lines), parse_mode='Markdown')
 
 # ------------------------------------------------------------------------------
+# Vinted token management
+# ------------------------------------------------------------------------------
+
+async def handle_vinted_token(update: Update, context) -> None:
+    if int(update.effective_chat.id) != int(OWNER_CHAT_ID):
+        return
+    args = context.args
+    if not args:
+        secs = token_expires_in()
+        if secs > 0:
+            mins = int(secs // 60)
+            await update.message.reply_text(f"Vinted token valid for {mins}m.")
+        else:
+            await update.message.reply_text("Vinted token expired. Send: /vinted <token>")
+        return
+    raw = args[0].strip()
+    vinted_load_token(raw)
+    secs = token_expires_in()
+    mins = int(secs // 60)
+    await update.message.reply_text(f"✅ Vinted token loaded, expires in {mins}m. Nugget loop resuming.")
+
+
+async def _vinted_expiry_monitor(app) -> None:
+    warned = False
+    while True:
+        secs = token_expires_in()
+        if secs <= 0:
+            if not warned:
+                await app.bot.send_message(
+                    chat_id=OWNER_CHAT_ID,
+                    text="⚠️ Vinted token expired. Send /vinted <token> to resume nugget scanning."
+                )
+                warned = True
+        elif secs <= 600:
+            if not warned:
+                mins = int(secs // 60)
+                await app.bot.send_message(
+                    chat_id=OWNER_CHAT_ID,
+                    text=f"⏳ Vinted token expires in {mins}m. Get a fresh one ready."
+                )
+                warned = True
+        else:
+            warned = False
+        await asyncio.sleep(60)
+
+
+# ------------------------------------------------------------------------------
 # Main
 # ------------------------------------------------------------------------------
 
@@ -242,7 +290,18 @@ async def main_async() -> None:
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("sold", handle_sold))
     app.add_handler(CommandHandler("pnl", handle_pnl))
+    app.add_handler(CommandHandler("vinted", handle_vinted_token))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
+
+    vinted_token = os.getenv("VINTED_TOKEN", "")
+    if vinted_token:
+        vinted_load_token(vinted_token)
+
+        async def _send_nugget(text: str) -> None:
+            await app.bot.send_message(chat_id=OWNER_CHAT_ID, text=text, parse_mode="Markdown")
+
+        asyncio.create_task(nugget_loop(_send_nugget))
+        asyncio.create_task(_vinted_expiry_monitor(app))
 
     await app.initialize()
     await app.start()
