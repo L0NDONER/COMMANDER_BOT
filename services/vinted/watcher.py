@@ -38,6 +38,7 @@ class BrandConfig:
 
 BRANDS: List[BrandConfig] = [
     BrandConfig("Rab Hoodie", 60, size_label=None),
+    BrandConfig("Champion Reverse Weave", 25),
     BrandConfig("Penfield", 20),
     BrandConfig("Patagonia", 35),
     BrandConfig("MKI Miyuki Zoku", 10),
