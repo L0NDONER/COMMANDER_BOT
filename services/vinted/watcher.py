@@ -366,7 +366,7 @@ async def sweep() -> List[tuple[BrandConfig, Dict[str, Any]]]:
 # NUGGET DETECTION
 # -------------------------
 
-NUGGET_VAL   = 0.50
+NUGGET_VAL   = 0.40
 NUGGET_REL   = 1.00
 NUGGET_TRUST = 0.70
 
