@@ -232,23 +232,40 @@ async def handle_pnl(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 # Vinted token management
 # ------------------------------------------------------------------------------
 
+def _extract_cookie(cookie_str: str, name: str) -> str:
+    for part in cookie_str.split(";"):
+        k, _, v = part.strip().partition("=")
+        if k.strip() == name:
+            return v.strip()
+    return ""
+
+
 async def handle_vinted_token(update: Update, context) -> None:
     if int(update.effective_chat.id) != int(OWNER_CHAT_ID):
         return
-    args = context.args
-    if not args:
+    # Reconstruct full text after /vinted (context.args splits on spaces)
+    raw = " ".join(context.args).strip() if context.args else ""
+
+    if not raw:
         secs = token_expires_in()
         if secs > 0:
-            mins = int(secs // 60)
-            await update.message.reply_text(f"Vinted token valid for {mins}m.")
+            await update.message.reply_text(f"Vinted token valid for {int(secs // 60)}m.")
         else:
-            await update.message.reply_text("Vinted token expired. Send: /vinted <token>")
+            await update.message.reply_text("Vinted token expired. Send: /vinted <token or cookie string>")
         return
-    raw = args[0].strip()
-    vinted_load_token(raw)
+
+    # Accept either a bare JWT or a full cookie string containing access_token_web=
+    if "access_token_web=" in raw:
+        token = _extract_cookie(raw, "access_token_web")
+        if not token:
+            await update.message.reply_text("Could not find access_token_web in cookie string.")
+            return
+    else:
+        token = raw
+
+    vinted_load_token(token)
     secs = token_expires_in()
-    mins = int(secs // 60)
-    await update.message.reply_text(f"✅ Vinted token loaded, expires in {mins}m. Nugget loop resuming.")
+    await update.message.reply_text(f"✅ Vinted token loaded, expires in {int(secs // 60)}m. Nugget loop resuming.")
 
 
 async def _vinted_expiry_monitor(app) -> None:
