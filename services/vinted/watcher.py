@@ -33,13 +33,14 @@ LOGGER = logging.getLogger(__name__)
 class BrandConfig:
     name: str
     max_price: float  # GBP
-    size_label: str = "XL"
+    size_label: Optional[str] = "XL"  # None = any size
 
 
 BRANDS: List[BrandConfig] = [
+    BrandConfig("Rab Hoodie", 60, size_label=None),
     BrandConfig("Penfield", 20),
     BrandConfig("Patagonia", 35),
-    BrandConfig("MKI Miyuki Zoku", 30),
+    BrandConfig("MKI Miyuki Zoku", 10),
     BrandConfig("Barbour", 40),
     BrandConfig("Arc'teryx", 30),
     BrandConfig("Reiss", 20),
@@ -226,7 +227,7 @@ def _filter(items: List[Dict[str, Any]], brand: BrandConfig) -> List[Dict[str, A
         rel = _brand_relevance(i, brand)
         if rel < _REL_THRESHOLD:
             continue
-        if not _size_matches(i, brand.size_label):
+        if brand.size_label and not _size_matches(i, brand.size_label):
             continue
         price = _safe_price(i)
         if price > brand.max_price:
