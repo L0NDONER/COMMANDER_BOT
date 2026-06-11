@@ -156,14 +156,21 @@ def invalidate_token() -> None:
 # SEARCH & FILTER
 # -------------------------
 
+_QUERY_SUFFIXES = ["", "", "", "mens", "men's", "xl", "men xl"]
+
+def _vary_query(name: str) -> str:
+    suffix = random.choice(_QUERY_SUFFIXES)
+    return f"{name} {suffix}".strip() if suffix else name
+
+
 async def search_brand(brand: BrandConfig, token: str) -> List[Dict[str, Any]]:
-    """Async search for a single brand using bearer auth."""
     client = _get_client()
+    query = _vary_query(brand.name)
     resp = await client.get(
         "https://www.vinted.co.uk/api/v2/catalog/items",
         headers={"Authorization": f"Bearer {token}"},
         params={
-            "search_text": brand.name,
+            "search_text": query,
             "order": "newest_first",
             "per_page": 50,
             "size_id": 206,
