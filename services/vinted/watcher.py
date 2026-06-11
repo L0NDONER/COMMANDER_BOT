@@ -25,7 +25,8 @@ import httpx
 
 LOGGER = logging.getLogger(__name__)
 
-_seller_sem = asyncio.Semaphore(4)
+_seller_sem = asyncio.Semaphore(2)
+_seller_cache: Dict[int, Dict[str, Any]] = {}
 
 # -------------------------
 # CONFIG
@@ -309,9 +310,13 @@ async def _search_timed(brand: BrandConfig, token: str) -> tuple[BrandConfig, Li
 
 
 async def fetch_seller(user_id: int, token: str) -> Dict[str, Any]:
+    if user_id in _seller_cache:
+        return _seller_cache[user_id]
     client = _get_client()
     async with _seller_sem:
-        await asyncio.sleep(random.uniform(0.3, 0.8))
+        if user_id in _seller_cache:
+            return _seller_cache[user_id]
+        await asyncio.sleep(random.uniform(0.5, 1.2))
         try:
             resp = await client.get(
                 f"https://www.vinted.co.uk/api/v2/users/{user_id}",
@@ -319,7 +324,9 @@ async def fetch_seller(user_id: int, token: str) -> Dict[str, Any]:
                 timeout=8.0,
             )
             if resp.status_code == 200:
-                return resp.json().get("user", {})
+                profile = resp.json().get("user", {})
+                _seller_cache[user_id] = profile
+                return profile
         except Exception as exc:
             LOGGER.debug("[SELLER] fetch failed for %s: %s", user_id, exc)
     return {}
@@ -355,10 +362,7 @@ async def _enrich_with_seller(brand_item: tuple, token: str) -> tuple:
 
 
 async def sweep() -> List[tuple[BrandConfig, Dict[str, Any]]]:
-    """
-    Confirm the token is live once, then fan out all brand searches in
-    parallel. Enrich candidates with seller profile data after filtering.
-    """
+    _seller_cache.clear()
     token = await get_token()
     results = await asyncio.gather(*(_search_timed(b, token) for b in BRANDS))
     candidates = [(brand, item) for brand, items in results for item in items]
