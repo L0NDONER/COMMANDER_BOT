@@ -156,21 +156,45 @@ def invalidate_token() -> None:
 # SEARCH & FILTER
 # -------------------------
 
-_QUERY_SUFFIXES = ["", "", "", "mens", "men's", "xl", "men xl"]
-
-def _vary_query(name: str) -> str:
-    suffix = random.choice(_QUERY_SUFFIXES)
-    return f"{name} {suffix}".strip() if suffix else name
+_GARMENT_HINTS = ["jacket", "coat", "shirt", "long sleeve", "hoodie", "polo"]
+_VAGUE_INTENTS  = ["top", "clothes", "mens wear", "xl top"]
+_GENDER_HINTS   = ["mens", "men's"]
 
 
-async def search_brand(brand: BrandConfig, token: str) -> List[Dict[str, Any]]:
+def _misspell(s: str) -> str:
+    if len(s) < 5:
+        return s
+    i = random.randint(1, len(s) - 2)
+    return s[:i] + s[i + 1:]
+
+
+def _choose_query_shape(brand: BrandConfig) -> str:
+    n = brand.name.lower()
+    sz = (brand.size_label or "xl").lower()
+    shapes = [
+        (0.40, n),
+        (0.25, f"{n} {sz}"),
+        (0.15, f"{n} {random.choice(_GARMENT_HINTS)}"),
+        (0.10, f"{n} {random.choice(_GENDER_HINTS)}"),
+        (0.05, f"{_misspell(n)} {sz}"),
+        (0.05, f"{n} {random.choice(_VAGUE_INTENTS)}"),
+    ]
+    r = random.random()
+    acc = 0.0
+    for weight, query in shapes:
+        acc += weight
+        if r <= acc:
+            return query
+    return n
+
+
+async def search_brand(brand: BrandConfig, token: str, query: Optional[str] = None) -> List[Dict[str, Any]]:
     client = _get_client()
-    query = _vary_query(brand.name)
     resp = await client.get(
         "https://www.vinted.co.uk/api/v2/catalog/items",
         headers={"Authorization": f"Bearer {token}"},
         params={
-            "search_text": query,
+            "search_text": query or brand.name,
             "order": "newest_first",
             "per_page": 50,
             "size_id": 206,
@@ -260,7 +284,7 @@ async def _human_search_brand(brand: BrandConfig, token: str) -> tuple[BrandConf
         LOGGER.info("[DRIFT] skipped %s this sweep", brand.name)
         return brand, []
 
-    items = await search_brand(brand, token)
+    items = await search_brand(brand, token, query=_choose_query_shape(brand))
 
     if items and all(
         _safe_price(i) > brand.max_price for i in items[:5]
