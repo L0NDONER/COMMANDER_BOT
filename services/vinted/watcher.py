@@ -347,19 +347,6 @@ def seller_trust(profile: Dict[str, Any]) -> float:
     return max(0.1, min(1.0, rep * 0.7 + sales_w * 0.2 + verified * 0.1))
 
 
-async def _enrich_with_seller(brand_item: tuple, token: str) -> tuple:
-    brand, item = brand_item
-    user_id = (item.get("user") or {}).get("id")
-    if user_id:
-        profile = await fetch_seller(user_id, token)
-        trust = seller_trust(profile)
-        item["_trust"] = round(trust, 2)
-        item["_seller_sales"] = profile.get("feedback_count", 0)
-        item["_seller_rep"] = profile.get("feedback_reputation", 0)
-    else:
-        item["_trust"] = 0.1
-    return brand, item
-
 
 async def sweep() -> List[tuple[BrandConfig, Dict[str, Any]]]:
     _seller_cache.clear()
@@ -367,10 +354,36 @@ async def sweep() -> List[tuple[BrandConfig, Dict[str, Any]]]:
     results = await asyncio.gather(*(_search_timed(b, token) for b in BRANDS))
     candidates = [(brand, item) for brand, items in results for item in items]
 
-    enriched = await asyncio.gather(
-        *(_enrich_with_seller(c, token) for c in candidates)
-    )
-    return [(b, i) for b, i in enriched if i.get("_trust", 0) >= 0.35]
+    # Fetch each unique seller exactly once, prioritised by the best _value
+    # among their items — so high-value candidates are enriched first if we
+    # hit a rate limit before completing the full set.
+    uid_best_val: Dict[int, float] = {}
+    for _, item in candidates:
+        uid = (item.get("user") or {}).get("id")
+        if uid:
+            uid_best_val[uid] = max(uid_best_val.get(uid, 0.0), item.get("_value", 0.0))
+    SELLER_BUDGET = random.randint(18, 25)
+    ordered_ids = sorted(uid_best_val, key=uid_best_val.__getitem__, reverse=True)[:SELLER_BUDGET]
+
+    profiles: Dict[int, Dict[str, Any]] = {}
+    for profile in await asyncio.gather(*(fetch_seller(uid, token) for uid in ordered_ids)):
+        uid = profile.get("id")
+        if uid:
+            profiles[uid] = profile
+
+    out = []
+    for brand, item in candidates:
+        uid = (item.get("user") or {}).get("id")
+        profile = profiles.get(uid, {})
+        if profile:
+            item["_trust"] = round(seller_trust(profile), 2)
+            item["_seller_sales"] = profile.get("feedback_count", 0)
+            item["_seller_rep"] = profile.get("feedback_reputation", 0)
+        else:
+            item["_trust"] = 0.1
+        if item["_trust"] >= 0.35:
+            out.append((brand, item))
+    return out
 
 
 # -------------------------
