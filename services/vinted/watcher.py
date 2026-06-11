@@ -39,24 +39,19 @@ class BrandConfig:
     size_label: Optional[str] = "XL"  # None = any size
 
 
-BRANDS: List[BrandConfig] = [
-    BrandConfig("Rab Hoodie", 60, size_label=None),
-    BrandConfig("Champion Reverse Weave", 25),
-    BrandConfig("Napapijri", 35),
-    BrandConfig("Penfield", 20),
-    BrandConfig("Patagonia", 35),
-    BrandConfig("MKI Miyuki Zoku", 10),
-    BrandConfig("Barbour", 40),
-    BrandConfig("Arc'teryx", 30),
-    BrandConfig("Reiss", 20),
-    BrandConfig("Boss Orange", 25),
-    BrandConfig("Gant", 20),
-    BrandConfig("Abercrombie & Fitch", 18),
-    BrandConfig("Fred Perry", 25),
-]
+def _load_brands() -> List[BrandConfig]:
+    import json as _json
+    p = os.path.join(os.path.dirname(__file__), "watchlist.json")
+    with open(p) as f:
+        return [BrandConfig(**e) for e in _json.load(f)]
 
-# Set VINTED_TOKEN in env, or paste here (never commit a real value).
+BRANDS: List[BrandConfig] = _load_brands()
+
+# Set VINTED_TOKEN in env, or write to token.txt next to this file.
 ACCESS_TOKEN: str = os.getenv("VINTED_TOKEN", "")
+
+_TOKEN_FILE = os.path.join(os.path.dirname(__file__), "token.txt")
+_token_file_mtime: float = 0.0
 
 _USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
@@ -154,6 +149,24 @@ def _parse_exp(token: str) -> float:
         return 0.0
 
 
+def _maybe_reload_token_from_file() -> None:
+    global _token_file_mtime
+    try:
+        mtime = os.path.getmtime(_TOKEN_FILE)
+    except OSError:
+        return
+    if mtime <= _token_file_mtime:
+        return
+    try:
+        raw = open(_TOKEN_FILE).read().strip()
+    except OSError:
+        return
+    if raw:
+        _token_file_mtime = mtime
+        load_token(raw)
+        LOGGER.info("[TOKEN] hot-reloaded from token.txt")
+
+
 def load_token(raw: str) -> None:
     """Accept a freshly pasted token and update module state."""
     global _token, _token_exp
@@ -172,6 +185,7 @@ async def get_token() -> str:
     Return a live bearer token. Raises RuntimeError if expired — callers
     must handle this gracefully rather than blocking on stdin.
     """
+    _maybe_reload_token_from_file()
     if _token_live():
         return _token
 

@@ -1,6 +1,7 @@
 # Secrets & credentials
 credentials.py
 secrets.py
+services/vinted/token.txt
 
 # Proprietary business logic — lives on EC2 only
 services/ebay/brands.py
