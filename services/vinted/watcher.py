@@ -66,13 +66,38 @@ _USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0",
 ]
 
+_ACCEPT_LANGUAGE_POOL = [
+    "en-GB,en-US;q=0.9,en;q=0.8",
+    "en-GB,en;q=0.9,en-US;q=0.8,de;q=0.7",
+    "en-US,en-GB;q=0.9,en;q=0.8",
+    "en-GB,en;q=0.9",
+    "en-GB,en;q=0.9,pl;q=0.8",
+]
+
+_SESSION_UA = random.choice(_USER_AGENTS)
+
+
 def _base_headers() -> dict:
-    return {
-        "User-Agent": random.choice(_USER_AGENTS),
+    h = {
+        "User-Agent": _SESSION_UA,
         "Accept": "application/json, text/plain, */*",
-        "Accept-Language": "en-GB,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": random.choice(_ACCEPT_LANGUAGE_POOL),
         "Referer": "https://www.vinted.co.uk/",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Dest": "empty",
     }
+    # Client hints only sent by Chromium-based browsers
+    if "Chrome/" in _SESSION_UA:
+        import re as _re
+        m = _re.search(r"Chrome/(\d+)", _SESSION_UA)
+        v = m.group(1) if m else "125"
+        platform = '"macOS"' if "Macintosh" in _SESSION_UA else '"Windows"'
+        h["Sec-Ch-Ua"] = f'"Google Chrome";v="{v}", "Chromium";v="{v}", "Not.A/Brand";v="24"'
+        h["Sec-Ch-Ua-Mobile"] = "?0"
+        h["Sec-Ch-Ua-Platform"] = platform
+    return h
 
 POLL_MIN = 7
 POLL_MAX = 18
@@ -368,7 +393,11 @@ def seller_trust(profile: Dict[str, Any]) -> float:
 async def sweep() -> List[tuple[BrandConfig, Dict[str, Any]]]:
     _seller_cache.clear()
     token = await get_token()
-    results = await asyncio.gather(*(_search_timed(b, token) for b in BRANDS))
+    pool = random.sample(BRANDS, k=random.randint(6, len(BRANDS)))
+    results = []
+    for b in pool:
+        results.append(await _search_timed(b, token))
+        await asyncio.sleep(random.uniform(4, 14))
     candidates = [(brand, item) for brand, items in results for item in items]
 
     # Fetch each unique seller exactly once, prioritised by the best _value
