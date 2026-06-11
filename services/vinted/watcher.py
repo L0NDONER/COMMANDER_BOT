@@ -67,9 +67,6 @@ HEADERS = {
 POLL_MIN = 7
 POLL_MAX = 18
 SEARCH_TIMEOUT_SECONDS = 12.0
-FAVOURITE_DELAY_MIN = 20
-FAVOURITE_DELAY_MAX = 40
-MAX_FAVOURITES_PER_RUN = 20
 
 # Proactive refresh margin: treat token as expired this many seconds early.
 TOKEN_EXPIRY_MARGIN = 120
@@ -243,27 +240,6 @@ def _filter(items: List[Dict[str, Any]], brand: BrandConfig) -> List[Dict[str, A
         results.append(i)
     return results
 
-
-# -------------------------
-# FAVOURITE
-# -------------------------
-
-async def favourite_item(item_id: int, token: str) -> bool:
-    client = _get_client()
-    resp = await client.post(
-        f"https://www.vinted.co.uk/api/v2/items/{item_id}/favorite",
-        headers={"Authorization": f"Bearer {token}"},
-        json={},
-    )
-    if resp.status_code in (401, 403):
-        invalidate_token()
-        LOGGER.warning("[AUTH] %s favouriting %s — token invalidated", resp.status_code, item_id)
-        return False
-    if resp.status_code == 200:
-        LOGGER.info("[+] Favourited %s", item_id)
-        return True
-    LOGGER.warning("[!] Favourite %s → %s", item_id, resp.status_code)
-    return False
 
 
 # -------------------------
@@ -461,33 +437,15 @@ async def run_watcher() -> None:
     if ACCESS_TOKEN:
         load_token(ACCESS_TOKEN)
 
-    favourites_done = 0
-
-    while favourites_done < MAX_FAVOURITES_PER_RUN:
+    while True:
         candidates = await sweep()
         LOGGER.info("[SWEEP] %d candidates across all brands", len(candidates))
-
         for brand, item in candidates:
-            if favourites_done >= MAX_FAVOURITES_PER_RUN:
-                break
-            item_id = item.get("id")
-            if not item_id:
-                continue
-
-            token = await get_token()
-            delay = random.uniform(FAVOURITE_DELAY_MIN, FAVOURITE_DELAY_MAX)
-            LOGGER.info("[WAIT] %.1fs before favouriting %s (%s)", delay, item_id, brand.name)
-            await asyncio.sleep(delay)
-
-            if await favourite_item(item_id, token):
-                favourites_done += 1
+            LOGGER.info("[CANDIDATE] %s £%s %s", brand.name, item.get("price", {}).get("amount"), item.get("title", ""))
 
         sweep_delay = random.uniform(POLL_MIN, POLL_MAX)
         LOGGER.info("[SWEEP DONE] sleeping %.1fs", sweep_delay)
         await asyncio.sleep(sweep_delay)
-
-    LOGGER.info("[END] reached MAX_FAVOURITES_PER_RUN=%d", MAX_FAVOURITES_PER_RUN)
-    await aclose()
 
 
 if __name__ == "__main__":
