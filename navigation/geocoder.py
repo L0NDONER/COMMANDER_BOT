@@ -17,7 +17,7 @@ import hashlib
 from pathlib import Path
 from typing import Optional
 
-from courier_gps import Vec2, latlon_to_vec2
+from courier_gps import latlon_to_vec2
 
 POSTCODES_DIR = Path(__file__).parent / "postcodes"
 

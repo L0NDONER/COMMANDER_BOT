@@ -193,7 +193,7 @@ def _street_name(address: str) -> Optional[str]:
 def _road_type(street: str) -> int:
     """2 = through-road, 0 = cul-de-sac, 1 = unknown."""
     last = street.split()[-1] if street else ''
-    if last in _THROUGH_WORDS:  return 2
+    if last in _THROUGH_WORDS: return 2
     if last in _CULDESAC_WORDS: return 0
     return 1
 
