@@ -109,7 +109,8 @@ def _token_live() -> bool:
 
 def _parse_exp(token: str) -> float:
     """Decode exp claim from a JWT without a third-party library."""
-    import base64, json
+    import base64
+    import json
     try:
         payload = token.split(".")[1]
         payload += "=" * (-len(payload) % 4)   # re-pad
