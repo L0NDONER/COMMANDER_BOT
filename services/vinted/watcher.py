@@ -58,11 +58,21 @@ BRANDS: List[BrandConfig] = [
 # Set VINTED_TOKEN in env, or paste here (never commit a real value).
 ACCESS_TOKEN: str = os.getenv("VINTED_TOKEN", "")
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-    "Accept": "application/json, text/plain, */*",
-    "Referer": "https://www.vinted.co.uk/",
-}
+_USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0",
+]
+
+def _base_headers() -> dict:
+    return {
+        "User-Agent": random.choice(_USER_AGENTS),
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-GB,en;q=0.9",
+        "Referer": "https://www.vinted.co.uk/",
+    }
 
 POLL_MIN = 7
 POLL_MAX = 18
@@ -88,7 +98,7 @@ _token_exp: float = 0.0   # unix timestamp; 0 = unknown, treat as expired
 def _get_client() -> httpx.AsyncClient:
     global _client
     if _client is None:
-        _client = httpx.AsyncClient(headers=HEADERS, timeout=10.0)
+        _client = httpx.AsyncClient(timeout=10.0)
     return _client
 
 
@@ -192,7 +202,7 @@ async def search_brand(brand: BrandConfig, token: str, query: Optional[str] = No
     client = _get_client()
     resp = await client.get(
         "https://www.vinted.co.uk/api/v2/catalog/items",
-        headers={"Authorization": f"Bearer {token}"},
+        headers={**_base_headers(), "Authorization": f"Bearer {token}"},
         params={
             "search_text": query or brand.name,
             "order": "newest_first",
@@ -327,7 +337,7 @@ async def fetch_seller(user_id: int, token: str) -> Dict[str, Any]:
         try:
             resp = await client.get(
                 f"https://www.vinted.co.uk/api/v2/users/{user_id}",
-                headers={"Authorization": f"Bearer {token}"},
+                headers={**_base_headers(), "Authorization": f"Bearer {token}"},
                 timeout=8.0,
             )
             if resp.status_code == 200:
