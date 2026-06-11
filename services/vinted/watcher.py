@@ -203,6 +203,9 @@ def _misspell(s: str) -> str:
     return s[:i] + s[i + 1:]
 
 
+_last_queries: Dict[str, str] = {}
+
+
 def _choose_query_shape(brand: BrandConfig) -> str:
     n = brand.name.lower()
     sz = (brand.size_label or "xl").lower()
@@ -216,11 +219,25 @@ def _choose_query_shape(brand: BrandConfig) -> str:
     ]
     r = random.random()
     acc = 0.0
-    for weight, query in shapes:
+    base = n
+    for weight, q in shapes:
         acc += weight
         if r <= acc:
-            return query
-    return n
+            base = q
+            break
+
+    if random.random() < 0.12:
+        prev = _last_queries.get(brand.name)
+        tokens = base.split()
+        if len(tokens) > 1 and random.random() < 0.4:
+            base = " ".join(tokens[:-1])
+        elif random.random() < 0.3:
+            base = f"{base} {random.choice(_GARMENT_HINTS)}"
+        elif prev and random.random() < 0.3:
+            base = prev
+
+    _last_queries[brand.name] = base
+    return base
 
 
 async def search_brand(brand: BrandConfig, token: str, query: Optional[str] = None) -> List[Dict[str, Any]]:
