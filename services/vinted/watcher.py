@@ -25,6 +25,8 @@ import httpx
 
 LOGGER = logging.getLogger(__name__)
 
+_seller_sem = asyncio.Semaphore(4)
+
 # -------------------------
 # CONFIG
 # -------------------------
@@ -308,16 +310,18 @@ async def _search_timed(brand: BrandConfig, token: str) -> tuple[BrandConfig, Li
 
 async def fetch_seller(user_id: int, token: str) -> Dict[str, Any]:
     client = _get_client()
-    try:
-        resp = await client.get(
-            f"https://www.vinted.co.uk/api/v2/users/{user_id}",
-            headers={"Authorization": f"Bearer {token}"},
-            timeout=8.0,
-        )
-        if resp.status_code == 200:
-            return resp.json().get("user", {})
-    except Exception as exc:
-        LOGGER.debug("[SELLER] fetch failed for %s: %s", user_id, exc)
+    async with _seller_sem:
+        await asyncio.sleep(random.uniform(0.3, 0.8))
+        try:
+            resp = await client.get(
+                f"https://www.vinted.co.uk/api/v2/users/{user_id}",
+                headers={"Authorization": f"Bearer {token}"},
+                timeout=8.0,
+            )
+            if resp.status_code == 200:
+                return resp.json().get("user", {})
+        except Exception as exc:
+            LOGGER.debug("[SELLER] fetch failed for %s: %s", user_id, exc)
     return {}
 
 
