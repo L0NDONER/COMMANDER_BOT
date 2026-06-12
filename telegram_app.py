@@ -24,7 +24,14 @@ import uvicorn
 import database
 from services.ebay.scout_async import evaluate_with_consensus_saas
 from services.ebay.vinted_catalog import warmup as vinted_warmup
-from services.vinted.watcher import nugget_loop, load_token as vinted_load_token, token_expires_in
+from services.vinted.watcher import (
+    nugget_loop,
+    load_token as vinted_load_token,
+    token_expires_in,
+    sweep as vinted_sweep,
+    format_nugget_alert,
+    is_nugget,
+)
 from web_app import app as web_app
 
 # ------------------------------------------------------------------------------
@@ -292,6 +299,23 @@ async def _vinted_expiry_monitor(app) -> None:
         await asyncio.sleep(60)
 
 
+async def handle_sweep(update: Update, context) -> None:
+    if int(update.effective_chat.id) != int(OWNER_CHAT_ID):
+        return
+    await update.message.reply_text("Running sweep…")
+    try:
+        candidates = await vinted_sweep()
+    except RuntimeError as exc:
+        await update.message.reply_text(f"Sweep failed: {exc}")
+        return
+    nuggets = [(b, item) for b, item in candidates if is_nugget(item)]
+    if not nuggets:
+        await update.message.reply_text("Sweep done — no nuggets found.")
+        return
+    for brand, item in nuggets:
+        await update.message.reply_text(format_nugget_alert(brand, item), parse_mode="Markdown")
+
+
 # ------------------------------------------------------------------------------
 # Main
 # ------------------------------------------------------------------------------
@@ -308,6 +332,7 @@ async def main_async() -> None:
     app.add_handler(CommandHandler("sold", handle_sold))
     app.add_handler(CommandHandler("pnl", handle_pnl))
     app.add_handler(CommandHandler("vinted", handle_vinted_token))
+    app.add_handler(CommandHandler("sweep", handle_sweep))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
 
     vinted_token = os.getenv("VINTED_TOKEN", "")

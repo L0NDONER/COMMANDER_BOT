@@ -1,5 +1,5 @@
 [
-  {"name": "Rab Hoodie",            "max_price": 60, "size_label": null},
+  {"name": "Rab",                   "max_price": 35, "size_label": "XL"},
   {"name": "Champion Reverse Weave","max_price": 25, "size_label": "XL"},
   {"name": "Napapijri",             "max_price": 35, "size_label": "XL"},
   {"name": "Penfield",              "max_price": 20, "size_label": "XL"},
