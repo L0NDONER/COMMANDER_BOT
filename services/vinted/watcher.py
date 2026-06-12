@@ -1,15 +1,8 @@
 """Vinted brand watcher — async fan-out over all brands in one sweep.
 
-Auth pattern mirrors the eBay token lock in scout_async.py:
-  - _token_lock: first coroutine to find the bearer token expired queues a
-    refresh; all concurrent waiters get the new token for free (knock-wait).
-  - asyncio.gather fans out all brand searches in parallel once the token is
-    confirmed live; each search is individually time-boxed.
-
-Token: Vinted issues 2-hour JWT bearer tokens (access_token_web from
-devtools). Set VINTED_TOKEN env var or paste into ACCESS_TOKEN below.
-Refresh by logging in again and copying the new token — no refresh endpoint
-is exposed publicly.
+Token: Vinted issues 2-hour JWT bearer tokens (access_token_web).
+Hot-reload: drop a fresh token into token.txt or cookies.json; the watcher
+picks it up on the next get_token() call or within 30s if paused.
 """
 
 import asyncio
@@ -79,7 +72,7 @@ def _curl_impersonate() -> str:
     if "Chrome/" in _SESSION_UA:
         m = re.search(r"Chrome/(\d+)", _SESSION_UA)
         v = int(m.group(1)) if m else 124
-        return "chrome124" if v <= 124 else "chrome124"
+        return "chrome124" if v <= 124 else "chrome131"
     if "Firefox/" in _SESSION_UA:
         return "firefox133"
     if "Safari/" in _SESSION_UA:
@@ -127,7 +120,6 @@ _client: Optional[AsyncSession] = None
 # Knock-wait: first caller to find the token expired or missing fetches a new
 # one; all concurrent callers queue here and then read the refreshed value
 # without hitting the network again (double-checked pattern).
-_token_lock = asyncio.Lock()
 _token: str = ACCESS_TOKEN
 _token_exp: float = 0.0   # unix timestamp; 0 = unknown, treat as expired
 
@@ -266,19 +258,11 @@ def token_expires_in() -> float:
 
 
 async def get_token() -> str:
-    """
-    Return a live bearer token. Raises RuntimeError if expired — callers
-    must handle this gracefully rather than blocking on stdin.
-    """
     _maybe_reload_cookie_jar()
     _maybe_reload_token_from_file()
     if _token_live():
         return _token
-
-    async with _token_lock:
-        if _token_live():
-            return _token
-        raise RuntimeError("VINTED_TOKEN expired — paste cookies.json or token.txt")
+    raise RuntimeError("VINTED_TOKEN expired — paste cookies.json or token.txt")
 
 
 def invalidate_token() -> None:
@@ -680,8 +664,9 @@ async def nugget_loop(send_fn, interval_min: int = 8, interval_max: int = 20) ->
                     _alerted_ids.add(item_id)
         except RuntimeError as exc:
             LOGGER.warning("[NUGGET] paused: %s", exc)
-            # wait until token is refreshed (load_token sets _token_exp)
             while not _token_live():
+                _maybe_reload_token_from_file()
+                _maybe_reload_cookie_jar()
                 await asyncio.sleep(30)
             LOGGER.info("[NUGGET] token refreshed, resuming")
             continue
@@ -697,7 +682,8 @@ async def nugget_loop(send_fn, interval_min: int = 8, interval_max: int = 20) ->
 # MAIN LOOP
 # -------------------------
 
-async def run_watcher() -> None:
+async def dry_run_sweep() -> None:
+    # Debug mode: logs all candidates but never fires alerts. Use nugget_loop for production.
     if ACCESS_TOKEN:
         load_token(ACCESS_TOKEN)
 
@@ -705,7 +691,8 @@ async def run_watcher() -> None:
         candidates = await sweep()
         LOGGER.info("[SWEEP] %d candidates across all brands", len(candidates))
         for brand, item in candidates:
-            LOGGER.info("[CANDIDATE] %s £%s %s", brand.name, item.get("price", {}).get("amount"), item.get("title", ""))
+            nugget_flag = " NUGGET" if is_nugget(item) else ""
+            LOGGER.info("[CANDIDATE%s] %s £%s %s", nugget_flag, brand.name, item.get("price", {}).get("amount"), item.get("title", ""))
 
         sweep_delay = random.uniform(POLL_MIN, POLL_MAX)
         LOGGER.info("[SWEEP DONE] sleeping %.1fs", sweep_delay)
@@ -714,4 +701,4 @@ async def run_watcher() -> None:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
-    asyncio.run(run_watcher())
+    asyncio.run(dry_run_sweep())
