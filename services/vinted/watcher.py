@@ -209,6 +209,34 @@ _GARMENT_HINTS = ["jacket", "coat", "shirt", "long sleeve", "hoodie", "polo"]
 _VAGUE_INTENTS  = ["top", "clothes", "mens wear", "xl top"]
 _GENDER_HINTS   = ["mens", "men's"]
 
+# Category moods — biases garment hints for one sweep
+_CATEGORY_MOODS: List[List[str]] = [
+    ["jacket", "coat", "overshirt", "gilet"],
+    ["shirt", "flannel", "button up", "oxford"],
+    ["hoodie", "sweatshirt", "fleece", "knitwear"],
+    ["t-shirt", "tee", "polo", "long sleeve"],
+]
+_sweep_garment_hints: List[str] = _GARMENT_HINTS
+
+# Size drift: 70% XL, 15% L, 15% XXL
+_SIZE_DRIFT = [(0.70, 206), (0.15, 205), (0.15, 207)]
+
+def _pick_size_id() -> int:
+    r = random.random()
+    acc = 0.0
+    for w, sid in _SIZE_DRIFT:
+        acc += w
+        if r <= acc:
+            return sid
+    return 206
+
+# Occasional brand hops to break the coherent-taste signature
+_DRIFT_BRANDS = [
+    "Nike", "Adidas", "Ralph Lauren", "Tommy Hilfiger", "Levi's",
+    "Stone Island", "New Balance", "Carhartt", "The North Face", "Ellesse",
+    "Superdry", "Polo Sport", "Lacoste", "Under Armour",
+]
+
 
 def _misspell(s: str) -> str:
     if len(s) < 5:
@@ -226,7 +254,7 @@ def _choose_query_shape(brand: BrandConfig) -> str:
     shapes = [
         (0.40, n),
         (0.25, f"{n} {sz}"),
-        (0.15, f"{n} {random.choice(_GARMENT_HINTS)}"),
+        (0.15, f"{n} {random.choice(_sweep_garment_hints)}"),
         (0.10, f"{n} {random.choice(_GENDER_HINTS)}"),
         (0.05, f"{_misspell(n)} {sz}"),
         (0.05, f"{n} {random.choice(_VAGUE_INTENTS)}"),
@@ -246,7 +274,7 @@ def _choose_query_shape(brand: BrandConfig) -> str:
         if len(tokens) > 1 and random.random() < 0.4:
             base = " ".join(tokens[:-1])
         elif random.random() < 0.3:
-            base = f"{base} {random.choice(_GARMENT_HINTS)}"
+            base = f"{base} {random.choice(_sweep_garment_hints)}"
         elif prev and random.random() < 0.3:
             base = prev
 
@@ -263,7 +291,7 @@ async def search_brand(brand: BrandConfig, token: str, query: Optional[str] = No
             "search_text": query or brand.name,
             "order": "newest_first",
             "per_page": 50,
-            "size_id": 206,
+            "size_id": _pick_size_id(),
             "catalog_ids": 5,
         },
     )
@@ -422,6 +450,28 @@ def seller_trust(profile: Dict[str, Any]) -> float:
 
 
 
+async def _fire_drift_brand(token: str) -> None:
+    """Browse a random non-watchlist brand — breaks the coherent-taste signature."""
+    brand = random.choice(_DRIFT_BRANDS)
+    client = _get_client()
+    try:
+        await client.get(
+            "https://www.vinted.co.uk/api/v2/catalog/items",
+            headers={**_base_headers(), "Authorization": f"Bearer {token}"},
+            params={
+                "search_text": brand.lower(),
+                "order": "newest_first",
+                "per_page": 20,
+                "size_id": _pick_size_id(),
+                "catalog_ids": 5,
+            },
+            timeout=8.0,
+        )
+        LOGGER.debug("[DRIFT] hopped to %s", brand)
+    except Exception:
+        pass
+
+
 async def _land_on_homepage(token: str) -> None:
     """Simulate landing on the main feed before navigating to men's."""
     client = _get_client()
@@ -439,14 +489,23 @@ async def _land_on_homepage(token: str) -> None:
 
 
 async def sweep() -> List[tuple[BrandConfig, Dict[str, Any]]]:
+    global _sweep_garment_hints
     _seller_cache.clear()
     token = await get_token()
+    _sweep_garment_hints = random.choice(_CATEGORY_MOODS)
+    LOGGER.debug("[MOOD] %s", _sweep_garment_hints)
     await _land_on_homepage(token)
     pool = random.sample(BRANDS, k=random.randint(6, len(BRANDS)))
     results = []
+    drift_budget = random.randint(0, 2)
+    drift_spent = 0
     for b in pool:
         results.append(await _search_timed(b, token))
         await asyncio.sleep(random.uniform(4, 14))
+        if drift_spent < drift_budget and random.random() < 0.25:
+            await _fire_drift_brand(token)
+            drift_spent += 1
+            await asyncio.sleep(random.uniform(3, 8))
     candidates = [(brand, item) for brand, items in results for item in items]
 
     # Fetch each unique seller exactly once, prioritised by the best _value
