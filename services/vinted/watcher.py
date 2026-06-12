@@ -21,7 +21,7 @@ import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
-import httpx
+from curl_cffi.requests import AsyncSession
 
 LOGGER = logging.getLogger(__name__)
 
@@ -72,6 +72,20 @@ _ACCEPT_LANGUAGE_POOL = [
 _SESSION_UA = random.choice(_USER_AGENTS)
 
 
+def _curl_impersonate() -> str:
+    if "Chrome/" in _SESSION_UA:
+        m = re.search(r"Chrome/(\d+)", _SESSION_UA)
+        v = int(m.group(1)) if m else 124
+        return "chrome124" if v <= 124 else "chrome124"
+    if "Firefox/" in _SESSION_UA:
+        return "firefox133"
+    if "Safari/" in _SESSION_UA:
+        return "safari17_0"
+    return "chrome124"
+
+_IMPERSONATE = _curl_impersonate()
+
+
 def _base_headers() -> dict:
     h = {
         "User-Agent": _SESSION_UA,
@@ -106,7 +120,7 @@ TOKEN_EXPIRY_MARGIN = 120
 # SHARED CLIENT + TOKEN LOCK
 # -------------------------
 
-_client: Optional[httpx.AsyncClient] = None
+_client: Optional[AsyncSession] = None
 # Knock-wait: first caller to find the token expired or missing fetches a new
 # one; all concurrent callers queue here and then read the refreshed value
 # without hitting the network again (double-checked pattern).
@@ -115,17 +129,17 @@ _token: str = ACCESS_TOKEN
 _token_exp: float = 0.0   # unix timestamp; 0 = unknown, treat as expired
 
 
-def _get_client() -> httpx.AsyncClient:
+def _get_client() -> AsyncSession:
     global _client
     if _client is None:
-        _client = httpx.AsyncClient(timeout=10.0)
+        _client = AsyncSession(impersonate=_IMPERSONATE)
     return _client
 
 
 async def aclose() -> None:
     global _client
     if _client is not None:
-        await _client.aclose()
+        await _client.close()
         _client = None
 
 
