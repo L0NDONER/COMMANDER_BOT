@@ -225,12 +225,39 @@ def _maybe_reload_token_from_file() -> None:
         LOGGER.info("[TOKEN] hot-reloaded from token.txt")
 
 
+_SESSION_COOKIES = {
+    "access_token_web", "refresh_token_web",
+    "_vinted_fr_session", "v_sid", "v_udt", "v_uid",
+}
+
+
+def _jwt_sid(token: str) -> str:
+    import base64
+    import json as _json
+    try:
+        payload = token.split(".")[1]
+        payload += "=" * (-len(payload) % 4)
+        return _json.loads(base64.urlsafe_b64decode(payload)).get("sid", "")
+    except Exception:
+        return ""
+
+
 def load_token(raw: str) -> None:
     """Accept a freshly pasted token and update module state."""
     global _token, _token_exp
     _token = raw.strip()
     _token_exp = _parse_exp(_token)
     LOGGER.info("[TOKEN] loaded, exp in %.0fs", _token_exp - time.time())
+    if _client is not None:
+        jar_sid = _client.cookies.get("v_sid", "")
+        token_sid = _jwt_sid(_token)
+        if jar_sid and token_sid and jar_sid != token_sid:
+            for name in _SESSION_COOKIES:
+                try:
+                    del _client.cookies[name]
+                except KeyError:
+                    pass
+            LOGGER.info("[COOKIES] session mismatch — stale session cookies cleared")
 
 
 def token_expires_in() -> float:
