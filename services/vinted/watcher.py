@@ -264,6 +264,7 @@ async def search_brand(brand: BrandConfig, token: str, query: Optional[str] = No
             "order": "newest_first",
             "per_page": 50,
             "size_id": 206,
+            "catalog_ids": 5,
         },
     )
     if resp.status_code in (401, 403):
@@ -421,9 +422,26 @@ def seller_trust(profile: Dict[str, Any]) -> float:
 
 
 
+async def _land_on_homepage(token: str) -> None:
+    """Simulate landing on the main feed before navigating to men's."""
+    client = _get_client()
+    try:
+        await client.get(
+            "https://www.vinted.co.uk/api/v2/catalog/items",
+            headers={**_base_headers(), "Authorization": f"Bearer {token}"},
+            params={"order": "newest_first", "per_page": 20},
+            timeout=8.0,
+        )
+        LOGGER.debug("[LAND] homepage hit")
+    except Exception:
+        pass
+    await asyncio.sleep(random.uniform(2.5, 6.0))
+
+
 async def sweep() -> List[tuple[BrandConfig, Dict[str, Any]]]:
     _seller_cache.clear()
     token = await get_token()
+    await _land_on_homepage(token)
     pool = random.sample(BRANDS, k=random.randint(6, len(BRANDS)))
     results = []
     for b in pool:
