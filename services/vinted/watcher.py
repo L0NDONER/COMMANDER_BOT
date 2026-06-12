@@ -53,6 +53,9 @@ ACCESS_TOKEN: str = os.getenv("VINTED_TOKEN", "")
 _TOKEN_FILE = os.path.join(os.path.dirname(__file__), "token.txt")
 _token_file_mtime: float = 0.0
 
+_COOKIE_FILE = os.path.join(os.path.dirname(__file__), "cookies.json")
+_cookie_file_mtime: float = 0.0
+
 _USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -129,10 +132,51 @@ _token: str = ACCESS_TOKEN
 _token_exp: float = 0.0   # unix timestamp; 0 = unknown, treat as expired
 
 
+def _load_cookie_jar() -> Dict[str, str]:
+    """Parse EditThisCookie JSON export → {name: value} dict."""
+    import json as _json
+    try:
+        with open(_COOKIE_FILE) as f:
+            data = _json.load(f)
+        if isinstance(data, list):
+            return {c["name"]: c["value"] for c in data if "name" in c and "value" in c}
+        if isinstance(data, dict):
+            return data
+    except Exception:
+        pass
+    return {}
+
+
+def _maybe_reload_cookie_jar() -> None:
+    global _cookie_file_mtime
+    try:
+        mtime = os.path.getmtime(_COOKIE_FILE)
+    except OSError:
+        return
+    if mtime <= _cookie_file_mtime:
+        return
+    jar = _load_cookie_jar()
+    if not jar:
+        return
+    _cookie_file_mtime = mtime
+    if _client is not None:
+        for name, value in jar.items():
+            _client.cookies[name] = value
+    token_val = jar.get("access_token_web", "")
+    if token_val:
+        load_token(token_val)
+    LOGGER.info("[COOKIES] jar reloaded (%d cookies)", len(jar))
+
+
 def _get_client() -> AsyncSession:
     global _client
     if _client is None:
         _client = AsyncSession(impersonate=_IMPERSONATE)
+        jar = _load_cookie_jar()
+        if jar:
+            for name, value in jar.items():
+                _client.cookies[name] = value
+            LOGGER.debug("[COOKIES] %d cookies loaded into session", len(jar))
     return _client
 
 
@@ -199,6 +243,7 @@ async def get_token() -> str:
     Return a live bearer token. Raises RuntimeError if expired — callers
     must handle this gracefully rather than blocking on stdin.
     """
+    _maybe_reload_cookie_jar()
     _maybe_reload_token_from_file()
     if _token_live():
         return _token
@@ -206,7 +251,7 @@ async def get_token() -> str:
     async with _token_lock:
         if _token_live():
             return _token
-        raise RuntimeError("VINTED_TOKEN expired — paste a fresh token via /vinted")
+        raise RuntimeError("VINTED_TOKEN expired — paste cookies.json or token.txt")
 
 
 def invalidate_token() -> None:

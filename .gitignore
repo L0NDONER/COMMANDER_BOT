@@ -2,6 +2,7 @@
 credentials.py
 secrets.py
 services/vinted/token.txt
+services/vinted/cookies.json
 
 # Proprietary business logic — lives on EC2 only
 services/ebay/brands.py
