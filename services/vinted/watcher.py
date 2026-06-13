@@ -11,6 +11,7 @@ import os
 import random
 import re
 import time
+from collections import deque
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
@@ -117,9 +118,6 @@ TOKEN_EXPIRY_MARGIN = 120
 # -------------------------
 
 _client: Optional[AsyncSession] = None
-# Knock-wait: first caller to find the token expired or missing fetches a new
-# one; all concurrent callers queue here and then read the refreshed value
-# without hitting the network again (double-checked pattern).
 _token: str = ACCESS_TOKEN
 _token_exp: float = 0.0   # unix timestamp; 0 = unknown, treat as expired
 
@@ -358,6 +356,7 @@ async def search_brand(brand: BrandConfig, token: str, query: Optional[str] = No
             "size_id": _pick_size_id(),
             "catalog_ids": 5,
         },
+        timeout=15.0,
     )
     if resp.status_code in (401, 403):
         invalidate_token()
@@ -612,7 +611,7 @@ NUGGET_VAL   = 0.40
 NUGGET_REL   = 1.00
 NUGGET_TRUST = 0.70
 
-_alerted_ids: set = set()
+_alerted_ids: deque = deque(maxlen=5000)
 
 
 def is_nugget(item: Dict[str, Any]) -> bool:
@@ -655,7 +654,7 @@ async def nugget_loop(send_fn, interval_min: int = 8, interval_max: int = 20) ->
                     msg = format_nugget_alert(brand, item)
                     LOGGER.info("[NUGGET] %s £%s", brand.name, item.get("price", {}).get("amount"))
                     await send_fn(msg)
-                    _alerted_ids.add(item_id)
+                    _alerted_ids.append(item_id)
         except (RuntimeError, PermissionError) as exc:
             LOGGER.warning("[NUGGET] paused: %s", exc)
             invalidate_token()
@@ -683,11 +682,14 @@ async def dry_run_sweep() -> None:
         load_token(ACCESS_TOKEN)
 
     while True:
-        candidates = await sweep()
-        LOGGER.info("[SWEEP] %d candidates across all brands", len(candidates))
-        for brand, item in candidates:
-            nugget_flag = " NUGGET" if is_nugget(item) else ""
-            LOGGER.info("[CANDIDATE%s] %s £%s %s", nugget_flag, brand.name, item.get("price", {}).get("amount"), item.get("title", ""))
+        try:
+            candidates = await sweep()
+            LOGGER.info("[SWEEP] %d candidates across all brands", len(candidates))
+            for brand, item in candidates:
+                nugget_flag = " NUGGET" if is_nugget(item) else ""
+                LOGGER.info("[CANDIDATE%s] %s £%s %s", nugget_flag, brand.name, item.get("price", {}).get("amount"), item.get("title", ""))
+        except Exception as exc:
+            LOGGER.error("[DRY RUN] sweep error: %s", exc)
 
         sweep_delay = random.uniform(POLL_MIN, POLL_MAX)
         LOGGER.info("[SWEEP DONE] sleeping %.1fs", sweep_delay)
