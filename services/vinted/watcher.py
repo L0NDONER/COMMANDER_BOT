@@ -6,6 +6,8 @@ picks it up on the next get_token() call or within 30s if paused.
 """
 
 import asyncio
+import base64
+import json
 import logging
 import os
 import random
@@ -13,6 +15,7 @@ import re
 import time
 from collections import deque
 from dataclasses import dataclass
+from difflib import SequenceMatcher
 from typing import Any, Dict, List, Optional
 
 from curl_cffi.requests import AsyncSession
@@ -34,10 +37,9 @@ class BrandConfig:
 
 
 def _load_brands() -> List[BrandConfig]:
-    import json as _json
     p = os.path.join(os.path.dirname(__file__), "watchlist.json")
     with open(p) as f:
-        return [BrandConfig(**e) for e in _json.load(f)]
+        return [BrandConfig(**e) for e in json.load(f)]
 
 BRANDS: List[BrandConfig] = _load_brands()
 
@@ -96,8 +98,7 @@ def _base_headers() -> dict:
     }
     # Client hints only sent by Chromium-based browsers
     if "Chrome/" in _SESSION_UA:
-        import re as _re
-        m = _re.search(r"Chrome/(\d+)", _SESSION_UA)
+        m = re.search(r"Chrome/(\d+)", _SESSION_UA)
         v = m.group(1) if m else "125"
         platform = '"macOS"' if "Macintosh" in _SESSION_UA else '"Windows"'
         h["Sec-Ch-Ua"] = f'"Google Chrome";v="{v}", "Chromium";v="{v}", "Not.A/Brand";v="24"'
@@ -124,10 +125,9 @@ _token_exp: float = 0.0   # unix timestamp; 0 = unknown, treat as expired
 
 def _load_cookie_jar() -> Dict[str, str]:
     """Parse EditThisCookie JSON export → {name: value} dict."""
-    import json as _json
     try:
         with open(_COOKIE_FILE) as f:
-            data = _json.load(f)
+            data = json.load(f)
         if isinstance(data, list):
             return {c["name"]: c["value"] for c in data if "name" in c and "value" in c}
         if isinstance(data, dict):
@@ -187,8 +187,6 @@ def _token_live() -> bool:
 
 def _parse_exp(token: str) -> float:
     """Decode exp claim from a JWT without a third-party library."""
-    import base64
-    import json
     try:
         payload = token.split(".")[1]
         payload += "=" * (-len(payload) % 4)   # re-pad
@@ -222,12 +220,10 @@ _SESSION_COOKIES = {
 
 
 def _jwt_sid(token: str) -> str:
-    import base64
-    import json as _json
     try:
         payload = token.split(".")[1]
         payload += "=" * (-len(payload) % 4)
-        return _json.loads(base64.urlsafe_b64decode(payload)).get("sid", "")
+        return json.loads(base64.urlsafe_b64decode(payload)).get("sid", "")
     except Exception:
         return ""
 
@@ -394,7 +390,6 @@ def _size_matches(item: Dict[str, Any], target: str) -> bool:
 
 
 def _brand_relevance(item: Dict[str, Any], brand: BrandConfig) -> float:
-    from difflib import SequenceMatcher
     title = (item.get("title") or "").lower()
     b = brand.name.lower()
     if b in title:
