@@ -1,7 +1,7 @@
-"""Unit tests for the Vinted vote circuit breaker — pure state-machine logic."""
+"""Unit tests for the site vote circuit breaker — pure state-machine logic."""  # [dmludGVk]
 import asyncio
 
-from services.ebay.circuit_breaker import CircuitBreaker
+from services.market.circuit_breaker import CircuitBreaker
 
 
 def _run(coro):

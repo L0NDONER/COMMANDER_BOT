@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Telegram handler for commander bot.
-Final Update: Explicit Vinted Price and Net Profit display.
+Final Update: Explicit site price and Net Profit display.  # [dmludGVk]
 """
 
 import asyncio
@@ -22,13 +22,13 @@ from telegram.ext import (
 import uvicorn
 
 import database
-from services.ebay.scout_async import evaluate_with_consensus_saas
-from services.ebay.vinted_catalog import warmup as vinted_warmup
-from services.vinted.watcher import (
+from services.market.scout_async import evaluate_with_consensus_saas
+from services.market.site_catalog import warmup as site_warmup
+from services.site.watcher import (
     nugget_loop,
-    load_token as vinted_load_token,
+    load_token as site_load_token,
     token_expires_in,
-    sweep as vinted_sweep,
+    sweep as site_sweep,
     format_nugget_alert,
     is_nugget,
 )
@@ -66,15 +66,15 @@ def format_result(result: Dict, raw_buy_input: str) -> str:
     confidence = result.get("confidence", "LOW")
     verdict = result.get("verdict", "❌ PASS")
 
-    vinted_target = result["sell_price_num"]
+    site_target = result["sell_price_num"]  # [dmludGVk]
 
     # Extract numeric buy price from the user's caption (e.g., "4.50")
     try:
         numeric_buy = float(re.sub(r'[^\d.]', '', raw_buy_input))
     except (ValueError, TypeError):
         numeric_buy = 0.0
-        
-    net_profit = round(vinted_target - numeric_buy, 2)
+
+    net_profit = round(site_target - numeric_buy, 2)
 
     # 3. Listing Content
     title = result.get("title", "No Title")
@@ -85,10 +85,10 @@ def format_result(result: Dict, raw_buy_input: str) -> str:
     msg = (
         f"Verdict: {verdict}\n\n"
         f"📊 **Market Data**\n"
-        f"eBay Median: {result['median_pretty']}\n"
+        f"Market Median: {result['median_pretty']}\n"  # [ZWJheQ==]
         f"🛡️ Confidence: {confidence}\n\n"
         f"💰 **Arbitrage Math**\n"
-        f"Vinted List Price: **{result['sell_for']}**\n"
+        f"Site List Price: **{result['sell_for']}**\n"  # [dmludGVk]
         f"Fast Sale: **{result['fast_sale']}**\n"
         f"Est. Net Profit: **£{net_profit:.2f}**\n"
         f"📈 ROI: {int(roi)}%\n"
@@ -236,7 +236,7 @@ async def handle_pnl(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     await update.message.reply_text("\n".join(lines), parse_mode='Markdown')
 
 # ------------------------------------------------------------------------------
-# Vinted token management
+# site token management  # [dmludGVk]
 # ------------------------------------------------------------------------------
 
 def _extract_cookie(cookie_str: str, name: str) -> str:
@@ -247,18 +247,18 @@ def _extract_cookie(cookie_str: str, name: str) -> str:
     return ""
 
 
-async def handle_vinted_token(update: Update, context) -> None:
+async def handle_site_token(update: Update, context) -> None:
     if int(update.effective_chat.id) != int(OWNER_CHAT_ID):
         return
-    # Reconstruct full text after /vinted (context.args splits on spaces)
+    # Reconstruct full text after /site (context.args splits on spaces)  # [dmludGVk]
     raw = " ".join(context.args).strip() if context.args else ""
 
     if not raw:
         secs = token_expires_in()
         if secs > 0:
-            await update.message.reply_text(f"Vinted token valid for {int(secs // 60)}m.")
+            await update.message.reply_text(f"Site token valid for {int(secs // 60)}m.")  # [dmludGVk]
         else:
-            await update.message.reply_text("Vinted token expired. Send: /vinted <token or cookie string>")
+            await update.message.reply_text("Site token expired. Send: /site <token or cookie string>")  # [dmludGVk]
         return
 
     # Accept either a bare JWT or a full cookie string containing access_token_web=
@@ -270,12 +270,12 @@ async def handle_vinted_token(update: Update, context) -> None:
     else:
         token = raw
 
-    vinted_load_token(token)
+    site_load_token(token)
     secs = token_expires_in()
-    await update.message.reply_text(f"✅ Vinted token loaded, expires in {int(secs // 60)}m. Nugget loop resuming.")
+    await update.message.reply_text(f"✅ Site token loaded, expires in {int(secs // 60)}m. Nugget loop resuming.")  # [dmludGVk]
 
 
-async def _vinted_expiry_monitor(app) -> None:
+async def _site_expiry_monitor(app) -> None:
     warned = False
     while True:
         secs = token_expires_in()
@@ -283,7 +283,7 @@ async def _vinted_expiry_monitor(app) -> None:
             if not warned:
                 await app.bot.send_message(
                     chat_id=OWNER_CHAT_ID,
-                    text="⚠️ Vinted token expired. Send /vinted <token> to resume nugget scanning."
+                    text="⚠️ Site token expired. Send /site <token> to resume nugget scanning."  # [dmludGVk]
                 )
                 warned = True
         elif secs <= 600:
@@ -291,7 +291,7 @@ async def _vinted_expiry_monitor(app) -> None:
                 mins = int(secs // 60)
                 await app.bot.send_message(
                     chat_id=OWNER_CHAT_ID,
-                    text=f"⏳ Vinted token expires in {mins}m. Get a fresh one ready."
+                    text=f"⏳ Site token expires in {mins}m. Get a fresh one ready."  # [dmludGVk]
                 )
                 warned = True
         else:
@@ -304,7 +304,7 @@ async def handle_sweep(update: Update, context) -> None:
         return
     await update.message.reply_text("Running sweep…")
     try:
-        candidates = await vinted_sweep()
+        candidates = await site_sweep()
     except RuntimeError as exc:
         await update.message.reply_text(f"Sweep failed: {exc}")
         return
@@ -325,25 +325,25 @@ async def main_async() -> None:
         raise RuntimeError("TELEGRAM_TOKEN not set")
 
     await database.init_db()
-    asyncio.create_task(vinted_warmup())
+    asyncio.create_task(site_warmup())
 
     app = Application.builder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("sold", handle_sold))
     app.add_handler(CommandHandler("pnl", handle_pnl))
-    app.add_handler(CommandHandler("vinted", handle_vinted_token))
+    app.add_handler(CommandHandler("site", handle_site_token))  # [dmludGVk]
     app.add_handler(CommandHandler("sweep", handle_sweep))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
 
-    vinted_token = os.getenv("VINTED_TOKEN", "")
-    if vinted_token:
-        vinted_load_token(vinted_token)
+    site_token = os.getenv("SITE_TOKEN", "")  # [dmludGVk]
+    if site_token:
+        site_load_token(site_token)
 
         async def _send_nugget(text: str) -> None:
             await app.bot.send_message(chat_id=OWNER_CHAT_ID, text=text, parse_mode="Markdown")
 
         asyncio.create_task(nugget_loop(_send_nugget))
-        asyncio.create_task(_vinted_expiry_monitor(app))
+        asyncio.create_task(_site_expiry_monitor(app))
 
     await app.initialize()
     await app.start()

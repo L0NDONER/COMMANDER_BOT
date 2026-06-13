@@ -23,7 +23,7 @@ class _FakeResponse:
 
 
 def _items_with_feedback(*feedback_pcts):
-    """Build fake eBay item list with given seller feedbackPercentage values."""
+    """Build fake market item list with given seller feedbackPercentage values."""  # [ZWJheQ==]
     prices = [20.0, 25.0, 30.0]
     return [
         {
@@ -58,14 +58,14 @@ class FakeAsyncClient:
 # ── Fixture ───────────────────────────────────────────────────────────────────
 
 def _make_scout(tmp_path, items):
-    for name in ("database", "services.ebay.scout_async"):
+    for name in ("database", "services.market.scout_async"):
         sys.modules.pop(name, None)
 
     import database
     database.DB_PATH = tmp_path / "stress.db"
     asyncio.run(database.init_db())
 
-    import services.ebay.scout_async as mod
+    import services.market.scout_async as mod
     fake = FakeAsyncClient(items)
     mod._client = fake
     mod._token_lock = asyncio.Lock()

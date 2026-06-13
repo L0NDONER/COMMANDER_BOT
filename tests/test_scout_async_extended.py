@@ -1,4 +1,4 @@
-"""Extended tests for services/ebay/scout_async.py — covers paths
+"""Extended tests for services/market/scout_async.py — covers paths  # [ZWJheQ==]
 the existing test_scout_async.py doesn't reach."""
 
 import asyncio
@@ -53,14 +53,14 @@ class FakeAsyncClient:
 
 @pytest.fixture
 def scout(tmp_path):
-    for name in ("database", "services.ebay.scout_async"):
+    for name in ("database", "services.market.scout_async"):
         sys.modules.pop(name, None)
 
     import database
     database.DB_PATH = tmp_path / "test.db"
     asyncio.run(database.init_db())
 
-    import services.ebay.scout_async as scout_mod
+    import services.market.scout_async as scout_mod
     fake = FakeAsyncClient()
     scout_mod._client = fake
     scout_mod._token_lock = asyncio.Lock()

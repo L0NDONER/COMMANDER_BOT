@@ -2,12 +2,12 @@
 
 import pytest
 
-from services.ebay import scout_update
-from services.ebay.scout_update import (
+from services.market import scout_update
+from services.market.scout_update import (
     _title_matches,
     analyse,
     charm,
-    choose_vinted_discount,
+    choose_site_discount,
     compute_confidence,
     detect_condition,
     diversify_query,
@@ -88,21 +88,21 @@ def test_haircut_low_confidence_spares_big_winner():
     assert res["verdict"] == "STRONG BUY"
 
 
-# ---------- choose_vinted_discount ----------
+# ---------- choose_site_discount ----------
 
-def test_choose_vinted_discount_default_when_no_brand_match():
-    assert choose_vinted_discount("random thing") == scout_update.DEFAULT_VINTED_DISCOUNT
+def test_choose_site_discount_default_when_no_brand_match():
+    assert choose_site_discount("random thing") == scout_update.DEFAULT_SITE_DISCOUNT
 
 
-def test_choose_vinted_discount_strong_brand(monkeypatch):
+def test_choose_site_discount_strong_brand(monkeypatch):
     monkeypatch.setattr(scout_update, "STRONG_BRANDS", ["barbour"])
-    assert choose_vinted_discount("barbour jacket xxl") == scout_update.STRONG_BRAND_DISCOUNT
+    assert choose_site_discount("barbour jacket xxl") == scout_update.STRONG_BRAND_DISCOUNT
 
 
-def test_choose_vinted_discount_slow_keyword(monkeypatch):
+def test_choose_site_discount_slow_keyword(monkeypatch):
     monkeypatch.setattr(scout_update, "STRONG_BRANDS", [])
     monkeypatch.setattr(scout_update, "SLOW_KEYWORDS", ["pyjamas"])
-    assert choose_vinted_discount("kids pyjamas") == 0.40
+    assert choose_site_discount("kids pyjamas") == 0.40
 
 
 # ---------- analyse ----------

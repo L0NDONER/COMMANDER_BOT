@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Pure helpers and constants for the eBay pricing pipeline.
+"""Pure helpers and constants for the market pricing pipeline.  # [ZWJheQ==]
 
 The networking, Redis fan-out, and consensus dispatch that used to live here
-were collapsed into services/ebay/scout_async.py. This module now holds only
+were collapsed into services/market/scout_async.py. This module now holds only
 the side-effect-free pieces that scout_async (and the test suite) import.
 """
 
@@ -14,7 +14,7 @@ import statistics
 from datetime import datetime, timezone
 from typing import Dict, List
 
-from services.ebay.brands import STRONG_BRANDS, SLOW_KEYWORDS
+from services.market.brands import STRONG_BRANDS, SLOW_KEYWORDS
 
 # ------------------------------------------------------------------------------
 # Configuration
@@ -22,19 +22,19 @@ from services.ebay.brands import STRONG_BRANDS, SLOW_KEYWORDS
 
 MARKETPLACE = "EBAY_GB"
 
-# Vinted discount tiers (eBay median × tier = Vinted list price)
-DEFAULT_VINTED_DISCOUNT = 0.75
+# site discount tiers (market median × tier = site list price)  # [dmludGVk] [ZWJheQ==]
+DEFAULT_SITE_DISCOUNT = 0.75
 STRONG_BRAND_DISCOUNT = 0.80
 SLOW_KEYWORD_DISCOUNT = 0.40
-FAST_SALE_MULTIPLIER = 0.88        # Vinted "Fast Sale" = list × this
+FAST_SALE_MULTIPLIER = 0.88        # site "Fast Sale" = list × this  # [dmludGVk]
 
 # Consensus — tiered fan-out deadlines (passed into gather_votes per source).
-# eBay is fast + reliable: keep the hot path snappy. Vinted is slow + polite
+# market is fast + reliable: keep the hot path snappy. site is slow + polite  # [ZWJheQ==] [dmludGVk]
 # (behind the home-IP SOCKS tunnel): give it a generous window so the timeout
 # stops truncating real comps and biasing the median-of-medians.
 CONSENSUS_TIMEOUT_SECONDS = 10          # legacy default / shared fallback
-EBAY_TIMEOUT_SECONDS = 8                # Tier 1 (fast)
-VINTED_TIMEOUT_SECONDS = 25             # Tier 2 (polite)
+MARKET_TIMEOUT_SECONDS = 8                # Tier 1 (fast)
+SITE_TIMEOUT_SECONDS = 25             # Tier 2 (polite)
 
 # kv_cache TTLs (seconds)
 VISION_CACHE_TTL_SECONDS = 3600
@@ -180,13 +180,13 @@ def compute_confidence(vals: List[float]) -> str:
     return "LOW"
 
 
-def choose_vinted_discount(query: str) -> float:
+def choose_site_discount(query: str) -> float:
     ql = query.lower()
     if any(b in ql for b in STRONG_BRANDS):
         return STRONG_BRAND_DISCOUNT
     if any(k in ql for k in SLOW_KEYWORDS):
         return SLOW_KEYWORD_DISCOUNT
-    return DEFAULT_VINTED_DISCOUNT
+    return DEFAULT_SITE_DISCOUNT
 
 
 def generate_listing_draft(query: str, keywords: List[str]) -> Dict[str, str]:
@@ -199,7 +199,7 @@ def generate_listing_draft(query: str, keywords: List[str]) -> Dict[str, str]:
         "- Condition: Great pre-owned condition\n\n"
         "Fast shipping! Check my other items for bundle deals."
     )
-    # Vinted search is a text search bar, not a hashtag browser. Space-stripped
+    # site search is a text search bar, not a hashtag browser. Space-stripped  # [dmludGVk]
     # tags (#StoneIsland) don't match a buyer typing "Stone Island" — keep the
     # spaces and use commas so each word is a separate search-indexable token.
     seo_tags = ", ".join(keywords)
@@ -241,7 +241,7 @@ def _score(votes: List[Dict], base_query: str, clean_buy: float) -> Dict:
         len(votes), winner["replica"], winner["query"],
     )
 
-    discount = choose_vinted_discount(base_query)
+    discount = choose_site_discount(base_query)
     sell_price = avg_median * discount
     confidence = compute_confidence(medians)
 

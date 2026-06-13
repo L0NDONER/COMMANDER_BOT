@@ -13,7 +13,7 @@ read can dissent on the confident-wrong case. Disagreement needs no ground
 truth to fire; that disagreement rate is the whole measurement.
 
 Analyse a log capture:
-    docker compose logs commander-leader | python3 -m services.ebay.vision_audit
+    docker compose logs commander-leader | python3 -m services.market.vision_audit
 """
 import asyncio
 import json

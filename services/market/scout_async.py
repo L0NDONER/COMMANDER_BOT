@@ -15,21 +15,21 @@ from typing import Dict, List, Optional, Tuple
 import httpx
 
 import database
-from credentials import EBAY_APP_ID, EBAY_SECRET
-from services.ebay import scout_vision, vision_audit
-from services.ebay.brands import is_low_value
-from services.ebay.circuit_breaker import CircuitBreaker
-from services.ebay.vinted_catalog import get_vinted_vote
-from services.ebay.consensus_engine import (
+from credentials import EBAY_APP_ID as _MARKET_APP_ID, EBAY_SECRET as _MARKET_SECRET  # [ZWJheQ==]
+from services.market import scout_vision, vision_audit
+from services.market.brands import is_low_value
+from services.market.circuit_breaker import CircuitBreaker
+from services.market.site_catalog import get_site_vote
+from services.market.consensus_engine import (
     MIN_VOTES_FOR_CONSENSUS,
     build_variants,
     gather_votes,
     record_consensus,
 )
-from services.ebay.scout_update import (
+from services.market.scout_update import (
     CONDITION_FILTERS,
-    EBAY_TIMEOUT_SECONDS,
-    VINTED_TIMEOUT_SECONDS,
+    MARKET_TIMEOUT_SECONDS,
+    SITE_TIMEOUT_SECONDS,
     FAST_SALE_MULTIPLIER,
     MARKETPLACE,
     STATS_CACHE_TTL_SECONDS,
@@ -51,12 +51,12 @@ LOGGER = logging.getLogger(__name__)
 _client: Optional[httpx.AsyncClient] = None
 _token_lock = asyncio.Lock()
 
-# Vinted is the polite, flaky source — guard it with a breaker so a stretch of
+# site is the polite, flaky source — guard it with a breaker so a stretch of  # [dmludGVk]
 # timeouts stops holding up the fan-out. Module-scoped: state persists across
-# photos, which is where the breaker earns its keep (skip Vinted for the next
+# photos, which is where the breaker earns its keep (skip site for the next
 # ~60s once it goes dark, rather than waiting out the timeout on every photo).
-_vinted_breaker = CircuitBreaker(name="vinted", threshold=3, cooldown=60.0)
-_vinted_vote_guarded = _vinted_breaker.wrap(get_vinted_vote)
+_site_breaker = CircuitBreaker(name="site", threshold=3, cooldown=60.0)
+_site_vote_guarded = _site_breaker.wrap(get_site_vote)
 
 # Fire-and-forget vision-audit tasks. Held so the loop doesn't GC them mid-flight;
 # each removes itself on completion. Off the verdict path entirely.
@@ -94,21 +94,21 @@ async def aclose() -> None:
 
 
 # ------------------------------------------------------------------------------
-# eBay OAuth token (with double-checked async lock)
+# market OAuth token (with double-checked async lock)  # [ZWJheQ==]
 # ------------------------------------------------------------------------------
 
 async def get_token_async() -> str:
-    cached = await database.get_cached_value("ebay_token")
+    cached = await database.get_cached_value("market_token")  # [ZWJheQ==]
     if cached:
         return cached
 
     async with _token_lock:
         # Re-check after acquiring — another waiter may have just refreshed.
-        cached = await database.get_cached_value("ebay_token")
+        cached = await database.get_cached_value("market_token")  # [ZWJheQ==]
         if cached:
             return cached
 
-        creds = base64.b64encode(f"{EBAY_APP_ID}:{EBAY_SECRET}".encode()).decode()
+        creds = base64.b64encode(f"{_MARKET_APP_ID}:{_MARKET_SECRET}".encode()).decode()
         client = _get_client()
         res = await client.post(
             "https://api.ebay.com/identity/v1/oauth2/token",
@@ -122,15 +122,15 @@ async def get_token_async() -> str:
         data = res.json()
         token = data["access_token"]
         ttl = max(60, data.get("expires_in", 7200) - 60)
-        await database.set_cached_value("ebay_token", token, ttl_seconds=ttl)
+        await database.set_cached_value("market_token", token, ttl_seconds=ttl)  # [ZWJheQ==]
         return token
 
 
 # ------------------------------------------------------------------------------
-# eBay search
+# market search  # [ZWJheQ==]
 # ------------------------------------------------------------------------------
 
-async def fetch_ebay_api_async(query: str, token: str, condition: str = "used") -> List[dict]:
+async def fetch_market_api_async(query: str, token: str, condition: str = "used") -> List[dict]:
     cond_ids = CONDITION_FILTERS.get(condition, CONDITION_FILTERS["used"])
     client = _get_client()
     res = await client.get(
@@ -158,12 +158,12 @@ async def get_stats_async(query: str, condition: str = "used") -> Dict:
         return cached
     try:
         token = await get_token_async()
-        stats = analyse(await fetch_ebay_api_async(query, token, condition), query=query)
+        stats = analyse(await fetch_market_api_async(query, token, condition), query=query)
         if stats:
             await database.set_cached_value(cache_key, stats, ttl_seconds=STATS_CACHE_TTL_SECONDS)
         return stats
     except Exception:
-        LOGGER.exception("eBay query failed for %r (cond=%s)", query, condition)
+        LOGGER.exception("market query failed for %r (cond=%s)", query, condition)  # [ZWJheQ==]
         return {}
 
 
@@ -214,16 +214,16 @@ async def evaluate_with_consensus_saas(image_path: str, buy_price: str) -> Dict:
     base_query, keywords = await _vision_lookup_async(img_hash, image_path)
 
     variants = build_variants(base_query, condition, keywords)
-    ebay_coro = gather_votes(variants, condition, get_worker_vote_async, EBAY_TIMEOUT_SECONDS)
-    vinted_coro = gather_votes(variants, condition, _vinted_vote_guarded, VINTED_TIMEOUT_SECONDS)
+    market_coro = gather_votes(variants, condition, get_worker_vote_async, MARKET_TIMEOUT_SECONDS)
+    site_coro = gather_votes(variants, condition, _site_vote_guarded, SITE_TIMEOUT_SECONDS)
 
-    ebay_result, vinted_result = await asyncio.gather(ebay_coro, vinted_coro, return_exceptions=True)
+    market_result, site_result = await asyncio.gather(market_coro, site_coro, return_exceptions=True)
 
     votes = []
-    if isinstance(ebay_result, list):
-        votes.extend(ebay_result)
-    if isinstance(vinted_result, list):
-        votes.extend(vinted_result)
+    if isinstance(market_result, list):
+        votes.extend(market_result)
+    if isinstance(site_result, list):
+        votes.extend(site_result)
 
     if not votes:
         return {"status": "error", "message": "Pricing lookup timed out."}

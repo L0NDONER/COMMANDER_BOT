@@ -1,4 +1,4 @@
-"""Tests for services/ebay/consensus_engine.py."""
+"""Tests for services/market/consensus_engine.py."""  # [ZWJheQ==]
 
 import asyncio
 import sys
@@ -7,7 +7,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from services.ebay.consensus_engine import (
+from services.market.consensus_engine import (
     MIN_VOTES_FOR_CONSENSUS,
     build_variants,
     gather_votes,

@@ -1,6 +1,6 @@
 """End-to-end test for the async consensus pipeline.
 
-Mocks the shared httpx.AsyncClient (so no real eBay calls) and leans on the
+Mocks the shared httpx.AsyncClient (so no real market calls) and leans on the  # [ZWJheQ==]
 conftest stub for scout_vision. Catches wiring mistakes — missing awaits,
 wrong vote shape, broken cache reads, lock regressions — without needing
 real API keys.
@@ -28,7 +28,7 @@ class _FakeResponse:
 
 
 class FakeAsyncClient:
-    """Records every call, returns canned eBay/OAuth responses."""
+    """Records every call, returns canned market/OAuth responses."""  # [ZWJheQ==]
 
     def __init__(self, search_items=None, fail_queries=None):
         self.token_calls = 0
@@ -71,14 +71,14 @@ class FakeAsyncClient:
 @pytest.fixture
 def scout(tmp_path):
     # Fresh import so the test gets an isolated module-level _client / _token_lock.
-    for name in ("database", "services.ebay.scout_async"):
+    for name in ("database", "services.market.scout_async"):
         sys.modules.pop(name, None)
 
     import database
     database.DB_PATH = tmp_path / "test_saas.db"
     asyncio.run(database.init_db())
 
-    import services.ebay.scout_async as scout_mod
+    import services.market.scout_async as scout_mod
     fake = FakeAsyncClient()
     scout_mod._client = fake
     # Fresh lock bound to the test's event loop (asyncio.run creates a new loop per call,
@@ -143,7 +143,7 @@ def test_token_cache_reused_across_runs(scout, image_path, tmp_path):
     """Second photo eval should reuse the cached token, no OAuth round-trip."""
     scout_mod, fake, _db = scout
     _run(scout_mod.evaluate_with_consensus_saas(image_path, "5.00"))
-    # Different image so vision/stats caches don't short-circuit eBay calls
+    # Different image so vision/stats caches don't short-circuit market calls  # [ZWJheQ==]
     second = tmp_path / "photo2.jpg"
     second.write_bytes(b"different-image-bytes")
     _run(scout_mod.evaluate_with_consensus_saas(str(second), "5.00"))

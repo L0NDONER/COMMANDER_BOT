@@ -1,7 +1,7 @@
 """Unified async SQLite store for commander-saas.
 
 Holds the SaaS user ledger, a TTL-aware key/value cache that replaces the
-Redis string keys (ebay_token, vision:*, stats:*), and the buys/sales tables
+Redis string keys (market_token, vision:*, stats:*), and the buys/sales tables  # [ZWJheQ==]
 migrated from the old sales_db.py.
 
 WAL mode lets the photo pipeline read/write concurrently from multiple awaits
@@ -94,7 +94,7 @@ async def init_db() -> None:
 
 
 # ------------------------------------------------------------------------------
-# kv_cache — replaces Redis string keys (ebay_token, vision:*, stats:*)
+# kv_cache — replaces Redis string keys (market_token, vision:*, stats:*)  # [ZWJheQ==]
 # ------------------------------------------------------------------------------
 
 async def get_cached_value(key: str):
@@ -170,7 +170,7 @@ async def log_buy(
     query: str,
     buy_price: float,
     median: Optional[float] = None,
-    vinted_target: Optional[float] = None,
+    site_target: Optional[float] = None,  # [dmludGVk] column: vinted_target
     verdict: Optional[str] = None,
     raw: str = "",
 ) -> int:
@@ -183,7 +183,7 @@ async def log_buy(
                 query.lower().strip(),
                 float(buy_price),
                 float(median) if median is not None else None,
-                float(vinted_target) if vinted_target is not None else None,
+                float(site_target) if site_target is not None else None,
                 verdict,
                 raw,
             ),

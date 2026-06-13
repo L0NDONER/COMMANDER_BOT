@@ -9,11 +9,11 @@ return closes it, another timeout re-arms it.
 
 It trips on asyncio.CancelledError only — that is the fan-out deadline firing,
 i.e. the "knock that wasn't answered". A graceful None (no comps found) leaves
-the breaker closed: the source answered, it just had no data. (Vinted swallows
+the breaker closed: the source answered, it just had no data. (site swallows  # [dmludGVk]
 its own HTTP errors into None upstream, so the timeout is the only hard-failure
 signal that reaches this layer.)
 
-Generic — knows nothing about Vinted or eBay; mirrors scout_diag.instrument().
+Generic — knows nothing about site or market; mirrors scout_diag.instrument().  # [dmludGVk] [ZWJheQ==]
 One breaker instance per source, held at module scope so state persists across
 fan-outs — that cross-photo memory is the whole point.
 """

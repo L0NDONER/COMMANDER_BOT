@@ -7,11 +7,11 @@ survivors we want to study. One `event` id per instrument() call groups a single
 fan-out, so the analyser can ask, *within one photo*, whether slower variants
 price differently (i.e. whether the timeout biases the median-of-medians).
 
-Generic timing wrapper — knows nothing about eBay; the engine stays pure.
+Generic timing wrapper — knows nothing about market; the engine stays pure.  # [ZWJheQ==]
 
 Analyse a log capture:
-    docker compose logs commander-leader | python3 -m services.ebay.scout_diag
-    # or:  python3 -m services.ebay.scout_diag < some_logfile
+    docker compose logs commander-leader | python3 -m services.market.scout_diag
+    # or:  python3 -m services.market.scout_diag < some_logfile
 """
 import json
 import logging
@@ -45,7 +45,7 @@ def instrument(fetch_vote: VoteFetcher) -> VoteFetcher:
 
 
 # ── analyser: read SCOUT_DIAG lines, test latency<->price within each photo ───
-_CACHE_MS = 2.0   # below this, a "fetch" was a cache hit (no eBay latency signal)
+_CACHE_MS = 2.0   # below this, a "fetch" was a cache hit (no market latency signal)  # [ZWJheQ==]
 
 
 def _parse(stream) -> List[dict]:

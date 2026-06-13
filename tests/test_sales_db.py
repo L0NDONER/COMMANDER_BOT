@@ -86,7 +86,7 @@ def test_parse_sold_returns_none_without_pound_prefix(parse_sold):
 
 def test_log_buy_persists(db):
     rid = _run(db.log_buy("u", "Jordan 1 Low uk 9", 4.50,
-                          median=70.0, vinted_target=50.4,
+                          median=70.0, site_target=50.4,  # [dmludGVk]
                           verdict="✅ BUY", raw="4.50"))
     assert rid == 1
     rows = _run(db.recent_buys())

@@ -1,7 +1,7 @@
 """Tests for the vision-audit comparator, shadow runner, and analyser."""
 import asyncio
 
-from services.ebay import vision_audit
+from services.market import vision_audit
 
 
 def _run(coro):
@@ -63,7 +63,7 @@ def test_run_shadow_logs_comparison(caplog):
         return "Ralph Lauren, Polo Shirt, M"
 
     import logging
-    with caplog.at_level(logging.INFO, logger="services.ebay.vision_audit"):
+    with caplog.at_level(logging.INFO, logger="services.market.vision_audit"):
         _run(vision_audit.run_shadow("img.jpg", "Ralph Lauren Polo Shirt", fake_groq))
     assert any("VISION_AUDIT" in r.message for r in caplog.records)
     assert any('"agree": true' in r.message for r in caplog.records)

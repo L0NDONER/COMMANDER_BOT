@@ -12,7 +12,7 @@ def test_telegram_app_imports():
 
 
 def test_scout_update_imports():
-    from services.ebay import scout_update
+    from services.market import scout_update
     # Pure helpers + verdict math survived the Redis-strip refactor.
     assert hasattr(scout_update, "analyse")
     assert hasattr(scout_update, "charm")
@@ -21,7 +21,7 @@ def test_scout_update_imports():
 
 
 def test_scout_async_imports():
-    from services.ebay import scout_async
+    from services.market import scout_async
     assert hasattr(scout_async, "evaluate_with_consensus_saas")
     assert hasattr(scout_async, "get_token_async")
     assert hasattr(scout_async, "get_worker_vote_async")

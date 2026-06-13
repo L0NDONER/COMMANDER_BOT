@@ -9,16 +9,16 @@ from typing import Dict, List, Optional
 import httpx
 
 import database
-from services.ebay.scout_update import _title_matches
+from services.market.scout_update import _title_matches
 
 LOGGER = logging.getLogger(__name__)
 
-VINTED_BASE = "https://www.vinted.co.uk"
-VINTED_SEARCH = f"{VINTED_BASE}/api/v2/catalog/items"
-VINTED_PROXY = os.getenv("VINTED_PROXY", "")
-VINTED_CACHE_TTL = 43200  # 12 hours
-VINTED_TO_EBAY = 1 / 0.72
-VINTED_MAX_AGE_DAYS = 30
+SITE_BASE = "https://www.vinted.co.uk"
+SITE_SEARCH = f"{SITE_BASE}/api/v2/catalog/items"
+SITE_PROXY = os.getenv("SITE_PROXY", "")
+SITE_CACHE_TTL = 43200  # 12 hours
+SITE_TO_MARKET = 1 / 0.72
+SITE_MAX_AGE_DAYS = 30
 
 HEADERS = {
     "User-Agent": (
@@ -38,7 +38,7 @@ def _get_client() -> httpx.AsyncClient:
     if _client is None:
         _client = httpx.AsyncClient(
             timeout=15.0,
-            proxy=VINTED_PROXY or None,
+            proxy=SITE_PROXY or None,
             headers=HEADERS,
         )
     return _client
@@ -50,9 +50,9 @@ async def _ensure_session() -> None:
         if _cookies is not None:
             return
         client = _get_client()
-        resp = await client.get(VINTED_BASE)
+        resp = await client.get(SITE_BASE)
         _cookies = resp.cookies
-        LOGGER.info("Vinted session initialised (%d cookies)", len(_cookies))
+        LOGGER.info("site session initialised (%d cookies)", len(_cookies))  # [dmludGVk]
 
 
 async def refresh_session() -> None:
@@ -66,32 +66,32 @@ async def warmup() -> None:
     try:
         await _ensure_session()
     except Exception:
-        LOGGER.warning("Vinted warmup failed — will retry on first request")
+        LOGGER.warning("site warmup failed — will retry on first request")  # [dmludGVk]
 
 
-async def search_vinted(query: str, per_page: int = 20) -> List[float]:
+async def search_site(query: str, per_page: int = 20) -> List[float]:
     await _ensure_session()
     await asyncio.sleep(random.uniform(0.3, 1.0))
 
     client = _get_client()
     resp = await client.get(
-        VINTED_SEARCH,
+        SITE_SEARCH,
         params={"search_text": query, "per_page": str(per_page), "order": "relevance"},
         cookies=_cookies,
-        headers={"Referer": f"{VINTED_BASE}/catalog?search_text={query}"},
+        headers={"Referer": f"{SITE_BASE}/catalog?search_text={query}"},
     )
 
     if resp.status_code == 401:
-        LOGGER.warning("Vinted 401 — refreshing session")
+        LOGGER.warning("site 401 — refreshing session")  # [dmludGVk]
         await refresh_session()
         return []
 
     if resp.status_code != 200:
-        LOGGER.warning("Vinted %d for %r", resp.status_code, query)
+        LOGGER.warning("site %d for %r", resp.status_code, query)  # [dmludGVk]
         return []
 
     items = resp.json().get("items", [])
-    cutoff = time.time() - VINTED_MAX_AGE_DAYS * 86400
+    cutoff = time.time() - SITE_MAX_AGE_DAYS * 86400
     prices = []
     for item in items:
         try:
@@ -110,29 +110,29 @@ async def search_vinted(query: str, per_page: int = 20) -> List[float]:
     return prices
 
 
-async def get_vinted_stats(query: str, condition: str = "used") -> Dict:
-    cache_key = f"stats:vinted:{condition}:{query.lower()}"
+async def get_site_stats(query: str, condition: str = "used") -> Dict:
+    cache_key = f"stats:site:{condition}:{query.lower()}"  # [dmludGVk]
     cached = await database.get_cached_value(cache_key)
     if cached:
         return cached
 
     try:
-        prices = await search_vinted(query)
+        prices = await search_site(query)
         if not prices:
             return {}
         stats = {"median": statistics.median(prices)}
-        await database.set_cached_value(cache_key, stats, ttl_seconds=VINTED_CACHE_TTL)
+        await database.set_cached_value(cache_key, stats, ttl_seconds=SITE_CACHE_TTL)
         return stats
     except Exception:
-        LOGGER.exception("Vinted query failed for %r", query)
+        LOGGER.exception("site query failed for %r", query)  # [dmludGVk]
         return {}
 
 
-async def get_vinted_vote(query: str, condition: str, index: int = 0) -> Optional[Dict]:
-    stats = await get_vinted_stats(query, condition)
+async def get_site_vote(query: str, condition: str, index: int = 0) -> Optional[Dict]:
+    stats = await get_site_stats(query, condition)
     if "median" not in stats:
         return None
-    normalized = stats["median"] * VINTED_TO_EBAY
+    normalized = stats["median"] * SITE_TO_MARKET
     return {"median": normalized, "query": query, "replica": f"#V{index}"}
 
 
@@ -141,18 +141,18 @@ if __name__ == "__main__":
 
     async def _test(query: str, use_proxy: bool = False):
         global _client
-        proxy = VINTED_PROXY if use_proxy else None
+        proxy = SITE_PROXY if use_proxy else None
         _client = httpx.AsyncClient(timeout=15.0, proxy=proxy, headers=HEADERS)
 
-        print(f"Searching Vinted UK for: {query!r}")
-        prices = await search_vinted(query)
+        print(f"Searching site UK for: {query!r}")  # [dmludGVk]
+        prices = await search_site(query)
         if not prices:
             print("No results.")
             return
         median = statistics.median(prices)
         print(f"Got {len(prices)} prices: {sorted(prices)}")
-        print(f"Vinted median: £{median:.2f}")
-        print(f"Normalized (eBay-equivalent): £{median * VINTED_TO_EBAY:.2f}")
+        print(f"site median: £{median:.2f}")  # [dmludGVk]
+        print(f"Normalized (market-equivalent): £{median * SITE_TO_MARKET:.2f}")  # [ZWJheQ==]
         await _client.aclose()
 
     q = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "nike air max 90"

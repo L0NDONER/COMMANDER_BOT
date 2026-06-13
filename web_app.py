@@ -17,7 +17,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 
 import database
 from navigation.router import router as nav_router
-from services.ebay.scout_async import evaluate_with_consensus_saas
+from services.market.scout_async import evaluate_with_consensus_saas
 
 LOGGER = logging.getLogger(__name__)
 

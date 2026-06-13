@@ -1,6 +1,6 @@
-"""Vinted brand watcher — async fan-out over all brands in one sweep.
+"""site brand watcher — async fan-out over all brands in one sweep.  # [dmludGVk]
 
-Token: Vinted issues 2-hour JWT bearer tokens (access_token_web).
+Token: site issues 2-hour JWT bearer tokens (access_token_web).  # [dmludGVk]
 Hot-reload: drop a fresh token into token.txt or cookies.json; the watcher
 picks it up on the next get_token() call or within 30s if paused.
 """
@@ -43,8 +43,8 @@ def _load_brands() -> List[BrandConfig]:
 
 BRANDS: List[BrandConfig] = _load_brands()
 
-# Set VINTED_TOKEN in env, or write to token.txt next to this file.
-ACCESS_TOKEN: str = os.getenv("VINTED_TOKEN", "")
+# Set SITE_TOKEN in env, or write to token.txt next to this file.
+ACCESS_TOKEN: str = os.getenv("SITE_TOKEN", "")
 
 _TOKEN_FILE = os.path.join(os.path.dirname(__file__), "token.txt")
 _token_file_mtime: float = 0.0
@@ -256,7 +256,7 @@ async def get_token() -> str:
     _maybe_reload_token_from_file()
     if _token_live():
         return _token
-    raise RuntimeError("VINTED_TOKEN expired — paste cookies.json or token.txt")
+    raise RuntimeError("SITE_TOKEN expired — paste cookies.json or token.txt")
 
 
 def invalidate_token() -> None:
