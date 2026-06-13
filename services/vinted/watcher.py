@@ -315,8 +315,6 @@ def _misspell(s: str) -> str:
     return s[:i] + s[i + 1:]
 
 
-_last_queries: Dict[str, str] = {}
-
 
 def _choose_query_shape(brand: BrandConfig) -> str:
     n = brand.name.lower()
@@ -339,16 +337,12 @@ def _choose_query_shape(brand: BrandConfig) -> str:
             break
 
     if random.random() < 0.12:
-        prev = _last_queries.get(brand.name)
         tokens = base.split()
         if len(tokens) > 1 and random.random() < 0.4:
             base = " ".join(tokens[:-1])
         elif random.random() < 0.3:
             base = f"{base} {random.choice(_sweep_garment_hints)}"
-        elif prev and random.random() < 0.3:
-            base = prev
 
-    _last_queries[brand.name] = base
     return base
 
 
@@ -662,8 +656,9 @@ async def nugget_loop(send_fn, interval_min: int = 8, interval_max: int = 20) ->
                     LOGGER.info("[NUGGET] %s £%s", brand.name, item.get("price", {}).get("amount"))
                     await send_fn(msg)
                     _alerted_ids.add(item_id)
-        except RuntimeError as exc:
+        except (RuntimeError, PermissionError) as exc:
             LOGGER.warning("[NUGGET] paused: %s", exc)
+            invalidate_token()
             while not _token_live():
                 _maybe_reload_token_from_file()
                 _maybe_reload_cookie_jar()
