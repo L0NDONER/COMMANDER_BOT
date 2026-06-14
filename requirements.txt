@@ -3,6 +3,7 @@ groq==1.0.0
 requests==2.32.3
 httpx[socks]
 curl-cffi>=0.7.0
+nugget @ git+https://github.com/L0NDONER/nugget.git
 aiosqlite
 PyYAML==6.0.2
 betfairlightweight

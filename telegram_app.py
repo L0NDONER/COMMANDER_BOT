@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Telegram handler for commander bot.
-Final Update: Explicit site price and Net Profit display.  # [dmludGVk]
+Final Update: Explicit site price and Net Profit display.
 """
 
 import asyncio
@@ -24,7 +24,7 @@ import uvicorn
 import database
 from services.market.scout_async import evaluate_with_consensus_saas
 from services.market.site_catalog import warmup as site_warmup
-from services.site.watcher import (
+from nugget import (
     nugget_loop,
     load_token as site_load_token,
     token_expires_in,
