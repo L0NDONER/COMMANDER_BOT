@@ -26,6 +26,7 @@ sync: ## Push local -> EC2, validate nginx, reload nginx + fail2ban.
 	$(RSYNC) $(LOCAL) $(HOST):/etc/
 	ssh $(HOST) "sudo nginx -t && sudo systemctl reload nginx && sudo fail2ban-client reload"
 	@echo "OK infra synced and services reloaded"
+	@python3 /home/martin/tama/signal.py feed deploy
 
 reload: ## Reload services without rsync (after an emergency edit on EC2).
 	ssh $(HOST) "sudo nginx -t && sudo systemctl reload nginx && sudo fail2ban-client reload"

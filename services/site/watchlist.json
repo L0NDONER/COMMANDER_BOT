@@ -11,5 +11,6 @@
   {"name": "Boss Orange",           "max_price": 25, "size_label": "XL"},
   {"name": "Gant",                  "max_price": 20, "size_label": "XL"},
   {"name": "Abercrombie & Fitch",   "max_price": 12, "size_label": "XL"},
-  {"name": "Fred Perry",            "max_price": 25, "size_label": "XL"}
+  {"name": "Fred Perry",            "max_price": 25, "size_label": "XL"},
+  {"name": "Haglofs",               "max_price": 35, "size_label": "XL"}
 ]
