@@ -21,9 +21,9 @@ from services.market.brands import is_low_value
 from services.market.circuit_breaker import CircuitBreaker
 from services.market.site_catalog import get_site_vote
 from services.market.consensus_engine import (
-    MIN_VOTES_FOR_CONSENSUS,
     build_variants,
     gather_votes,
+    meets_quorum,
     record_consensus,
 )
 from services.market.scout_update import (
@@ -228,7 +228,8 @@ async def evaluate_with_consensus_saas(image_path: str, buy_price: str) -> Dict:
     if not votes:
         return {"status": "error", "message": "Pricing lookup timed out."}
 
-    if len(votes) < MIN_VOTES_FOR_CONSENSUS:
+    if not meets_quorum(votes):
+        LOGGER.info("Quorum not met: %d votes pooled", len(votes))
         return {"status": "error", "message": "Insufficient market data."}
 
     scored = _score(votes, base_query, clean_buy)

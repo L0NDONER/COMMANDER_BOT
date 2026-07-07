@@ -95,10 +95,18 @@ def _stub_record_consensus(base_query, condition, keywords, votes):
     pass
 
 
+_MIN_VOTES_FOR_CONSENSUS = 2
+
+
+def _stub_meets_quorum(votes):
+    return votes is not None and len(votes) >= _MIN_VOTES_FOR_CONSENSUS
+
+
 _stub(
     "services.market.consensus_engine",
-    MIN_VOTES_FOR_CONSENSUS=2,
+    MIN_VOTES_FOR_CONSENSUS=_MIN_VOTES_FOR_CONSENSUS,
     build_variants=_stub_build_variants,
     gather_votes=_stub_gather_votes,
+    meets_quorum=_stub_meets_quorum,
     record_consensus=_stub_record_consensus,
 )
