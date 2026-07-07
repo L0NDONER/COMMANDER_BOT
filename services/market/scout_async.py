@@ -238,8 +238,8 @@ async def evaluate_with_consensus_saas(image_path: str, buy_price: str) -> Dict:
 
     return {
         "status": "success",
-        "median": round(scored["avg_median"], 2),
-        "median_pretty": charm(scored["avg_median"]),
+        "median": round(scored["verdict_median"], 2),
+        "median_pretty": charm(scored["verdict_median"]),
         "sell_for": charm(sell_price),
         "sell_price_num": round(sell_price, 2),
         "fast_sale": charm(sell_price * FAST_SALE_MULTIPLIER),
@@ -247,7 +247,7 @@ async def evaluate_with_consensus_saas(image_path: str, buy_price: str) -> Dict:
         "winner": scored["winner"],
         "roi": round(scored["roi"], 0),
         "verdict": scored["verdict"],
-        "spread": int(round(clean_buy - scored["avg_median"])),
+        "spread": int(round(clean_buy - scored["verdict_median"])),
         "trust": scored["trust"],
         "query": base_query,
         "title": listing["title"],

@@ -1,5 +1,7 @@
 """Pure-function tests — no network, no Redis, no DB."""
 
+import statistics
+
 import pytest
 
 from services.market import scout_update
@@ -54,9 +56,9 @@ def test_haircut_low_confidence_demotes_marginal_strong_to_maybe():
     # Wide median spread → LOW confidence. True ROI ~156% would be STRONG on its
     # own, but the 0.5 haircut drops it below the 80% BUY line → MAYBE.
     votes = [
-        {"median": 50.0, "replica": "#0", "query": "widget"},
-        {"median": 100.0, "replica": "#1", "query": "widget"},
-        {"median": 150.0, "replica": "#2", "query": "widget"},
+        {"median": 50.0, "replica": "#0", "query": "widget", "variant_idx": 0},
+        {"median": 100.0, "replica": "#1", "query": "widget", "variant_idx": 0},
+        {"median": 150.0, "replica": "#2", "query": "widget", "variant_idx": 0},
     ]
     res = scout_update._score(votes, "widget", clean_buy=29.3)
     assert res["confidence"] == "LOW"
@@ -67,9 +69,9 @@ def test_haircut_low_confidence_demotes_marginal_strong_to_maybe():
 def test_haircut_high_confidence_keeps_strong():
     # Same ROI, tight spread → HIGH confidence, no haircut → stays STRONG BUY.
     votes = [
-        {"median": 95.0, "replica": "#0", "query": "widget"},
-        {"median": 100.0, "replica": "#1", "query": "widget"},
-        {"median": 105.0, "replica": "#2", "query": "widget"},
+        {"median": 95.0, "replica": "#0", "query": "widget", "variant_idx": 0},
+        {"median": 100.0, "replica": "#1", "query": "widget", "variant_idx": 0},
+        {"median": 105.0, "replica": "#2", "query": "widget", "variant_idx": 0},
     ]
     res = scout_update._score(votes, "widget", clean_buy=29.3)
     assert res["confidence"] == "HIGH"
@@ -79,13 +81,58 @@ def test_haircut_high_confidence_keeps_strong():
 def test_haircut_low_confidence_spares_big_winner():
     # Even halved, a huge ROI clears the STRONG line — LOW shouldn't demote it.
     votes = [
-        {"median": 50.0, "replica": "#0", "query": "widget"},
-        {"median": 100.0, "replica": "#1", "query": "widget"},
-        {"median": 150.0, "replica": "#2", "query": "widget"},
+        {"median": 50.0, "replica": "#0", "query": "widget", "variant_idx": 0},
+        {"median": 100.0, "replica": "#1", "query": "widget", "variant_idx": 0},
+        {"median": 150.0, "replica": "#2", "query": "widget", "variant_idx": 0},
     ]
     res = scout_update._score(votes, "widget", clean_buy=10.0)
     assert res["confidence"] == "LOW"
     assert res["verdict"] == "STRONG BUY"
+
+
+# ---------- _score bucket ladder (base bucket vs. suffix fallback) ----------
+
+def _vote(median, variant_idx, replica=0):
+    return {"median": median, "replica": f"#{replica}", "query": "q", "variant_idx": variant_idx}
+
+
+def test_score_uses_base_bucket_alone_when_it_meets_threshold():
+    # 3 base votes (>= MIN_BUCKET_VOTES) at 100, plus a wildly different
+    # suffix bucket at 10 — verdict must come from the base bucket only.
+    votes = [
+        _vote(100.0, variant_idx=0, replica=0),
+        _vote(100.0, variant_idx=0, replica=1),
+        _vote(100.0, variant_idx=0, replica=2),
+        _vote(10.0, variant_idx=1, replica=0),
+        _vote(10.0, variant_idx=1, replica=1),
+    ]
+    res = scout_update._score(votes, "widget", clean_buy=1.0)
+    assert res["verdict_median"] == 100.0
+
+
+def test_score_falls_back_to_pooled_when_base_bucket_too_thin():
+    # Only 2 base votes (< MIN_BUCKET_VOTES) — must pool base + suffix, not
+    # drop the base votes and let the suffix bucket alone decide.
+    votes = [
+        _vote(100.0, variant_idx=0, replica=0),
+        _vote(100.0, variant_idx=0, replica=1),
+        _vote(10.0, variant_idx=1, replica=0),
+        _vote(10.0, variant_idx=1, replica=1),
+        _vote(10.0, variant_idx=1, replica=2),
+    ]
+    res = scout_update._score(votes, "widget", clean_buy=1.0)
+    assert res["verdict_median"] == statistics.median([100.0, 100.0, 10.0, 10.0, 10.0])
+
+
+def test_score_single_variant_never_hits_empty_median():
+    # build_variants can return just the base anchor (all suffixes
+    # inapplicable) — no suffix bucket to pool with, must not raise.
+    votes = [
+        _vote(100.0, variant_idx=0, replica=0),
+        _vote(100.0, variant_idx=0, replica=1),
+    ]
+    res = scout_update._score(votes, "widget", clean_buy=1.0)
+    assert res["verdict_median"] == 100.0
 
 
 # ---------- choose_site_discount ----------

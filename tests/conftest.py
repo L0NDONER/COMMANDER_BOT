@@ -75,7 +75,12 @@ async def _stub_gather_votes(variants, condition, fetch_vote, timeout):
         )
     except _asyncio.TimeoutError:
         return None
-    return [r for r in results if isinstance(r, dict) and "median" in r]
+    votes = []
+    for i, r in enumerate(results):
+        if isinstance(r, dict) and "median" in r:
+            r["variant_idx"] = i
+            votes.append(r)
+    return votes
 
 
 async def _stub_site_vote(query, condition, index=0):  # [dmludGVk]

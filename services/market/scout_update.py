@@ -36,6 +36,15 @@ CONSENSUS_TIMEOUT_SECONDS = 10          # legacy default / shared fallback
 MARKET_TIMEOUT_SECONDS = 8                # Tier 1 (fast)
 SITE_TIMEOUT_SECONDS = 25             # Tier 2 (polite)
 
+# Votes needed from the base-anchor bucket alone (variant_idx == 0) before we
+# trust it without the suffix bucket. A majority of the 5-replica fan-out, not
+# the same number as MIN_VOTES_FOR_CONSENSUS (consensus_engine.py) — that one
+# is the overall floor across every bucket combined; this one gates whether
+# the base bucket is trustworthy on its own. Keeping them separate means a
+# single flaky base replica can't silently demote the verdict to the
+# suffix-biased pooled path.
+MIN_BUCKET_VOTES = 3
+
 # kv_cache TTLs (seconds)
 VISION_CACHE_TTL_SECONDS = 3600
 STATS_CACHE_TTL_SECONDS = 3600
@@ -233,17 +242,34 @@ def _verdict_from_roi(roi: float) -> str:
 
 
 def _score(votes: List[Dict], base_query: str, clean_buy: float) -> Dict:
-    medians = [v["median"] for v in votes]
-    avg_median = statistics.median(medians)
-    winner = min(votes, key=lambda v: abs(v["median"] - avg_median))
+    # Three median levels: replica_median (per-vote "median", one search's
+    # listings), bucket_median (a variant's replicas), verdict_median (what
+    # the pricing decision is actually based on). variant_idx == 0 is always
+    # the base anchor (build_variants puts it first) — the trusted query.
+    # Suffix variants are a backup against a base-query miss, not a pricing
+    # input: they only enter verdict_median when the base bucket is too thin
+    # to stand alone, and even then only pooled alongside the base votes, so
+    # a sparse-but-present base sample still pulls its weight.
+    base_votes = [v for v in votes if v.get("variant_idx", 0) == 0]
+
+    if len(base_votes) >= MIN_BUCKET_VOTES:
+        path = "base"
+        bucket_votes = base_votes
+    else:
+        path = "pooled"
+        bucket_votes = votes  # caller already enforced len(votes) >= MIN_VOTES_FOR_CONSENSUS
+
+    bucket_medians = [v["median"] for v in bucket_votes]
+    verdict_median = statistics.median(bucket_medians)
+    winner = min(bucket_votes, key=lambda v: abs(v["median"] - verdict_median))
     LOGGER.info(
-        "Consensus: %d votes, winner=%s query=%s",
-        len(votes), winner["replica"], winner["query"],
+        "Consensus: path=%s base_votes=%d total_votes=%d winner=%s query=%s",
+        path, len(base_votes), len(votes), winner["replica"], winner["query"],
     )
 
     discount = choose_site_discount(base_query)
-    sell_price = avg_median * discount
-    confidence = compute_confidence(medians)
+    sell_price = verdict_median * discount
+    confidence = compute_confidence(bucket_medians)
 
     if clean_buy > 0:
         roi = (sell_price - clean_buy) / clean_buy * 100
@@ -254,10 +280,10 @@ def _score(votes: List[Dict], base_query: str, clean_buy: float) -> Dict:
         roi = FREE_STOCK_ROI_SENTINEL
         verdict = "STRONG BUY" if sell_price >= FREE_STOCK_MIN_SELL else "PASS"
 
-    trust_vals = [v["trust"] for v in votes if "trust" in v]
+    trust_vals = [v["trust"] for v in bucket_votes if "trust" in v]
     trust = round(statistics.median(trust_vals)) if trust_vals else None
     return {
-        "avg_median": avg_median,
+        "verdict_median": verdict_median,
         "sell_price": sell_price,
         "confidence": confidence,
         "winner": winner["replica"],
