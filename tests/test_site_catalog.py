@@ -176,8 +176,8 @@ def test_vote_returns_normalized_median(site):
     fake._items = [_make_item(10), _make_item(20), _make_item(30)]
     vote = _run(mod.get_site_vote("nike air max 90", "used", 0))
     assert vote is not None
-    # median=20, normalized = 20 / 0.72
-    expected = 20.0 * (1 / 0.72)
+    # median=20, normalized = 20 / 0.75
+    expected = 20.0 * (1 / 0.75)
     assert abs(vote["median"] - expected) < 0.01
     assert vote["replica"] == "#V0"
 

@@ -9,7 +9,7 @@ from typing import Dict, List, Optional
 import httpx
 
 import database
-from services.market.scout_update import _title_matches
+from services.market.scout_update import DEFAULT_SITE_DISCOUNT, _title_matches
 
 LOGGER = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ SITE_BASE = "https://www.vinted.co.uk"
 SITE_SEARCH = f"{SITE_BASE}/api/v2/catalog/items"
 SITE_PROXY = os.getenv("SITE_PROXY", "")
 SITE_CACHE_TTL = 43200  # 12 hours
-SITE_TO_MARKET = 1 / 0.72
+SITE_TO_MARKET = 1 / DEFAULT_SITE_DISCOUNT
 SITE_MAX_AGE_DAYS = 30
 
 HEADERS = {
