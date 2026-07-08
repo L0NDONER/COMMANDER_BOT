@@ -14,6 +14,7 @@ import os
 import PIL.Image
 import requests
 from google import genai
+from google.genai import types
 from pyzbar.pyzbar import decode as decode_barcode
 
 from credentials import GEMINI_API_KEY, GROQ_API_KEY
@@ -91,33 +92,37 @@ def _scan_barcode(image_path: str) -> tuple | None:
     return None
 
 
-def _call_gemini(image_path: str):
-    client = genai.Client(api_key=GEMINI_API_KEY)
+def _encode_jpeg(image_path: str) -> bytes:
+    """Shrink to the tile boundary and encode once, so Gemini and Groq read the
+    exact same bytes — a byte-identical comparison, not an approximately-fair one.
+    """
     image = PIL.Image.open(image_path)
-    # Phone photos are 4–8MB; shrinking to the tile boundary cuts upload latency
-    # over mobile by seconds. Barcode scanning keeps the full-res image.
     image.thumbnail((VISION_MAX_PX, VISION_MAX_PX))
+    if image.mode != "RGB":
+        image = image.convert("RGB")
+    buf = io.BytesIO()
+    image.save(buf, format="JPEG", quality=95)  # near-lossless; don't starve labels
+    return buf.getvalue()
+
+
+def _call_gemini(image_bytes: bytes):
+    client = genai.Client(api_key=GEMINI_API_KEY)
     return client.models.generate_content(
         model="gemini-3-flash-preview",
-        contents=[image, IDENTIFY_PROMPT],
+        contents=[types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg"), IDENTIFY_PROMPT],
     )
 
 
-def groq_identify(image_path: str) -> str:
+def groq_identify(image_bytes: bytes) -> str:
     """Independent vision read via Groq's multimodal Llama 4. Returns the raw
     model string (may be 'NOT_FOUND'). Diagnostic only — the verdict never sees
     this; it exists so VISION_AUDIT can compare it against the Gemini read.
 
-    Uses the same IDENTIFY_PROMPT as Gemini so the two are answering the same
-    question. OpenAI-compatible chat endpoint with a base64 image block.
+    Takes the same encoded bytes passed to Gemini, so the two are reading an
+    identical image, not just similarly-fair ones. OpenAI-compatible chat
+    endpoint with a base64 image block.
     """
-    image = PIL.Image.open(image_path)
-    image.thumbnail((VISION_MAX_PX, VISION_MAX_PX))   # same fidelity as Gemini
-    if image.mode != "RGB":
-        image = image.convert("RGB")
-    buf = io.BytesIO()
-    image.save(buf, format="JPEG", quality=95)        # near-lossless; don't starve labels
-    b64 = base64.b64encode(buf.getvalue()).decode()
+    b64 = base64.b64encode(image_bytes).decode()
 
     resp = requests.post(
         "https://api.groq.com/openai/v1/chat/completions",
@@ -142,10 +147,11 @@ def identify_item(image_path: str) -> tuple:
     barcode_result = _scan_barcode(image_path)
     if barcode_result:
         return barcode_result
+    image_bytes = _encode_jpeg(image_path)
     # ThreadPoolExecutor gives the call site a hard wall-clock timeout —
     # the Gemini SDK has no caller-controllable timeout option.
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(_call_gemini, image_path)
+        future = executor.submit(_call_gemini, image_bytes)
         try:
             response = future.result(timeout=GEMINI_TIMEOUT)
         except concurrent.futures.TimeoutError:

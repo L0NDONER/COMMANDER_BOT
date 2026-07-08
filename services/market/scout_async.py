@@ -63,6 +63,20 @@ _site_vote_guarded = _site_breaker.wrap(get_site_vote)
 _audit_tasks: set = set()
 
 
+async def _run_vision_audit(image_path: str, gemini_query: str) -> None:
+    # Re-encode with the same params identify_item used for Gemini, so Groq
+    # reads byte-identical JPEG bytes rather than a separately-encoded copy.
+    # to_thread'd: PIL open/thumbnail/encode is sync and must not block the loop.
+    try:
+        image_bytes = await asyncio.to_thread(scout_vision._encode_jpeg, image_path)
+    except asyncio.CancelledError:
+        return                                  # loop shutting down; nothing to log
+    except Exception as exc:
+        LOGGER.warning("VISION_AUDIT encode failed: %r", exc)
+        return
+    await vision_audit.run_shadow(image_bytes, gemini_query, scout_vision.groq_identify)
+
+
 def _schedule_vision_audit(image_path: str, gemini_query: str) -> None:
     """Kick off the independent Groq read in the background (cache-miss only).
     OFF by default: the 2026-05-27 audit found Gemini reads reliable and Groq's
@@ -70,9 +84,7 @@ def _schedule_vision_audit(image_path: str, gemini_query: str) -> None:
     the live path. Set env VISION_AUDIT=1 to re-enable, e.g. for a real-photo run."""
     if os.getenv("VISION_AUDIT", "0") != "1":
         return
-    task = asyncio.create_task(
-        vision_audit.run_shadow(image_path, gemini_query, scout_vision.groq_identify)
-    )
+    task = asyncio.create_task(_run_vision_audit(image_path, gemini_query))
     _audit_tasks.add(task)
     task.add_done_callback(_audit_tasks.discard)
 
@@ -222,8 +234,12 @@ async def evaluate_with_consensus_saas(image_path: str, buy_price: str) -> Dict:
     votes = []
     if isinstance(market_result, list):
         votes.extend(market_result)
+    else:
+        LOGGER.warning("Market vote gather failed: %r", market_result)
     if isinstance(site_result, list):
         votes.extend(site_result)
+    else:
+        LOGGER.warning("Site vote gather failed: %r", site_result)
 
     if not votes:
         return {"status": "error", "message": "Pricing lookup timed out."}

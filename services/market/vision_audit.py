@@ -24,7 +24,7 @@ from typing import Callable, List
 
 LOGGER = logging.getLogger(__name__)
 
-GroqReader = Callable[[str], str]   # image_path -> raw model string
+GroqReader = Callable[[bytes], str]   # jpeg bytes -> raw model string
 
 # Sizes are noise for "is this the same product"; brand + type carry the signal.
 _SIZE_TOKENS = {"xs", "s", "m", "l", "xl", "xxl", "xxxl", "os"}
@@ -61,11 +61,11 @@ def same_product(a: str, b: str) -> bool:
     return len(shared_non_brand) >= 1
 
 
-async def run_shadow(image_path: str, gemini_query: str, groq_reader: GroqReader) -> None:
+async def run_shadow(image_bytes: bytes, gemini_query: str, groq_reader: GroqReader) -> None:
     """Background: independent Groq read, compared to the Gemini query, logged.
     Swallows everything — a diagnostic must never disturb the request."""
     try:
-        groq_raw = await asyncio.to_thread(groq_reader, image_path)
+        groq_raw = await asyncio.to_thread(groq_reader, image_bytes)
         LOGGER.info("VISION_AUDIT %s", json.dumps({
             "gemini": gemini_query,
             "groq": groq_raw,
