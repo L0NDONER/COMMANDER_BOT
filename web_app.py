@@ -7,6 +7,8 @@ pipeline the Telegram bot uses, and returns the verdict as JSON.
 
 import logging
 import os
+import re
+import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 from uuid import uuid4
@@ -17,11 +19,38 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 
 import database
 from navigation.router import router as nav_router
+from services.market.identity_evaluate import evaluate_via_identity
 from services.market.scout_async import evaluate_with_consensus_saas
 
 LOGGER = logging.getLogger(__name__)
 
 WEB_DIR = Path(__file__).parent / "web"
+
+# Retry support: uploaded photos live here (not bare /tmp — we don't own that
+# dir, a glob sweep there would delete other processes' files) for PHOTO_TTL
+# so a failed evaluate can be retried without re-upload. photo_id is always a
+# uuid4().hex minted server-side, so PHOTO_ID_RE makes path lookups safe by
+# construction — never build a path from client input without matching first.
+PHOTO_DIR = Path("/tmp/flaz_photos")
+PHOTO_DIR.mkdir(exist_ok=True)
+PHOTO_TTL_SECONDS = 3600
+PHOTO_ID_RE = re.compile(r"^[0-9a-f]{32}$")
+
+
+def _sweep_expired_photos() -> None:
+    cutoff = time.time() - PHOTO_TTL_SECONDS
+    for f in PHOTO_DIR.glob("*.jpg"):
+        try:
+            if f.stat().st_mtime < cutoff:
+                f.unlink()
+        except OSError:
+            pass
+
+
+def _photo_path(photo_id: str) -> Path | None:
+    if not PHOTO_ID_RE.fullmatch(photo_id):
+        return None
+    return PHOTO_DIR / f"{photo_id}.jpg"
 
 
 @asynccontextmanager
@@ -99,25 +128,41 @@ async def log_buy(
         return JSONResponse({"status": "error", "message": str(exc)}, status_code=500)
 
 
+async def _run_pipeline(path: str, price: float, photo_id: str) -> JSONResponse:
+    try:
+        result = await evaluate_via_identity(path, str(price))
+        if result is None:  # not one of the closed-catalog models — fall back
+            result = await evaluate_with_consensus_saas(path, str(price))
+        result["photo_id"] = photo_id
+        return JSONResponse(result)
+    except Exception as exc:
+        LOGGER.exception("web evaluate failed")
+        return JSONResponse(
+            {"status": "error", "message": str(exc), "photo_id": photo_id},
+            status_code=500,
+        )
+
+
 @app.post("/api/evaluate")
 async def evaluate(
     image: UploadFile = File(...),
     price: float = Form(...),
 ) -> JSONResponse:
-    path = f"/tmp/{uuid4().hex}.jpg"
-    try:
-        with open(path, "wb") as f:
-            f.write(await image.read())
-        result = await evaluate_with_consensus_saas(path, str(price))
-        return JSONResponse(result)
-    except Exception as exc:
-        LOGGER.exception("web evaluate failed")
-        return JSONResponse(
-            {"status": "error", "message": str(exc)},
-            status_code=500,
-        )
-    finally:
-        try:
-            os.remove(path)
-        except OSError:
-            pass
+    _sweep_expired_photos()
+    photo_id = uuid4().hex
+    path = PHOTO_DIR / f"{photo_id}.jpg"
+    with open(path, "wb") as f:
+        f.write(await image.read())
+    return await _run_pipeline(str(path), price, photo_id)
+
+
+@app.post("/api/retry")
+async def retry(
+    photo_id: str = Form(...),
+    price: float = Form(...),
+) -> JSONResponse:
+    path = _photo_path(photo_id)
+    if path is None or not path.is_file():
+        return JSONResponse({"status": "error", "message": "photo expired or not found"}, status_code=404)
+    os.utime(path, None)  # touch: keep alive through the sweep while retry is in flight
+    return await _run_pipeline(str(path), price, photo_id)

@@ -300,6 +300,7 @@
   <div class="result idle" id="result">Take a photo, enter a price.</div>
   <div class="post-buttons hidden" id="postButtons">
     <button class="log-buy hidden" id="logBuy">LOG BUY</button>
+    <button class="hidden" id="retry">RETRY</button>
     <button id="reprice">RE-PRICE</button>
     <button id="again">SCAN ANOTHER</button>
   </div>
@@ -321,6 +322,7 @@ const goBtn = document.getElementById('go');
 const resultEl = document.getElementById('result');
 const postButtons = document.getElementById('postButtons');
 const logBuyBtn = document.getElementById('logBuy');
+const retryBtn = document.getElementById('retry');
 const repriceBtn = document.getElementById('reprice');
 const againBtn = document.getElementById('again');
 
@@ -329,6 +331,7 @@ let busy = false;
 let extrasOpen = false;
 let lastPrice = '';
 let lastVerdict = null;
+let lastPhotoId = null;
 
 function getTotalPrice() {
   const base = parseFloat(priceInput.value) || 0;
@@ -412,12 +415,36 @@ goBtn.addEventListener('click', async () => {
     renderVerdict(data, price);
     postButtons.classList.remove('hidden');
   } catch (e) {
+    retryBtn.classList.add('hidden');  // network error before a server response — no photo_id to retry with
     showResult('err', 'Network error', String(e));
     postButtons.classList.remove('hidden');
   } finally {
     busy = false;
     goBtn.textContent = 'GO';
     refresh();
+  }
+});
+
+retryBtn.addEventListener('click', async () => {
+  if (!lastPhotoId) return;
+  const price = getTotalPrice();
+  retryBtn.disabled = true;
+  retryBtn.textContent = 'RETRYING…';
+  showResult('idle', 'Retrying…', '');
+
+  const fd = new FormData();
+  fd.append('photo_id', lastPhotoId);
+  fd.append('price', String(price));
+
+  try {
+    const res = await fetch('/api/retry', { method: 'POST', body: fd });
+    const data = await res.json();
+    renderVerdict(data, price);
+  } catch (e) {
+    showResult('err', 'Network error', String(e));
+  } finally {
+    retryBtn.disabled = false;
+    retryBtn.textContent = 'RETRY';
   }
 });
 
@@ -446,6 +473,7 @@ repriceBtn.addEventListener('click', () => {
   shippingInput.value = '';
   totalLine.classList.add('hidden');
   logBuyBtn.classList.add('hidden');
+  retryBtn.classList.add('hidden');
   resultEl.className = 'result idle';
   resultEl.textContent = 'Same photo — enter a new price.';
   postButtons.classList.add('hidden');
@@ -475,14 +503,24 @@ againBtn.addEventListener('click', () => {
   resultEl.className = 'result idle';
   resultEl.textContent = 'Take a photo, enter a price.';
   postButtons.classList.add('hidden');
+  retryBtn.classList.add('hidden');
+  lastPhotoId = null;
   refresh();
 });
 
 function renderVerdict(data, buyPrice) {
+  lastPhotoId = (data && data.photo_id) || null;
   if (!data || data.status !== 'success') {
+    // Pipeline died before caching anything (Gemini timeout, eBay fan-out
+    // failure) — retry re-runs for free-ish (md5 cache may still help) and
+    // is the whole point of keeping the photo. A MAYBE below is a completed
+    // run: retrying hits the vision md5 cache and returns the same MAYBE,
+    // which just looks broken — so retry is error-only, never offered there.
+    retryBtn.classList.toggle('hidden', !lastPhotoId);
     showResult('err', data && data.message ? data.message : 'No verdict', '');
     return;
   }
+  retryBtn.classList.add('hidden');
   const net = (data.sell_price_num - buyPrice).toFixed(2);
   const kind = verdictClass(data.verdict);
   if (kind === 'strong-buy' && navigator.vibrate) navigator.vibrate([500, 100, 500]);
