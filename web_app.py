@@ -19,7 +19,6 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 
 import database
 from navigation.router import router as nav_router
-from services.market.identity_evaluate import evaluate_via_identity
 from services.market.scout_async import evaluate_with_consensus_saas
 
 LOGGER = logging.getLogger(__name__)
@@ -130,9 +129,7 @@ async def log_buy(
 
 async def _run_pipeline(path: str, price: float, photo_id: str) -> JSONResponse:
     try:
-        result = await evaluate_via_identity(path, str(price))
-        if result is None:  # not one of the closed-catalog models — fall back
-            result = await evaluate_with_consensus_saas(path, str(price))
+        result = await evaluate_with_consensus_saas(path, str(price))
         result["photo_id"] = photo_id
         return JSONResponse(result)
     except Exception as exc:
